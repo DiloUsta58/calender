@@ -278,12 +278,9 @@ grid.addEventListener("click", (e) => {
   if (!cell) return;
 
   if (window.matchMedia("(max-width: 520px)").matches) {
-    const items = [...cell.querySelectorAll(".entry")]
-      .map(el => el.dataset.fullText || el.textContent || "")
-      .filter(Boolean);
-    if (items.length) {
-      showEntryOverlay(items.join("\n"));
-    }
+    // Mobile: empty area opens menu
+    grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
+    cell.classList.add("menu-open");
     return;
   }
 
