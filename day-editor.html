@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Ereignis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/day-editor.css">
+</head>
+<body>
+  <div class="editor">
+    <header class="editor-header">
+      <a class="btn ghost" href="index.html">Abbrechen</a>
+      <h1>Ereignis</h1>
+      <button id="saveBtn" class="btn primary" type="button">Fertig</button>
+    </header>
+
+    <section class="panel">
+      <label class="field">
+        <span id="titleLabel" class="label">Titel</span>
+        <input id="titleInput" type="text" placeholder="Titel">
+      </label>
+      <label id="locationField" class="field">
+        <span id="locationLabel" class="label">Ort</span>
+        <input id="locationInput" type="text" placeholder="Ort">
+      </label>
+    </section>
+
+    <section class="panel">
+      <div class="row">
+        <span class="label">Wiederholungen</span>
+        <select id="repeatInput">
+          <option value="none">Einmalig</option>
+          <option value="yearly">Jährlich</option>
+        </select>
+      </div>
+      <label class="row field-inline">
+        <span id="startLabel" class="label">Beginn</span>
+        <div class="inline-inputs">
+          <input id="startInput" type="date">
+          <input id="startTimeInput" type="time">
+        </div>
+      </label>
+      <div id="birthdayHint" class="hint">Bitte vollständiges Datum eingeben (TT.MM.JJJJ)</div>
+      <label id="endField" class="row field-inline">
+        <span id="endLabel" class="label">Ende</span>
+        <div class="inline-inputs">
+          <input id="endInput" type="date">
+          <input id="endTimeInput" type="time">
+        </div>
+      </label>
+      <label class="row field-inline">
+        <span class="label">Typ</span>
+        <select id="typeInput">
+          <option value="appointment">Termin</option>
+          <option value="birthday">Geburtstag</option>
+          <option value="shift">Schicht</option>
+          <option value="vacation">Urlaub</option>
+        </select>
+      </label>
+      <label class="row field-inline">
+        <span class="label">Farbe</span>
+        <div class="inline-inputs">
+          <select id="colorPreset">
+            <option value="#3b82f6">Blau</option>
+            <option value="#22c55e">Grün</option>
+            <option value="#ef4444">Rot</option>
+            <option value="#f97316">Orange</option>
+            <option value="#eab308">Gelb</option>
+            <option value="#8b5cf6">Violett</option>
+            <option value="#ec4899">Pink</option>
+            <option value="#14b8a6">Türkis</option>
+            <option value="#06b6d4">Cyan</option>
+            <option value="#a3e635">Limette</option>
+            <option value="custom">Custom (RGB)</option>
+          </select>
+          <input id="colorCustom" type="color" value="#3b82f6">
+        </div>
+      </label>
+    </section>
+
+    <section class="panel">
+      <label class="field">
+        <span class="label">Notizen</span>
+        <textarea id="notesInput" rows="4" placeholder="Notizen"></textarea>
+      </label>
+    </section>
+
+    <section class="panel danger">
+      <button id="deleteBtn" class="btn danger" type="button">Eintrag löschen</button>
+    </section>
+  </div>
+
+  <script src="js/day-editor.js"></script>
+</body>
+</html>

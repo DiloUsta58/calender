@@ -1,0 +1,218 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: #0f1115;
+  color: #e5e7eb;
+}
+
+.calendar {
+  max-width: 1200px;
+  margin: auto;
+  background: #161a22;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  padding: 16px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+  border-bottom: 1px solid #1f2937;
+  padding-bottom: 12px;
+}
+
+.calendar-header button {
+  padding: 6px 12px;
+  cursor: pointer;
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+.calendar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-menu {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1f2937;
+}
+
+.calendar-menu button {
+  padding: 6px 12px;
+  cursor: pointer;
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(110px, auto);
+  gap: 6px;
+}
+
+.day {
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #0f1115;
+}
+
+.day.today {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22,163,74,.2) inset;
+}
+
+.day.islamic-day {
+  border-color: #eab308;
+}
+
+.day.today .day-number {
+  background: #16a34a;
+  color: #fff;
+  border-radius: 999px;
+  display: inline-block;
+  padding: 2px 8px;
+}
+
+.day-number {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.day-weekday {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.day-menu {
+  display: none;
+  position: absolute;
+  top: 28px;
+  left: 6px;
+  right: 6px;
+  background: #161a22;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+  padding: 6px;
+  gap: 6px;
+  z-index: 5;
+}
+
+.day.menu-open .day-menu {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.day-menu .day-action {
+  border: 1px solid #1f2937;
+  background: #0f1115;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: left;
+  color: #e5e7eb;
+}
+
+.day-menu .day-action:hover {
+  background: #111827;
+}
+
+.day.saturday .day-number {
+  color: #2563eb;
+}
+
+.day.saturday .day-weekday {
+  color: #2563eb;
+}
+
+.day.sunday .day-number,
+.day.holiday-day .day-number,
+.day.sunday .day-weekday,
+.day.holiday-day .day-weekday {
+  color: #dc2626;
+}
+
+.entry {
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.entries {
+  margin-top: auto;
+}
+
+.appointment { background: #3b82f6; }
+.birthday    { background: #ec4899; }
+.shift       { background: #22c55e; }
+.holiday     { background: #ef4444; }
+.vacation    { background: #10b981; }
+.islamic-holiday {
+  background: #ef4444;
+  border: 1px solid #eab308;
+}
+
+@media print {
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .calendar {
+    box-shadow: none;
+  }
+
+  .calendar-header button {
+    display: none;
+  }
+
+  .entry {
+    color: #000 !important;
+    background: #ddd !important;
+  }
+}
+

@@ -1,0 +1,346 @@
+const HOLIDAYS = {
+  DE: (year) => [
+    { date: `${year}-01-01`, name: "Neujahr" },
+    { date: `${year}-05-01`, name: "Tag der Arbeit" },
+    { date: `${year}-10-03`, name: "Tag der Einheit" },
+    { date: `${year}-12-25`, name: "1. Weihnachtstag" },
+    { date: `${year}-12-26`, name: "2. Weihnachtstag" }
+  ],
+  TR: (year) => [
+    { date: `${year}-04-23`, name: "Ulusal Egemenlik" },
+    { date: `${year}-05-19`, name: "Atatürk Günü" },
+    { date: `${year}-08-30`, name: "Zafer Bayramı" },
+    { date: `${year}-10-29`, name: "Cumhuriyet Bayramı" }
+  ]
+};
+
+
+const EVENTS_KEY = "calendar_events";
+const ISLAMIC_KEY = "calendar_islamic_holidays";
+
+let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
+  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
+  { date: "2026-02-14", type: "birthday", title: "Mama 🎂" }
+];
+
+function saveEvents() {
+  localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+}
+
+// Initialisierung
+const grid = document.querySelector(".calendar-grid");
+const monthLabel = document.getElementById("monthLabel");
+
+let currentDate = new Date();
+let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
+
+function renderCalendar(date) {
+
+  // alte Tage/Platzhalter löschen (Wochentage bleiben)
+  grid.querySelectorAll(".day, .pad").forEach(d => d.remove());
+
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  monthLabel.textContent =
+    date.toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay  = new Date(year, month + 1, 0);
+
+  // Montag = 0
+  const startOffset = (firstDay.getDay() + 6) % 7;
+
+  // Leere Felder vor Monatsstart
+  for (let i = 0; i < startOffset; i++) {
+    const pad = document.createElement("div");
+    pad.className = "pad";
+    grid.appendChild(pad);
+  }
+
+  const holidayList = [
+    ...HOLIDAYS.DE(year),
+    ...HOLIDAYS.TR(year)
+  ];
+
+  // Tage erzeugen
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+    const cell = document.createElement("div");
+    cell.className = "day";
+    cell.dataset.date = iso;
+    if (iso === new Date().toISOString().slice(0, 10)) {
+      cell.classList.add("today");
+    }
+    const dayOfWeek = new Date(year, month, day).getDay(); // 0=So, 6=Sa
+    if (dayOfWeek === 6) cell.classList.add("saturday");
+    if (dayOfWeek === 0) cell.classList.add("sunday");
+
+    const dayMenu = document.createElement("div");
+    dayMenu.className = "day-menu";
+    dayMenu.innerHTML = `
+      <button class="day-action" data-type="appointment">Termin</button>
+      <button class="day-action" data-type="birthday">Geburtstag</button>
+      <button class="day-action" data-type="shift">Schicht</button>
+      <button class="day-action" data-type="vacation">Urlaub</button>
+    `;
+
+    const entries = document.createElement("div");
+    entries.className = "entries";
+
+    let isHoliday = false;
+
+    events
+      .filter(e => eventMatchesDate(e, year, month + 1, day, iso))
+      .forEach(e => {
+        const eventIndex = events.indexOf(e);
+        const timeLabel = e.type === "birthday"
+          ? ""
+          : (e.startTime && e.endTime ? `${e.startTime}–${e.endTime} ` : (e.startTime ? `${e.startTime} ` : ""));
+        const titleLabel = e.type === "birthday"
+          ? formatBirthdayTitle(e, year)
+          : formatRangeTitle(e);
+        const bg = e.color || "";
+        const fg = bg ? getContrastColor(bg) : "";
+        const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
+        entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" title="Klicken zum Bearbeiten"${colorStyle}>${timeLabel}${titleLabel}</div>`;
+      });
+
+    holidayList
+      .filter(h => h.date === iso)
+      .forEach(h => {
+        isHoliday = true;
+        entries.innerHTML += `<div class="entry holiday">${h.name}</div>`;
+      });
+
+    if (includeIslamic) {
+      const islamicEntries = getIslamicHolidaysForDate(year, month + 1, day);
+      if (islamicEntries.length) {
+        isHoliday = true;
+        cell.classList.add("islamic-day");
+        islamicEntries.forEach(name => {
+          entries.innerHTML += `<div class="entry holiday islamic-holiday">${name}</div>`;
+        });
+      }
+    }
+
+    if (isHoliday) cell.classList.add("holiday-day");
+
+    const weekdayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+    const weekdayIndex = (dayOfWeek + 6) % 7; // Monday=0
+
+    cell.innerHTML = `
+      <div class="day-head">
+        <div class="day-weekday">${weekdayNames[weekdayIndex]}</div>
+        <div class="day-number">${day}</div>
+      </div>
+    `;
+    cell.appendChild(dayMenu);
+    cell.appendChild(entries);
+    grid.appendChild(cell);
+  }
+}
+
+// Navigation
+document.getElementById("prevMonth").onclick = () => {
+  currentDate.setMonth(currentDate.getMonth() - 1);
+  renderCalendar(currentDate);
+};
+
+document.getElementById("nextMonth").onclick = () => {
+  currentDate.setMonth(currentDate.getMonth() + 1);
+  renderCalendar(currentDate);
+};
+
+document.getElementById("todayBtn").onclick = () => {
+  const today = new Date();
+  currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  renderCalendar(today);
+};
+
+document.getElementById("addAppointment").onclick = () => {
+  const date = prompt("Datum (YYYY-MM-DD):");
+  if (!date) return;
+  window.location.href = `day-editor.html?date=${date}&type=appointment`;
+};
+
+document.getElementById("addBirthday").onclick = () => {
+  const date = prompt("Datum (YYYY-MM-DD):");
+  if (!date) return;
+  window.location.href = `day-editor.html?date=${date}&type=birthday`;
+};
+
+document.getElementById("addShift").onclick = () => {
+  const date = prompt("Datum (YYYY-MM-DD):");
+  if (!date) return;
+  window.location.href = `day-editor.html?date=${date}&type=shift`;
+};
+
+grid.addEventListener("click", (e) => {
+  const entry = e.target.closest(".entry");
+  if (entry && !entry.classList.contains("holiday")) {
+    const index = entry.dataset.index;
+    window.location.href = `day-editor.html?index=${index}`;
+    return;
+  }
+
+  const action = e.target.closest(".day-action");
+  if (action) {
+    const cell = action.closest(".day");
+    const date = cell?.dataset.date;
+    if (!date) return;
+    const type = action.dataset.type;
+    window.location.href = `day-editor.html?date=${date}&type=${type}`;
+    cell?.classList.remove("menu-open");
+    return;
+  }
+
+  const cell = e.target.closest(".day");
+  if (!cell) return;
+
+  grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
+  cell.classList.add("menu-open");
+});
+
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".day")) return;
+  grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
+});
+
+renderCalendar(currentDate);
+
+const islamicToggle = document.getElementById("toggleIslamic");
+if (islamicToggle) {
+  islamicToggle.checked = includeIslamic;
+  islamicToggle.addEventListener("change", () => {
+    includeIslamic = islamicToggle.checked;
+    localStorage.setItem(ISLAMIC_KEY, JSON.stringify(includeIslamic));
+    renderCalendar(currentDate);
+  });
+}
+
+function gregorianToJD(y, m, d) {
+  if (m <= 2) {
+    y -= 1;
+    m += 12;
+  }
+  const a = Math.floor(y / 100);
+  const b = 2 - a + Math.floor(a / 4);
+  return Math.floor(365.25 * (y + 4716))
+    + Math.floor(30.6001 * (m + 1))
+    + d + b - 1524.5;
+}
+
+function islamicToJD(y, m, d) {
+  return d
+    + Math.ceil(29.5 * (m - 1))
+    + (y - 1) * 354
+    + Math.floor((3 + 11 * y) / 30)
+    + 1948439.5 - 1;
+}
+
+function jdToIslamic(jd) {
+  jd = Math.floor(jd) + 0.5;
+  const year = Math.floor((30 * (jd - 1948439.5) + 10646) / 10631);
+  const month = Math.min(12, Math.ceil((jd - 29 - islamicToJD(year, 1, 1)) / 29.5) + 1);
+  const day = Math.floor(jd - islamicToJD(year, month, 1) + 1);
+  return { year, month, day };
+}
+
+function gregorianToIslamic(y, m, d) {
+  const jd = gregorianToJD(y, m, d);
+  return jdToIslamic(jd);
+}
+
+function getIslamicHolidaysForDate(y, m, d) {
+  const { month, day } = gregorianToIslamic(y, m, d);
+  const result = [];
+  if (month === 10 && day >= 1 && day <= 3) {
+    result.push(`Ramazan Bayramı (${day}. gün)`);
+  }
+  if (month === 12 && day >= 10 && day <= 12) {
+    result.push(`Kurban Bayramı (${day - 9}. gün)`);
+  }
+  return result;
+}
+
+function eventMatchesDate(e, year, month, day, iso) {
+  if (e.type !== "birthday") {
+    return isDateInRange(iso, e.date, e.endDate);
+  }
+  if (!e.date) return false;
+  const birth = parseDateSafe(e.date);
+  if (!birth) return false;
+  const birthMonth = birth.getMonth() + 1;
+  const birthDay = birth.getDate();
+  const isSameMonthDay = birthMonth === month && birthDay === day;
+  if (e.repeat === "yearly") {
+    return isSameMonthDay;
+  }
+  if (e.repeat === "once") {
+    const onceYear = Number(e.repeatYear);
+    const targetYear = Number.isFinite(onceYear) && onceYear > 0 ? onceYear : birth.getFullYear();
+    return isSameMonthDay && targetYear === year;
+  }
+  return false;
+}
+
+function formatBirthdayTitle(e, year) {
+  const birth = parseDateSafe(e.date);
+  const age = birth ? (year - birth.getFullYear()) : NaN;
+  const name = e.title || "Geburtstag";
+  if (Number.isFinite(age) && age > 0) {
+    return `${name} (${age}. Geburtstag)`;
+  }
+  return name;
+}
+
+function formatRangeTitle(e) {
+  if (!e.endDate || e.endDate === e.date) return e.title;
+  const start = parseDateSafe(e.date);
+  const end = parseDateSafe(e.endDate);
+  if (!start || !end) return e.title;
+  return `${e.title} (${formatDateShort(start)}–${formatDateShort(end)})`;
+}
+
+function isDateInRange(isoDate, startDate, endDate) {
+  const current = parseDateSafe(isoDate);
+  const start = parseDateSafe(startDate);
+  const end = parseDateSafe(endDate || startDate);
+  if (!current || !start || !end) return false;
+  const cur = current.setHours(0, 0, 0, 0);
+  const s = start.setHours(0, 0, 0, 0);
+  const e = end.setHours(0, 0, 0, 0);
+  return cur >= s && cur <= e;
+}
+
+function formatDateShort(d) {
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${day}.${month}`;
+}
+
+function getContrastColor(hex) {
+  const c = hex.replace("#", "");
+  if (c.length !== 6) return "#fff";
+  const r = parseInt(c.slice(0, 2), 16);
+  const g = parseInt(c.slice(2, 4), 16);
+  const b = parseInt(c.slice(4, 6), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 140 ? "#111" : "#fff";
+}
+
+function parseDateSafe(value) {
+  if (!value) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y, m, d] = value.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  if (/^\d{2}\.\d{2}\.\d{4}$/.test(value)) {
+    const [d, m, y] = value.split(".").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
