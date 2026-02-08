@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Kalender+</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="calendar">
+
+  <header class="calendar-header">
+    <button id="prevMonth">◀</button>
+    <h2 id="monthLabel"></h2>
+    <div class="calendar-actions">
+      <button id="todayBtn">Heute</button>
+      <button id="nextMonth">▶</button>
+    </div>
+  </header>
+
+  <div class="calendar-menu">
+    <button id="addAppointment">Termin hinzufügen</button>
+    <button id="addBirthday">Geburtstag hinzufügen</button>
+    <button id="addShift">Schichtplan ändern/hinzufügen</button>
+    <label class="menu-toggle">
+      <input type="checkbox" id="toggleIslamic">
+      Islamische Feiertage
+    </label>
+  </div>
+
+  <div class="calendar-grid">
+    <!-- Tage werden per JS erzeugt -->
+
+  </div>
+</div>
+
+<script src="js/calender.js"></script>
+</body>
+</html>
