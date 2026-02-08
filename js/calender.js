@@ -19,7 +19,7 @@ const EVENTS_KEY = "calendar_events";
 const ISLAMIC_KEY = "calendar_islamic_holidays";
 const GERMAN_KEY = "calendar_german_holidays";
 const TURKISH_KEY = "calendar_turkish_holidays";
-const APP_VERSION = "1.0.1";
+const APP_VERSION = "1.0.2";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
   { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -277,10 +277,18 @@ grid.addEventListener("click", (e) => {
   const cell = e.target.closest(".day");
   if (!cell) return;
 
-  if (!window.matchMedia("(max-width: 520px)").matches) {
-    grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
-    cell.classList.add("menu-open");
+  if (window.matchMedia("(max-width: 520px)").matches) {
+    const items = [...cell.querySelectorAll(".entry")]
+      .map(el => el.dataset.fullText || el.textContent || "")
+      .filter(Boolean);
+    if (items.length) {
+      showEntryOverlay(items.join("\n"));
+    }
+    return;
   }
+
+  grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
+  cell.classList.add("menu-open");
 });
 
 document.addEventListener("click", (e) => {
