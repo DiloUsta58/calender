@@ -277,8 +277,10 @@ grid.addEventListener("click", (e) => {
   const cell = e.target.closest(".day");
   if (!cell) return;
 
-  grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
-  cell.classList.add("menu-open");
+  if (!window.matchMedia("(max-width: 520px)").matches) {
+    grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
+    cell.classList.add("menu-open");
+  }
 });
 
 document.addEventListener("click", (e) => {
