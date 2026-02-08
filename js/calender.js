@@ -250,15 +250,17 @@ document.getElementById("todayBtn").onclick = () => {
 
 grid.addEventListener("click", (e) => {
   const entry = e.target.closest(".entry");
-  if (entry && !entry.classList.contains("holiday")) {
+  if (entry) {
     if (window.matchMedia("(max-width: 520px)").matches) {
       const text = entry.dataset.fullText || entry.textContent || "";
       showEntryOverlay(text);
       return;
     }
-    const index = entry.dataset.index;
-    window.location.href = `day-editor.html?index=${index}`;
-    return;
+    if (!entry.classList.contains("holiday")) {
+      const index = entry.dataset.index;
+      window.location.href = `day-editor.html?index=${index}`;
+      return;
+    }
   }
 
   const action = e.target.closest(".day-action");
