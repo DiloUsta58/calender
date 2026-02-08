@@ -17,7 +17,9 @@ const HOLIDAYS = {
 
 const EVENTS_KEY = "calendar_events";
 const ISLAMIC_KEY = "calendar_islamic_holidays";
-const APP_VERSION = "1.0.0";
+const GERMAN_KEY = "calendar_german_holidays";
+const TURKISH_KEY = "calendar_turkish_holidays";
+const APP_VERSION = "1.0.1";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
   { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -42,6 +44,8 @@ const versionLabel = document.getElementById("versionLabel");
 
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
+let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
+let includeTurkish = JSON.parse(localStorage.getItem(TURKISH_KEY)) ?? true;
 
 const MONTH_NAMES = [
   "Januar", "Februar", "März", "April", "Mai", "Juni",
@@ -189,8 +193,8 @@ function buildDayCell(cellDate, inCurrentMonth) {
     });
 
   const holidayList = [
-    ...HOLIDAYS.DE(year),
-    ...HOLIDAYS.TR(year)
+    ...(includeGerman ? HOLIDAYS.DE(year) : []),
+    ...(includeTurkish ? HOLIDAYS.TR(year) : [])
   ];
 
   holidayList
@@ -316,6 +320,26 @@ if (islamicToggle) {
   islamicToggle.addEventListener("change", () => {
     includeIslamic = islamicToggle.checked;
     localStorage.setItem(ISLAMIC_KEY, JSON.stringify(includeIslamic));
+    renderCalendar(currentDate);
+  });
+}
+
+const germanToggle = document.getElementById("toggleGerman");
+if (germanToggle) {
+  germanToggle.checked = includeGerman;
+  germanToggle.addEventListener("change", () => {
+    includeGerman = germanToggle.checked;
+    localStorage.setItem(GERMAN_KEY, JSON.stringify(includeGerman));
+    renderCalendar(currentDate);
+  });
+}
+
+const turkishToggle = document.getElementById("toggleTurkish");
+if (turkishToggle) {
+  turkishToggle.checked = includeTurkish;
+  turkishToggle.addEventListener("change", () => {
+    includeTurkish = turkishToggle.checked;
+    localStorage.setItem(TURKISH_KEY, JSON.stringify(includeTurkish));
     renderCalendar(currentDate);
   });
 }
