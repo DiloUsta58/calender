@@ -30,116 +30,195 @@ function saveEvents() {
 // Initialisierung
 const grid = document.querySelector(".calendar-grid");
 const monthLabel = document.getElementById("monthLabel");
+const monthSelect = document.getElementById("monthSelect");
+const yearSelect = document.getElementById("yearSelect");
+const toggleMonthPicker = document.getElementById("toggleMonthPicker");
+const calendarRoot = document.querySelector(".calendar");
 
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
 
+const MONTH_NAMES = [
+  "Januar", "Februar", "März", "April", "Mai", "Juni",
+  "Juli", "August", "September", "Oktober", "November", "Dezember"
+];
+
+function setupMonthPicker() {
+  if (!monthSelect || !yearSelect) return;
+  monthSelect.innerHTML = MONTH_NAMES
+    .map((name, i) => `<option value="${i}">${name}</option>`)
+    .join("");
+
+  const currentYear = new Date().getFullYear();
+  const startYear = currentYear - 5;
+  const endYear = currentYear + 5;
+  const years = [];
+  for (let y = startYear; y <= endYear; y++) years.push(y);
+  yearSelect.innerHTML = years
+    .map(y => `<option value="${y}">${y}</option>`)
+    .join("");
+
+  monthSelect.addEventListener("change", () => {
+    const m = Number(monthSelect.value);
+    const y = Number(yearSelect.value);
+    currentDate = new Date(y, m, 1);
+    renderCalendar(currentDate);
+  });
+
+  yearSelect.addEventListener("change", () => {
+    const m = Number(monthSelect.value);
+    const y = Number(yearSelect.value);
+    currentDate = new Date(y, m, 1);
+    renderCalendar(currentDate);
+  });
+}
+
 function renderCalendar(date) {
 
   // alte Tage/Platzhalter löschen (Wochentage bleiben)
-  grid.querySelectorAll(".day, .pad").forEach(d => d.remove());
+  grid.querySelectorAll(".day, .pad, .week-number").forEach(d => d.remove());
 
   const year = date.getFullYear();
   const month = date.getMonth();
 
   monthLabel.textContent =
     date.toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+  if (monthSelect && yearSelect) {
+    monthSelect.value = String(month);
+    yearSelect.value = String(year);
+  }
 
   const firstDay = new Date(year, month, 1);
   const lastDay  = new Date(year, month + 1, 0);
+  const prevLastDay = new Date(year, month, 0);
 
   // Montag = 0
   const startOffset = (firstDay.getDay() + 6) % 7;
 
-  // Leere Felder vor Monatsstart
-  for (let i = 0; i < startOffset; i++) {
-    const pad = document.createElement("div");
-    pad.className = "pad";
-    grid.appendChild(pad);
+  const totalDays = lastDay.getDate();
+  const totalCells = startOffset + totalDays;
+  const endPad = (7 - (totalCells % 7)) % 7;
+  const weeks = (totalCells + endPad) / 7;
+
+  let currentDay = 1;
+  let nextMonthDay = 1;
+
+  for (let w = 0; w < weeks; w++) {
+    const weekStartDate = new Date(year, month, 1 - startOffset + (w * 7));
+    const weekNumber = getISOWeek(weekStartDate);
+    const weekCell = document.createElement("div");
+    weekCell.className = "week-number";
+    weekCell.textContent = weekNumber;
+    grid.appendChild(weekCell);
+
+    for (let d = 0; d < 7; d++) {
+      const cellIndex = w * 7 + d;
+      let cellDate;
+      let inCurrentMonth = true;
+
+      if (cellIndex < startOffset) {
+        const dayNum = prevLastDay.getDate() - (startOffset - 1 - cellIndex);
+        cellDate = new Date(year, month - 1, dayNum);
+        inCurrentMonth = false;
+      } else if (currentDay <= totalDays) {
+        cellDate = new Date(year, month, currentDay);
+        currentDay++;
+      } else {
+        cellDate = new Date(year, month + 1, nextMonthDay);
+        nextMonthDay++;
+        inCurrentMonth = false;
+      }
+
+      const cell = buildDayCell(cellDate, inCurrentMonth);
+      grid.appendChild(cell);
+    }
   }
+}
+
+function buildDayCell(cellDate, inCurrentMonth) {
+  const year = cellDate.getFullYear();
+  const month = cellDate.getMonth();
+  const day = cellDate.getDate();
+  const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+  const cell = document.createElement("div");
+  cell.className = "day";
+  cell.dataset.date = iso;
+  if (!inCurrentMonth) cell.classList.add("other-month");
+  if (iso === new Date().toISOString().slice(0, 10)) {
+    cell.classList.add("today");
+  }
+  const dayOfWeek = cellDate.getDay(); // 0=So, 6=Sa
+  if (dayOfWeek === 6) cell.classList.add("saturday");
+  if (dayOfWeek === 0) cell.classList.add("sunday");
+
+  const dayMenu = document.createElement("div");
+  dayMenu.className = "day-menu";
+  dayMenu.innerHTML = `
+    <button class="day-action" data-type="appointment">Termin</button>
+    <button class="day-action" data-type="birthday">Geburtstag</button>
+    <button class="day-action" data-type="shift">Schicht</button>
+    <button class="day-action" data-type="vacation">Urlaub</button>
+  `;
+
+  const entries = document.createElement("div");
+  entries.className = "entries";
+
+  let isHoliday = false;
+
+  events
+    .filter(e => eventMatchesDate(e, year, month + 1, day, iso))
+    .forEach(e => {
+      const eventIndex = events.indexOf(e);
+      const timeLabel = e.type === "birthday"
+        ? ""
+        : (e.startTime && e.endTime ? `${e.startTime}–${e.endTime} ` : (e.startTime ? `${e.startTime} ` : ""));
+      const titleLabel = e.type === "birthday"
+        ? formatBirthdayTitle(e, year)
+        : formatRangeTitle(e);
+      const bg = e.color || "";
+      const fg = bg ? getContrastColor(bg) : "";
+      const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
+      entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" title="Klicken zum Bearbeiten"${colorStyle}>${timeLabel}${titleLabel}</div>`;
+    });
 
   const holidayList = [
     ...HOLIDAYS.DE(year),
     ...HOLIDAYS.TR(year)
   ];
 
-  // Tage erzeugen
-  for (let day = 1; day <= lastDay.getDate(); day++) {
-    const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  holidayList
+    .filter(h => h.date === iso)
+    .forEach(h => {
+      isHoliday = true;
+      entries.innerHTML += `<div class="entry holiday">${h.name}</div>`;
+    });
 
-    const cell = document.createElement("div");
-    cell.className = "day";
-    cell.dataset.date = iso;
-    if (iso === new Date().toISOString().slice(0, 10)) {
-      cell.classList.add("today");
-    }
-    const dayOfWeek = new Date(year, month, day).getDay(); // 0=So, 6=Sa
-    if (dayOfWeek === 6) cell.classList.add("saturday");
-    if (dayOfWeek === 0) cell.classList.add("sunday");
-
-    const dayMenu = document.createElement("div");
-    dayMenu.className = "day-menu";
-    dayMenu.innerHTML = `
-      <button class="day-action" data-type="appointment">Termin</button>
-      <button class="day-action" data-type="birthday">Geburtstag</button>
-      <button class="day-action" data-type="shift">Schicht</button>
-      <button class="day-action" data-type="vacation">Urlaub</button>
-    `;
-
-    const entries = document.createElement("div");
-    entries.className = "entries";
-
-    let isHoliday = false;
-
-    events
-      .filter(e => eventMatchesDate(e, year, month + 1, day, iso))
-      .forEach(e => {
-        const eventIndex = events.indexOf(e);
-        const timeLabel = e.type === "birthday"
-          ? ""
-          : (e.startTime && e.endTime ? `${e.startTime}–${e.endTime} ` : (e.startTime ? `${e.startTime} ` : ""));
-        const titleLabel = e.type === "birthday"
-          ? formatBirthdayTitle(e, year)
-          : formatRangeTitle(e);
-        const bg = e.color || "";
-        const fg = bg ? getContrastColor(bg) : "";
-        const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
-        entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" title="Klicken zum Bearbeiten"${colorStyle}>${timeLabel}${titleLabel}</div>`;
+  if (includeIslamic) {
+    const islamicEntries = getIslamicHolidaysForDate(year, month + 1, day);
+    if (islamicEntries.length) {
+      isHoliday = true;
+      cell.classList.add("islamic-day");
+      islamicEntries.forEach(name => {
+        entries.innerHTML += `<div class="entry holiday islamic-holiday">${name}</div>`;
       });
-
-    holidayList
-      .filter(h => h.date === iso)
-      .forEach(h => {
-        isHoliday = true;
-        entries.innerHTML += `<div class="entry holiday">${h.name}</div>`;
-      });
-
-    if (includeIslamic) {
-      const islamicEntries = getIslamicHolidaysForDate(year, month + 1, day);
-      if (islamicEntries.length) {
-        isHoliday = true;
-        cell.classList.add("islamic-day");
-        islamicEntries.forEach(name => {
-          entries.innerHTML += `<div class="entry holiday islamic-holiday">${name}</div>`;
-        });
-      }
     }
-
-    if (isHoliday) cell.classList.add("holiday-day");
-
-    const weekdayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
-    const weekdayIndex = (dayOfWeek + 6) % 7; // Monday=0
-
-    cell.innerHTML = `
-      <div class="day-head">
-        <div class="day-weekday">${weekdayNames[weekdayIndex]}</div>
-        <div class="day-number">${day}</div>
-      </div>
-    `;
-    cell.appendChild(dayMenu);
-    cell.appendChild(entries);
-    grid.appendChild(cell);
   }
+
+  if (isHoliday) cell.classList.add("holiday-day");
+
+  const weekdayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+  const weekdayIndex = (dayOfWeek + 6) % 7; // Monday=0
+
+  cell.innerHTML = `
+    <div class="day-head">
+      <div class="day-weekday">${weekdayNames[weekdayIndex]}</div>
+      <div class="day-number">${day}</div>
+    </div>
+  `;
+  cell.appendChild(dayMenu);
+  cell.appendChild(entries);
+  return cell;
 }
 
 // Navigation
@@ -157,24 +236,6 @@ document.getElementById("todayBtn").onclick = () => {
   const today = new Date();
   currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
   renderCalendar(today);
-};
-
-document.getElementById("addAppointment").onclick = () => {
-  const date = prompt("Datum (YYYY-MM-DD):");
-  if (!date) return;
-  window.location.href = `day-editor.html?date=${date}&type=appointment`;
-};
-
-document.getElementById("addBirthday").onclick = () => {
-  const date = prompt("Datum (YYYY-MM-DD):");
-  if (!date) return;
-  window.location.href = `day-editor.html?date=${date}&type=birthday`;
-};
-
-document.getElementById("addShift").onclick = () => {
-  const date = prompt("Datum (YYYY-MM-DD):");
-  if (!date) return;
-  window.location.href = `day-editor.html?date=${date}&type=shift`;
 };
 
 grid.addEventListener("click", (e) => {
@@ -209,6 +270,13 @@ document.addEventListener("click", (e) => {
 });
 
 renderCalendar(currentDate);
+setupMonthPicker();
+
+if (toggleMonthPicker && calendarRoot) {
+  toggleMonthPicker.addEventListener("click", () => {
+    calendarRoot.classList.toggle("show-month-controls");
+  });
+}
 
 const islamicToggle = document.getElementById("toggleIslamic");
 if (islamicToggle) {
@@ -263,6 +331,14 @@ function getIslamicHolidaysForDate(y, m, d) {
     result.push(`Kurban Bayramı (${day - 9}. gün)`);
   }
   return result;
+}
+
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
 function eventMatchesDate(e, year, month, day, iso) {

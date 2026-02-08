@@ -11,18 +11,22 @@
 <div class="calendar">
 
   <header class="calendar-header">
-    <button id="prevMonth">◀</button>
-    <h2 id="monthLabel"></h2>
+    <div class="month-picker">
+      <h2 id="monthLabel"></h2>
+      <button id="toggleMonthPicker" class="compact-toggle" type="button">Monat wählen</button>
+      <div class="month-controls">
+        <select id="monthSelect"></select>
+        <select id="yearSelect"></select>
+      </div>
+    </div>
     <div class="calendar-actions">
+      <button id="prevMonth">◀</button>
       <button id="todayBtn">Heute</button>
       <button id="nextMonth">▶</button>
     </div>
   </header>
 
   <div class="calendar-menu">
-    <button id="addAppointment">Termin hinzufügen</button>
-    <button id="addBirthday">Geburtstag hinzufügen</button>
-    <button id="addShift">Schichtplan ändern/hinzufügen</button>
     <label class="menu-toggle">
       <input type="checkbox" id="toggleIslamic">
       Islamische Feiertage
