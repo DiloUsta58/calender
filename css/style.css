@@ -302,6 +302,15 @@ body {
   white-space: pre-wrap;
 }
 
+.calendar-footer {
+  margin: 12px auto 0;
+  max-width: 1200px;
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  padding-bottom: 12px;
+}
+
 @media (max-width: 1100px) {
   body { padding: 12px; }
   .calendar { padding: 12px; }

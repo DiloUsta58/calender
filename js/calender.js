@@ -17,6 +17,7 @@ const HOLIDAYS = {
 
 const EVENTS_KEY = "calendar_events";
 const ISLAMIC_KEY = "calendar_islamic_holidays";
+const APP_VERSION = "1.0.0";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
   { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -37,6 +38,7 @@ const calendarRoot = document.querySelector(".calendar");
 const entryOverlay = document.getElementById("entryOverlay");
 const overlayBody = document.getElementById("overlayBody");
 const overlayClose = document.getElementById("overlayClose");
+const versionLabel = document.getElementById("versionLabel");
 
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
@@ -280,6 +282,9 @@ document.addEventListener("click", (e) => {
 
 renderCalendar(currentDate);
 setupMonthPicker();
+if (versionLabel) {
+  versionLabel.textContent = `v${APP_VERSION}`;
+}
 
 if (toggleMonthPicker && calendarRoot) {
   toggleMonthPicker.addEventListener("click", () => {
