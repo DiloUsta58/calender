@@ -34,6 +34,9 @@ const monthSelect = document.getElementById("monthSelect");
 const yearSelect = document.getElementById("yearSelect");
 const toggleMonthPicker = document.getElementById("toggleMonthPicker");
 const calendarRoot = document.querySelector(".calendar");
+const entryOverlay = document.getElementById("entryOverlay");
+const overlayBody = document.getElementById("overlayBody");
+const overlayClose = document.getElementById("overlayClose");
 
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
@@ -179,7 +182,8 @@ function buildDayCell(cellDate, inCurrentMonth) {
       const bg = e.color || "";
       const fg = bg ? getContrastColor(bg) : "";
       const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
-      entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" title="Klicken zum Bearbeiten"${colorStyle}>${timeLabel}${titleLabel}</div>`;
+      const fullText = `${timeLabel}${titleLabel}`;
+      entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="Klicken zum Bearbeiten"${colorStyle}>${fullText}</div>`;
     });
 
   const holidayList = [
@@ -241,6 +245,11 @@ document.getElementById("todayBtn").onclick = () => {
 grid.addEventListener("click", (e) => {
   const entry = e.target.closest(".entry");
   if (entry && !entry.classList.contains("holiday")) {
+    if (window.matchMedia("(max-width: 520px)").matches) {
+      const text = entry.dataset.fullText || entry.textContent || "";
+      showEntryOverlay(text);
+      return;
+    }
     const index = entry.dataset.index;
     window.location.href = `day-editor.html?index=${index}`;
     return;
@@ -277,6 +286,24 @@ if (toggleMonthPicker && calendarRoot) {
     calendarRoot.classList.toggle("show-month-controls");
   });
 }
+
+function showEntryOverlay(text) {
+  if (!entryOverlay || !overlayBody) return;
+  overlayBody.textContent = text;
+  entryOverlay.classList.add("show");
+  entryOverlay.setAttribute("aria-hidden", "false");
+}
+
+function hideEntryOverlay() {
+  if (!entryOverlay) return;
+  entryOverlay.classList.remove("show");
+  entryOverlay.setAttribute("aria-hidden", "true");
+}
+
+overlayClose?.addEventListener("click", hideEntryOverlay);
+entryOverlay?.addEventListener("click", (e) => {
+  if (e.target === entryOverlay) hideEntryOverlay();
+});
 
 const islamicToggle = document.getElementById("toggleIslamic");
 if (islamicToggle) {

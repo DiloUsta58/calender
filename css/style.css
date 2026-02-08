@@ -247,6 +247,57 @@ body {
   border: 1px solid #eab308;
 }
 
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 12, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+}
+
+.overlay.show {
+  display: flex;
+}
+
+.overlay-card {
+  width: min(520px, 100%);
+  background: #161a22;
+  border: 1px solid #1f2937;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.45);
+}
+
+.overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #1f2937;
+}
+
+.overlay-title {
+  font-weight: 600;
+}
+
+.overlay-close {
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.overlay-body {
+  padding: 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
 @media (max-width: 1100px) {
   body { padding: 12px; }
   .calendar { padding: 12px; }
@@ -292,6 +343,7 @@ body {
   .day-head { margin-bottom: 3px; }
   .day-weekday { font-size: 10px; }
   .day-number { font-size: 12px; }
+  .entry { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 
 @media (max-width: 400px) {
