@@ -19,7 +19,8 @@ const EVENTS_KEY = "calendar_events";
 const ISLAMIC_KEY = "calendar_islamic_holidays";
 const GERMAN_KEY = "calendar_german_holidays";
 const TURKISH_KEY = "calendar_turkish_holidays";
-const APP_VERSION = "1.0.2";
+const SHIFT_KEY = "calendar_shift_plan";
+const APP_VERSION = "1.0.3";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
   { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -40,12 +41,17 @@ const calendarRoot = document.querySelector(".calendar");
 const entryOverlay = document.getElementById("entryOverlay");
 const overlayBody = document.getElementById("overlayBody");
 const overlayClose = document.getElementById("overlayClose");
+const overlayTitle = document.getElementById("overlayTitle");
+const overlayAdd = document.getElementById("overlayAdd");
+const overlayAddMenu = document.getElementById("overlayAddMenu");
+const overlayCard = entryOverlay?.querySelector(".overlay-card");
 const versionLabel = document.getElementById("versionLabel");
 
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
 let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
 let includeTurkish = JSON.parse(localStorage.getItem(TURKISH_KEY)) ?? true;
+let shiftPlan = JSON.parse(localStorage.getItem(SHIFT_KEY)) || null;
 
 const MONTH_NAMES = [
   "Januar", "Februar", "März", "April", "Mai", "Juni",
@@ -161,19 +167,18 @@ function buildDayCell(cellDate, inCurrentMonth) {
   if (dayOfWeek === 6) cell.classList.add("saturday");
   if (dayOfWeek === 0) cell.classList.add("sunday");
 
-  const dayMenu = document.createElement("div");
-  dayMenu.className = "day-menu";
-  dayMenu.innerHTML = `
-    <button class="day-action" data-type="appointment">Termin</button>
-    <button class="day-action" data-type="birthday">Geburtstag</button>
-    <button class="day-action" data-type="shift">Schicht</button>
-    <button class="day-action" data-type="vacation">Urlaub</button>
-  `;
-
   const entries = document.createElement("div");
   entries.className = "entries";
 
   let isHoliday = false;
+
+  const shiftEntry = getShiftEntryForDate(year, month + 1, day);
+  if (shiftEntry) {
+    const bg = shiftEntry.color || "";
+    const fg = bg ? getContrastColor(bg) : "";
+    const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
+    entries.innerHTML += `<div class="entry shift" data-date="${iso}" data-shift-plan="1"${colorStyle}>${shiftEntry.label}</div>`;
+  }
 
   events
     .filter(e => eventMatchesDate(e, year, month + 1, day, iso))
@@ -226,7 +231,6 @@ function buildDayCell(cellDate, inCurrentMonth) {
       <div class="day-number">${day}</div>
     </div>
   `;
-  cell.appendChild(dayMenu);
   cell.appendChild(entries);
   return cell;
 }
@@ -252,40 +256,28 @@ grid.addEventListener("click", (e) => {
   const entry = e.target.closest(".entry");
   if (entry) {
     if (window.matchMedia("(max-width: 520px)").matches) {
-      const text = entry.dataset.fullText || entry.textContent || "";
-      showEntryOverlay(text);
+      const iso = entry.dataset.date;
+      showEntryOverlayForDate(iso);
       return;
     }
     if (!entry.classList.contains("holiday")) {
+      if (entry.dataset.shiftPlan === "1") {
+        window.location.href = "schicht-editor.html";
+        return;
+      }
       const index = entry.dataset.index;
       window.location.href = `day-editor.html?index=${index}`;
       return;
     }
   }
 
-  const action = e.target.closest(".day-action");
-  if (action) {
-    const cell = action.closest(".day");
-    const date = cell?.dataset.date;
-    if (!date) return;
-    const type = action.dataset.type;
-    window.location.href = `day-editor.html?date=${date}&type=${type}`;
-    cell?.classList.remove("menu-open");
-    return;
-  }
-
   const cell = e.target.closest(".day");
   if (!cell) return;
 
-  if (window.matchMedia("(max-width: 520px)").matches) {
-    // Mobile: empty area opens menu
-    grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
-    cell.classList.add("menu-open");
-    return;
+  const iso = cell.dataset.date;
+  if (iso) {
+    showEntryOverlayForDate(iso);
   }
-
-  grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
-  cell.classList.add("menu-open");
 });
 
 document.addEventListener("click", (e) => {
@@ -305,9 +297,16 @@ if (toggleMonthPicker && calendarRoot) {
   });
 }
 
-function showEntryOverlay(text) {
-  if (!entryOverlay || !overlayBody) return;
-  overlayBody.textContent = text;
+function showEntryOverlayForDate(iso) {
+  if (!entryOverlay || !overlayBody || !overlayTitle) return;
+  const dateObj = parseDateSafe(iso);
+  const titleText = dateObj
+    ? dateObj.toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short", year: "numeric" })
+    : "Ereignisse";
+  overlayTitle.textContent = titleText;
+  overlayBody.innerHTML = buildOverlayListHtml(iso);
+  overlayAddMenu?.classList.remove("show");
+  entryOverlay.dataset.date = iso;
   entryOverlay.classList.add("show");
   entryOverlay.setAttribute("aria-hidden", "false");
 }
@@ -316,12 +315,131 @@ function hideEntryOverlay() {
   if (!entryOverlay) return;
   entryOverlay.classList.remove("show");
   entryOverlay.setAttribute("aria-hidden", "true");
+  if (overlayCard) {
+    overlayCard.style.transform = "";
+  }
 }
 
 overlayClose?.addEventListener("click", hideEntryOverlay);
 entryOverlay?.addEventListener("click", (e) => {
   if (e.target === entryOverlay) hideEntryOverlay();
 });
+
+if (overlayCard) {
+  let startY = 0;
+  let currentY = 0;
+  let dragging = false;
+  const threshold = 90;
+
+  overlayCard.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+    dragging = true;
+    startY = e.touches[0].clientY;
+    currentY = 0;
+  }, { passive: true });
+
+  overlayCard.addEventListener("touchmove", (e) => {
+    if (!dragging) return;
+    const y = e.touches[0].clientY;
+    currentY = Math.max(0, y - startY);
+    overlayCard.style.transform = `translateY(${currentY}px)`;
+  }, { passive: true });
+
+  overlayCard.addEventListener("touchend", () => {
+    if (!dragging) return;
+    dragging = false;
+    if (currentY > threshold) {
+      hideEntryOverlay();
+    } else {
+      overlayCard.style.transition = "transform .25s cubic-bezier(0.2, 0.8, 0.2, 1.2)";
+      overlayCard.style.transform = "";
+      setTimeout(() => {
+        if (overlayCard) overlayCard.style.transition = "";
+      }, 260);
+    }
+  });
+}
+
+overlayBody?.addEventListener("click", (e) => {
+  const item = e.target.closest("[data-index], [data-shift-plan]");
+  if (!item) return;
+  if (item.dataset.shiftPlan === "1") {
+    window.location.href = "schicht-editor.html";
+    return;
+  }
+  const index = item.dataset.index;
+  if (index) window.location.href = `day-editor.html?index=${index}`;
+});
+
+overlayAdd?.addEventListener("click", () => {
+  overlayAddMenu?.classList.toggle("show");
+});
+
+overlayAddMenu?.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-type]");
+  if (!btn) return;
+  const date = entryOverlay?.dataset.date;
+  if (!date) return;
+  const type = btn.dataset.type;
+  if (type === "shift") {
+    window.location.href = "schicht-editor.html";
+    return;
+  }
+  window.location.href = `day-editor.html?date=${date}&type=${type}`;
+});
+
+function buildOverlayListHtml(iso) {
+  const dateObj = parseDateSafe(iso);
+  if (!dateObj) return `<div class="overlay-empty">Keine Ereignisse</div>`;
+  const year = dateObj.getFullYear();
+  const month = dateObj.getMonth() + 1;
+  const day = dateObj.getDate();
+  const items = [];
+
+  events
+    .filter(e => eventMatchesDate(e, year, month, day, iso))
+    .forEach(e => {
+      const timeLabel = e.type === "birthday"
+        ? ""
+        : (e.startTime && e.endTime ? `${e.startTime}–${e.endTime} ` : (e.startTime ? `${e.startTime} ` : ""));
+      const titleLabel = e.type === "birthday"
+        ? formatBirthdayTitle(e, year)
+        : formatRangeTitle(e);
+      const bg = e.color || "";
+      const fg = bg ? getContrastColor(bg) : "";
+      const style = bg ? ` style="background:${bg};color:${fg};"` : "";
+      const index = events.indexOf(e);
+      items.push(`<div class="overlay-item" data-index="${index}"${style}>${timeLabel}${titleLabel}</div>`);
+    });
+
+  const shiftEntry = getShiftEntryForDate(year, month, day);
+  if (shiftEntry) {
+    const bg = shiftEntry.color || "";
+    const fg = bg ? getContrastColor(bg) : "";
+    const style = bg ? ` style="background:${bg};color:${fg};"` : "";
+    items.push(`<div class="overlay-item shift-item" data-shift-plan="1"${style}><span class="shift-badge-inline">${shiftEntry.code}</span>${shiftEntry.label}</div>`);
+  }
+
+  const holidayList = [
+    ...(includeGerman ? HOLIDAYS.DE(year) : []),
+    ...(includeTurkish ? HOLIDAYS.TR(year) : [])
+  ];
+  holidayList
+    .filter(h => h.date === iso)
+    .forEach(h => {
+      items.push(`<div class="overlay-item holiday">${h.name}</div>`);
+    });
+
+  if (includeIslamic) {
+    const islamicEntries = getIslamicHolidaysForDate(year, month, day);
+    islamicEntries.forEach(name => {
+      items.push(`<div class="overlay-item holiday">${name}</div>`);
+    });
+  }
+
+  if (!items.length) return `<div class="overlay-empty">Keine Ereignisse</div>`;
+  return `<div class="overlay-list">${items.join("")}</div>`;
+}
 
 const islamicToggle = document.getElementById("toggleIslamic");
 if (islamicToggle) {
@@ -396,6 +514,36 @@ function getIslamicHolidaysForDate(y, m, d) {
     result.push(`Kurban Bayramı (${day - 9}. gün)`);
   }
   return result;
+}
+
+function getShiftEntryForDate(year, month, day) {
+  if (!shiftPlan || !shiftPlan.enabled || !shiftPlan.pattern?.length) return null;
+  const start = parseDateSafe(shiftPlan.startDate);
+  if (!start) return null;
+  const target = new Date(year, month - 1, day);
+  const diff = Math.floor((target - start) / 86400000);
+  const len = shiftPlan.pattern.length;
+  const offset = getShiftStartOffset(shiftPlan);
+  const idx = ((diff + offset) % len + len) % len;
+  const code = shiftPlan.pattern[idx];
+  if (!code || code === "-") return null;
+  const labels = shiftPlan.labels || {};
+  const shiftColors = shiftPlan.shiftColors || {};
+  return {
+    code,
+    label: labels[code] || code,
+    color: shiftColors[code] || shiftPlan.color || "#22c55e"
+  };
+}
+
+function getShiftStartOffset(plan) {
+  if (!plan?.pattern?.length) return 0;
+  if (Number.isInteger(plan.startOffset)) return plan.startOffset;
+  if (plan.startCode) {
+    const idx = plan.pattern.indexOf(plan.startCode);
+    return idx >= 0 ? idx : 0;
+  }
+  return 0;
 }
 
 function getISOWeek(date) {

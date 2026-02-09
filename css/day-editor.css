@@ -41,6 +41,18 @@ body {
   font-size: 13px;
 }
 
+#previewBtn {
+  display: none;
+  width: 100%;
+  margin-top: 6px;
+}
+
+@media (max-width: 700px) {
+  #previewBtn {
+    display: block;
+  }
+}
+
 .btn.primary {
   background: #111827;
   border-color: #334155;
@@ -124,6 +136,15 @@ input, select, textarea {
   border-radius: 8px;
 }
 
+#colorF,
+#colorM,
+#colorN {
+  width: 56px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+}
+
 .switch {
   position: relative;
   width: 48px;
@@ -184,4 +205,47 @@ input, select, textarea {
   color: #9ca3af;
   margin-top: -4px;
   margin-bottom: 8px;
+}
+
+.shift-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.shift-weekday {
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  padding-bottom: 4px;
+}
+
+.shift-cell {
+  background: #0f1115;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 6px;
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shift-date {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.shift-badge {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.field-help {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: -4px 0 10px;
 }

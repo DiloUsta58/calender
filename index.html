@@ -54,8 +54,17 @@
 <div id="entryOverlay" class="overlay" aria-hidden="true">
   <div class="overlay-card" role="dialog" aria-modal="true">
     <div class="overlay-header">
-      <div class="overlay-title">Eintrag</div>
-      <button id="overlayClose" class="overlay-close" type="button">✕</button>
+      <div id="overlayTitle" class="overlay-title">Ereignisse</div>
+      <div class="overlay-actions">
+        <button id="overlayAdd" class="overlay-add" type="button">＋</button>
+        <button id="overlayClose" class="overlay-close" type="button">✕</button>
+      </div>
+    </div>
+    <div id="overlayAddMenu" class="overlay-add-menu">
+      <button data-type="appointment">Termin</button>
+      <button data-type="birthday">Geburtstag</button>
+      <button data-type="shift">Schicht</button>
+      <button data-type="vacation">Urlaub</button>
     </div>
     <div id="overlayBody" class="overlay-body"></div>
   </div>
