@@ -23,9 +23,10 @@ const SHIFT_KEY = "calendar_shift_plan";
 const APP_VERSION = "1.0.3";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
-  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
-  { date: "2026-02-14", type: "birthday", title: "Mama 🎂" }
+/*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
+  { date: "2026-02-14", type: "birthday", title: "Mama 🎂" }*/
 ];
+
 
 function saveEvents() {
   localStorage.setItem(EVENTS_KEY, JSON.stringify(events));

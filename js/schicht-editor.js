@@ -23,14 +23,15 @@ function byId(id) {
 const modelEl = byId("shiftModel");
 const startEl = byId("shiftStart");
 const enabledEl = byId("shiftEnabled");
-const colorPreset = byId("shiftColorPreset");
-const colorCustom = byId("shiftColorCustom");
+const colorPresetF = byId("shiftColorPresetF");
+const colorCustomF = byId("shiftColorCustomF");
+const colorPresetM = byId("shiftColorPresetM");
+const colorCustomM = byId("shiftColorCustomM");
+const colorPresetN = byId("shiftColorPresetN");
+const colorCustomN = byId("shiftColorCustomN");
 const labelF = byId("labelF");
 const labelM = byId("labelM");
 const labelN = byId("labelN");
-const colorF = byId("colorF");
-const colorM = byId("colorM");
-const colorN = byId("colorN");
 const previewEl = byId("shiftPreview");
 const patternEl = byId("shiftPattern");
 const startCodeEl = byId("shiftStartCode");
@@ -45,25 +46,41 @@ enabledEl.checked = existing?.enabled ?? true;
 labelF.value = existing?.labels?.F || "F (06–14)";
 labelM.value = existing?.labels?.M || "M (14–22)";
 labelN.value = existing?.labels?.N || "N (22–06)";
-colorF.value = existing?.shiftColors?.F || "#22c55e";
-colorM.value = existing?.shiftColors?.M || "#3b82f6";
-colorN.value = existing?.shiftColors?.N || "#ef4444";
+const defaultColors = {
+  F: existing?.shiftColors?.F || "#22c55e",
+  M: existing?.shiftColors?.M || "#3b82f6",
+  N: existing?.shiftColors?.N || "#ef4444"
+};
+colorCustomF.value = defaultColors.F;
+colorCustomM.value = defaultColors.M;
+colorCustomN.value = defaultColors.N;
 patternEl.value = existing?.patternRaw || "";
 startCodeEl.value = existing?.startCode || "F";
 
-const existingColor = existing?.color || "#22c55e";
-if ([...colorPreset.options].some(o => o.value === existingColor)) {
-  colorPreset.value = existingColor;
-} else {
-  colorPreset.value = "custom";
-  colorCustom.value = existingColor;
+function initPreset(presetEl, customEl, value) {
+  if ([...presetEl.options].some(o => o.value === value)) {
+    presetEl.value = value;
+  } else {
+    presetEl.value = "custom";
+  }
+  customEl.value = value;
 }
 
-colorPreset.addEventListener("change", () => {
-  if (colorPreset.value !== "custom") {
-    colorCustom.value = colorPreset.value;
-  }
-});
+function wirePreset(presetEl, customEl) {
+  presetEl.addEventListener("change", () => {
+    if (presetEl.value !== "custom") {
+      customEl.value = presetEl.value;
+    }
+  });
+}
+
+initPreset(colorPresetF, colorCustomF, defaultColors.F);
+initPreset(colorPresetM, colorCustomM, defaultColors.M);
+initPreset(colorPresetN, colorCustomN, defaultColors.N);
+
+wirePreset(colorPresetF, colorCustomF);
+wirePreset(colorPresetM, colorCustomM);
+wirePreset(colorPresetN, colorCustomN);
 
 function getShiftForDate(dateObj, plan) {
   if (!plan || !plan.enabled || !plan.pattern?.length) return null;
@@ -92,16 +109,16 @@ function renderPreview() {
   const model = modelEl.value;
   const startDate = startEl.value || todayIso;
   const enabled = enabledEl.checked;
-  const color = (colorPreset.value === "custom" ? colorCustom.value : colorPreset.value) || "#22c55e";
+  const color = colorCustomF.value || defaultColors.F;
   const labels = {
     F: labelF.value.trim() || "F",
     M: labelM.value.trim() || "M",
     N: labelN.value.trim() || "N"
   };
   const shiftColors = {
-    F: colorF.value || "#22c55e",
-    M: colorM.value || "#3b82f6",
-    N: colorN.value || "#ef4444"
+    F: colorCustomF.value || "#22c55e",
+    M: colorCustomM.value || "#3b82f6",
+    N: colorCustomN.value || "#ef4444"
   };
   const pattern = model === "custom" ? parsePattern(patternEl.value) : (MODEL_PATTERNS[model] || []);
   const startCode = startCodeEl.value;
@@ -135,14 +152,15 @@ function renderPreview() {
   startEl.addEventListener(evt, renderPreview);
   startCodeEl.addEventListener(evt, renderPreview);
   enabledEl.addEventListener(evt, renderPreview);
-  colorPreset.addEventListener(evt, renderPreview);
-  colorCustom.addEventListener(evt, renderPreview);
+  colorPresetF.addEventListener(evt, renderPreview);
+  colorCustomF.addEventListener(evt, renderPreview);
+  colorPresetM.addEventListener(evt, renderPreview);
+  colorCustomM.addEventListener(evt, renderPreview);
+  colorPresetN.addEventListener(evt, renderPreview);
+  colorCustomN.addEventListener(evt, renderPreview);
   labelF.addEventListener(evt, renderPreview);
   labelM.addEventListener(evt, renderPreview);
   labelN.addEventListener(evt, renderPreview);
-  colorF.addEventListener(evt, renderPreview);
-  colorM.addEventListener(evt, renderPreview);
-  colorN.addEventListener(evt, renderPreview);
 });
 
 renderPreview();
@@ -160,16 +178,16 @@ byId("saveShift").addEventListener("click", () => {
   const model = modelEl.value;
   const startDate = startEl.value || todayIso;
   const enabled = enabledEl.checked;
-  const color = (colorPreset.value === "custom" ? colorCustom.value : colorPreset.value) || "#22c55e";
+  const color = existing?.color || colorCustomF.value || "#22c55e";
   const labels = {
     F: labelF.value.trim() || "F",
     M: labelM.value.trim() || "M",
     N: labelN.value.trim() || "N"
   };
   const shiftColors = {
-    F: colorF.value || "#22c55e",
-    M: colorM.value || "#3b82f6",
-    N: colorN.value || "#ef4444"
+    F: colorCustomF.value || "#22c55e",
+    M: colorCustomM.value || "#3b82f6",
+    N: colorCustomN.value || "#ef4444"
   };
 
   const pattern = model === "custom" ? parsePattern(patternEl.value) : (MODEL_PATTERNS[model] || []);
