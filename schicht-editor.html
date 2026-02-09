@@ -45,25 +45,6 @@
       </label>
       <div class="field-help">Komma‑getrennt: F=Früh, M=Mittag, N=Nacht, -=frei. Keine Leerzeichen am Ende.</div>
       <button id="previewBtn" class="btn" type="button">Vorschau aktualisieren</button>
-      <label class="row field-inline">
-        <span class="label">Farbe</span>
-        <div class="inline-inputs">
-          <select id="shiftColorPreset">
-            <option value="#22c55e">Grün</option>
-            <option value="#3b82f6">Blau</option>
-            <option value="#f97316">Orange</option>
-            <option value="#eab308">Gelb</option>
-            <option value="#ec4899">Pink</option>
-            <option value="#14b8a6">Türkis</option>
-            <option value="#06b6d4">Cyan</option>
-            <option value="#a3e635">Limette</option>
-            <option value="#8b5cf6">Violett</option>
-            <option value="#ef4444">Rot</option>
-            <option value="custom">Custom</option>
-          </select>
-          <input id="shiftColorCustom" type="color" value="#22c55e">
-        </div>
-      </label>
       <div class="row">
         <span class="label">Aktiv</span>
         <label class="switch">
@@ -78,28 +59,73 @@
         <span class="label">Früh‑Label</span>
         <input id="labelF" type="text" placeholder="F (06–14)">
       </div>
-      <div class="field-help">Hier trägst du den Text ein, der bei einer Frühschicht angezeigt wird (z.B. "F (06–14)").</div>
+      <div class="field-help">Anzeige Text Frühschicht..</div>
       <label class="row field-inline">
         <span class="label">Früh‑Farbe</span>
-        <input id="colorF" type="color" value="#22c55e">
+        <div class="inline-inputs">
+          <select id="shiftColorPresetF">
+            <option value="#22c55e">Grün</option>
+            <option value="#3b82f6">Blau</option>
+            <option value="#f97316">Orange</option>
+            <option value="#eab308">Gelb</option>
+            <option value="#ec4899">Pink</option>
+            <option value="#14b8a6">Türkis</option>
+            <option value="#06b6d4">Cyan</option>
+            <option value="#a3e635">Limette</option>
+            <option value="#8b5cf6">Violett</option>
+            <option value="#ef4444">Rot</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input id="shiftColorCustomF" class="color-custom" type="color" value="#22c55e">
+        </div>
       </label>
       <div class="row field-inline">
         <span class="label">Mittag‑Label</span>
         <input id="labelM" type="text" placeholder="M (14–22)">
       </div>
-      <div class="field-help">Hier trägst du den Text ein, der bei einer Mittagschicht angezeigt wird (z.B. "M (14–22)").</div>
+      <div class="field-help">Anzeige Text Mittagschicht..</div>
       <label class="row field-inline">
         <span class="label">Mittag‑Farbe</span>
-        <input id="colorM" type="color" value="#3b82f6">
+        <div class="inline-inputs">
+          <select id="shiftColorPresetM">
+            <option value="#22c55e">Grün</option>
+            <option value="#3b82f6">Blau</option>
+            <option value="#f97316">Orange</option>
+            <option value="#eab308">Gelb</option>
+            <option value="#ec4899">Pink</option>
+            <option value="#14b8a6">Türkis</option>
+            <option value="#06b6d4">Cyan</option>
+            <option value="#a3e635">Limette</option>
+            <option value="#8b5cf6">Violett</option>
+            <option value="#ef4444">Rot</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input id="shiftColorCustomM" class="color-custom" type="color" value="#3b82f6">
+        </div>
       </label>
       <div class="row field-inline">
         <span class="label">Nacht‑Label</span>
         <input id="labelN" type="text" placeholder="N (22–06)">
       </div>
-      <div class="field-help">Hier trägst du den Text ein, der bei einer Nachtschicht angezeigt wird (z.B. "N (22–06)").</div>
+      <div class="field-help">Anzeige Text Nachtschicht..</div>
       <label class="row field-inline">
         <span class="label">Nacht‑Farbe</span>
-        <input id="colorN" type="color" value="#ef4444">
+        <div class="inline-inputs">
+          <select id="shiftColorPresetN">
+            <option value="#22c55e">Grün</option>
+            <option value="#3b82f6">Blau</option>
+            <option value="#f97316">Orange</option>
+            <option value="#eab308">Gelb</option>
+            <option value="#ec4899">Pink</option>
+            <option value="#14b8a6">Türkis</option>
+            <option value="#06b6d4">Cyan</option>
+            <option value="#a3e635">Limette</option>
+            <option value="#8b5cf6">Violett</option>
+            <option value="#ef4444">Rot</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input id="shiftColorCustomN" class="color-custom" type="color" value="#ef4444">
+        </div>
       </label>
     </section>
 
