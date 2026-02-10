@@ -14,7 +14,7 @@
 	<meta name="theme-color" content="#0f172a">
 
 
-  <title>Kalender+</title>
+  <title data-i18n="app_title">Kalender+</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -24,20 +24,20 @@
   <header class="calendar-header">
     <div class="month-picker">
       <h2 id="monthLabel"></h2>
-      <button id="toggleMonthPicker" class="compact-toggle" type="button">Monat wählen</button>
+      <button id="toggleMonthPicker" class="compact-toggle" type="button" data-i18n="select_month">Monat wählen</button>
       <div class="month-controls">
         <select id="monthSelect"></select>
         <div class="year-input-wrap">
-          <input id="yearInput" type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr">
-          <button id="yearApply" type="button">Übernehmen</button>
+          <input id="yearInput" type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr" data-i18n-placeholder="year">
+          <button id="yearApply" type="button" data-i18n="apply">Übernehmen</button>
         </div>
       </div>
     </div>
     <div class="calendar-actions">
       <button id="prevMonth">◀</button>
-      <button id="todayBtn">Heute</button>
+      <button id="todayBtn" data-i18n="today">Heute</button>
       <button id="nextMonth">▶</button>
-      <a class="settings-link" href="settings.html" aria-label="Einstellungen">⚙</a>
+      <a class="settings-link" href="settings.html" aria-label="Einstellungen" data-i18n-aria-label="settings">⚙</a>
     </div>
   </header>
 
@@ -48,28 +48,29 @@
 </div>
 
 <footer class="calendar-footer">
-  © Calender+ <span id="versionLabel">v1.0.5</span> · Alle Rechte vorbehalten
+  © Calender+ <span id="versionLabel">v1.0.5</span> · <span data-i18n="rights">Alle Rechte vorbehalten</span>
 </footer>
 
 <div id="entryOverlay" class="overlay" aria-hidden="true">
   <div class="overlay-card" role="dialog" aria-modal="true">
     <div class="overlay-header">
-      <div id="overlayTitle" class="overlay-title">Ereignisse</div>
+      <div id="overlayTitle" class="overlay-title" data-i18n="events">Ereignisse</div>
       <div class="overlay-actions">
         <button id="overlayAdd" class="overlay-add" type="button">＋</button>
         <button id="overlayClose" class="overlay-close" type="button">✕</button>
       </div>
     </div>
     <div id="overlayAddMenu" class="overlay-add-menu">
-      <button data-type="appointment">Termin</button>
-      <button data-type="birthday">Geburtstag</button>
-      <button data-type="shift">Schicht</button>
-      <button data-type="vacation">Urlaub</button>
+      <button data-type="appointment" data-i18n="appointment">Termin</button>
+      <button data-type="birthday" data-i18n="birthday">Geburtstag</button>
+      <button data-type="shift" data-i18n="shift">Schicht</button>
+      <button data-type="vacation" data-i18n="vacation">Urlaub</button>
     </div>
     <div id="overlayBody" class="overlay-body"></div>
   </div>
 </div>
 
+<script src="js/lng.js"></script>
 <script src="js/calender.js"></script>
 </body>
 </html>

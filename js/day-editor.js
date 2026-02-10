@@ -48,12 +48,12 @@ setValue("typeInput", initialType);
 
 function setEditorTitle(eventType) {
   const titleMap = {
-    appointment: "Termin",
-    birthday: "Geburtstag",
-    shift: "Schicht",
-    vacation: "Urlaub"
+    appointment: t("appointment"),
+    birthday: t("birthday"),
+    shift: t("shift"),
+    vacation: t("vacation")
   };
-  const label = titleMap[eventType] || "Ereignis";
+  const label = titleMap[eventType] || t("event_title");
   if (editorTitle) editorTitle.textContent = label;
   document.title = label;
 }
@@ -75,30 +75,30 @@ function applyTypeUi(eventType) {
   const endTimeInput = document.getElementById("endTimeInput");
   const birthdayHint = document.getElementById("birthdayHint");
   if (eventType === "birthday") {
-    titleLabel.textContent = "Name";
-    locationLabel.textContent = "Geburtstag eintragen";
+    titleLabel.textContent = t("name");
+    locationLabel.textContent = t("birthday_entry");
     locationField.style.display = "none";
-    startLabel.textContent = "Geburtstag";
+    startLabel.textContent = t("birthday");
     endField.style.display = "none";
     startTimeInput.disabled = true;
     endTimeInput.disabled = true;
     birthdayHint.style.display = "";
     repeatInput.innerHTML = `
-      <option value="once">Einmalig (aktuelles Jahr)</option>
-      <option value="yearly">Für immer (jährlich)</option>
+      <option value="once">${t("once_current_year")}</option>
+      <option value="yearly">${t("yearly_forever")}</option>
     `;
     if (!["once", "yearly"].includes(repeatInput.value)) repeatInput.value = "yearly";
   } else {
-    titleLabel.textContent = "Titel";
-    locationLabel.textContent = "Ort";
+    titleLabel.textContent = t("title");
+    locationLabel.textContent = t("location");
     locationField.style.display = "";
-    startLabel.textContent = "Beginn";
+    startLabel.textContent = t("start");
     endField.style.display = "";
     startTimeInput.disabled = false;
     endTimeInput.disabled = false;
     birthdayHint.style.display = "none";
     repeatInput.innerHTML = `
-      <option value="none">Einmalig</option>
+      <option value="none">${t("once")}</option>
     `;
     repeatInput.value = "none";
   }
@@ -107,6 +107,11 @@ function applyTypeUi(eventType) {
 const typeInput = document.getElementById("typeInput");
 applyTypeUi(initialType);
 setEditorTitle(initialType);
+
+document.addEventListener("languageChanged", () => {
+  applyTypeUi(initialType);
+  setEditorTitle(initialType);
+});
 
 // Ensure repeat selection reflects existing value after UI reset
 const repeatInputInit = document.getElementById("repeatInput");
@@ -187,7 +192,7 @@ function normalizeDateInput(value) {
 
 deleteBtn?.addEventListener("click", () => {
   if (!existing || !Number.isInteger(indexNum)) return;
-  const ok = confirm("Eintrag wirklich löschen?");
+  const ok = confirm(t("confirm_delete_entry"));
   if (!ok) return;
   events.splice(indexNum, 1);
   saveEvents(events);

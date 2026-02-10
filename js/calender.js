@@ -68,44 +68,51 @@ let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
 let includeTurkish = JSON.parse(localStorage.getItem(TURKISH_KEY)) ?? true;
 let includeArabic = JSON.parse(localStorage.getItem(ARABIC_KEY)) ?? false;
 let shiftPlan = JSON.parse(localStorage.getItem(SHIFT_KEY)) || null;
+let monthPickerReady = false;
 
-const MONTH_NAMES = [
+const DEFAULT_MONTHS = [
   "Januar", "Februar", "März", "April", "Mai", "Juni",
   "Juli", "August", "September", "Oktober", "November", "Dezember"
 ];
 
 function setupMonthPicker() {
   if (!monthSelect || !yearInput) return;
-  monthSelect.innerHTML = MONTH_NAMES
+  const months = (window.i18n && window.i18n.getLangData)
+    ? window.i18n.getLangData("month_names", DEFAULT_MONTHS)
+    : DEFAULT_MONTHS;
+  monthSelect.innerHTML = months
     .map((name, i) => `<option value="${i}">${name}</option>`)
     .join("");
 
   yearInput.value = String(currentDate.getFullYear());
   monthSelect.value = String(currentDate.getMonth());
 
-  monthSelect.addEventListener("change", () => {
-    const m = Number(monthSelect.value);
-    const y = Number(yearInput.value);
-    currentDate = new Date(y, m, 1);
-    renderCalendar(currentDate);
-  });
+  if (!monthPickerReady) {
+    monthSelect.addEventListener("change", () => {
+      const m = Number(monthSelect.value);
+      const y = Number(yearInput.value);
+      currentDate = new Date(y, m, 1);
+      renderCalendar(currentDate);
+    });
 
-  const applyYear = () => {
-    const y = Number(yearInput.value);
-    if (!Number.isFinite(y) || y < 1900 || y > 2100) return;
-    const m = Number(monthSelect.value);
-    currentDate = new Date(y, m, 1);
-    renderCalendar(currentDate);
-  };
+    const applyYear = () => {
+      const y = Number(yearInput.value);
+      if (!Number.isFinite(y) || y < 1900 || y > 2100) return;
+      const m = Number(monthSelect.value);
+      currentDate = new Date(y, m, 1);
+      renderCalendar(currentDate);
+    };
 
-  yearInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      applyYear();
-    }
-  });
+    yearInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyYear();
+      }
+    });
 
-  yearApply?.addEventListener("click", applyYear);
+    yearApply?.addEventListener("click", applyYear);
+    monthPickerReady = true;
+  }
 }
 
 function renderCalendar(date) {
@@ -116,8 +123,11 @@ function renderCalendar(date) {
   const year = date.getFullYear();
   const month = date.getMonth();
 
+  const locale = (window.i18n && window.i18n.getLangData)
+    ? window.i18n.getLangData("locale", "de-DE")
+    : "de-DE";
   monthLabel.textContent =
-    date.toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+    date.toLocaleDateString(locale, { month: "long", year: "numeric" });
   if (monthSelect && yearInput) {
     monthSelect.value = String(month);
     yearInput.value = String(year);
@@ -214,7 +224,8 @@ function buildDayCell(cellDate, inCurrentMonth) {
       const fg = bg ? getContrastColor(bg) : "";
       const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
       const fullText = `${timeLabel}${titleLabel}`;
-      entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="Klicken zum Bearbeiten"${colorStyle}>${fullText}</div>`;
+      const editTitle = (window.i18n && window.i18n.t) ? window.i18n.t("click_edit") : "Klicken zum Bearbeiten";
+      entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="${editTitle}"${colorStyle}>${fullText}</div>`;
     });
 
   const holidayList = [
@@ -243,7 +254,9 @@ function buildDayCell(cellDate, inCurrentMonth) {
 
   if (isHoliday) cell.classList.add("holiday-day");
 
-  const weekdayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+  const weekdayNames = (window.i18n && window.i18n.getLangData)
+    ? window.i18n.getLangData("weekday_short", ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"])
+    : ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
   const weekdayIndex = (dayOfWeek + 6) % 7; // Monday=0
 
   cell.innerHTML = `
@@ -310,6 +323,18 @@ renderCalendar(currentDate);
 setupMonthPicker();
 loadVersion();
 
+if (window.i18n && window.i18n.t) {
+  document.title = window.i18n.t("app_title");
+}
+
+document.addEventListener("languageChanged", () => {
+  setupMonthPicker();
+  renderCalendar(currentDate);
+  if (window.i18n && window.i18n.t) {
+    document.title = window.i18n.t("app_title");
+  }
+});
+
 if (toggleMonthPicker && calendarRoot) {
   toggleMonthPicker.addEventListener("click", () => {
     calendarRoot.classList.toggle("show-month-controls");
@@ -319,9 +344,12 @@ if (toggleMonthPicker && calendarRoot) {
 function showEntryOverlayForDate(iso) {
   if (!entryOverlay || !overlayBody || !overlayTitle) return;
   const dateObj = parseDateSafe(iso);
+  const locale = (window.i18n && window.i18n.getLangData)
+    ? window.i18n.getLangData("locale", "de-DE")
+    : "de-DE";
   const titleText = dateObj
-    ? dateObj.toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short", year: "numeric" })
-    : "Ereignisse";
+    ? dateObj.toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", year: "numeric" })
+    : ((window.i18n && window.i18n.t) ? window.i18n.t("events") : "Ereignisse");
   overlayTitle.textContent = titleText;
   overlayBody.innerHTML = buildOverlayListHtml(iso);
   overlayAddMenu?.classList.remove("show");
@@ -409,7 +437,10 @@ overlayAddMenu?.addEventListener("click", (e) => {
 
 function buildOverlayListHtml(iso) {
   const dateObj = parseDateSafe(iso);
-  if (!dateObj) return `<div class="overlay-empty">Keine Ereignisse</div>`;
+  if (!dateObj) {
+    const emptyText = (window.i18n && window.i18n.t) ? window.i18n.t("overlay_empty") : "Keine Ereignisse";
+    return `<div class="overlay-empty">${emptyText}</div>`;
+  }
   const year = dateObj.getFullYear();
   const month = dateObj.getMonth() + 1;
   const day = dateObj.getDate();
@@ -457,7 +488,10 @@ function buildOverlayListHtml(iso) {
     });
   }
 
-  if (!items.length) return `<div class="overlay-empty">Keine Ereignisse</div>`;
+  if (!items.length) {
+    const emptyText = (window.i18n && window.i18n.t) ? window.i18n.t("overlay_empty") : "Keine Ereignisse";
+    return `<div class="overlay-empty">${emptyText}</div>`;
+  }
   return `<div class="overlay-list">${items.join("")}</div>`;
 }
 
@@ -604,9 +638,10 @@ function eventMatchesDate(e, year, month, day, iso) {
 function formatBirthdayTitle(e, year) {
   const birth = parseDateSafe(e.date);
   const age = birth ? (year - birth.getFullYear()) : NaN;
-  const name = e.title || "Geburtstag";
+  const name = e.title || ((window.i18n && window.i18n.t) ? window.i18n.t("birthday") : "Geburtstag");
   if (Number.isFinite(age) && age > 0) {
-    return `${name} (${age}. Geburtstag)`;
+    const suffix = (window.i18n && window.i18n.t) ? window.i18n.t("birthday_suffix") : "Geburtstag";
+    return `${name} (${age}. ${suffix})`;
   }
   return name;
 }

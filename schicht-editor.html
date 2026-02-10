@@ -2,55 +2,55 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Schichtplan</title>
+  <title data-i18n="shift_plan">Schichtplan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/day-editor.css">
 </head>
 <body>
   <div class="editor">
     <header class="editor-header">
-      <a class="btn" href="index.html">Abbrechen</a>
-      <h1>Schichtplan</h1>
-      <button id="saveShift" class="btn primary" type="button">Übernehmen</button>
+      <a class="btn" href="index.html" data-i18n="cancel">Abbrechen</a>
+      <h1 data-i18n="shift_plan">Schichtplan</h1>
+      <button id="saveShift" class="btn primary" type="button" data-i18n="apply">Übernehmen</button>
     </header>
 
     <section class="panel">
       <details id="panelModel" class="panel-disclosure" open>
-        <summary class="panel-summary">Modell & Zeitraum</summary>
+        <summary class="panel-summary" data-i18n="model_period">Modell & Zeitraum</summary>
         <div class="panel-body">
           <div class="row field-inline">
-            <span class="label">Modell</span>
+            <span class="label" data-i18n="model">Modell</span>
             <select id="shiftModel">
-              <option value="1">1‑Schicht (nur Früh)</option>
-              <option value="2">2‑Schicht (Früh/Mittag)</option>
-              <option value="3">3‑Schicht (Früh/Mittag/Nacht)</option>
-              <option value="4">4‑Schicht</option>
-              <option value="5">5‑Schicht</option>
-              <option value="custom">Eigenes Muster</option>
+              <option value="1" data-i18n="model_1">1‑Schicht (nur Früh)</option>
+              <option value="2" data-i18n="model_2">2‑Schicht (Früh/Mittag)</option>
+              <option value="3" data-i18n="model_3">3‑Schicht (Früh/Mittag/Nacht)</option>
+              <option value="4" data-i18n="model_4">4‑Schicht</option>
+              <option value="5" data-i18n="model_5">5‑Schicht</option>
+              <option value="custom" data-i18n="model_custom">Eigenes Muster</option>
             </select>
           </div>
           <label class="row field-inline">
-            <span class="label">Datum der 1. Schicht</span>
+            <span class="label" data-i18n="first_shift_date">Datum der 1. Schicht</span>
             <input id="shiftStart" type="date">
           </label>
           <label class="row field-inline">
-            <span class="label">Schicht am Startdatum</span>
+            <span class="label" data-i18n="shift_on_start">Schicht am Startdatum</span>
             <select id="shiftStartCode">
-              <option value="F">Früh</option>
-              <option value="M">Mittag</option>
-              <option value="N">Nacht</option>
-              <option value="-">Frei</option>
+              <option value="F" data-i18n="early">Früh</option>
+              <option value="M" data-i18n="noon">Mittag</option>
+              <option value="N" data-i18n="night">Nacht</option>
+              <option value="-" data-i18n="off">Frei</option>
             </select>
           </label>
           <label class="field">
-            <span class="label">Schichtrhythmus (Komma‑getrennt)</span>
-            <input id="shiftPattern" type="text" placeholder="z.B. M,N,-,-,-,-,F,F,M,M,N,N,-,-,-,-,F,F,M">
+            <span class="label" data-i18n="rhythm">Schichtrhythmus (Komma‑getrennt)</span>
+            <input id="shiftPattern" type="text" placeholder="z.B. M,N,-,-,-,-,F,F,M,M,N,N,-,-,-,-,F,F,M" data-i18n-placeholder="rhythm_example">
           </label>
-          <div class="field-help">Komma‑getrennt: F=Früh, M=Mittag, N=Nacht, -=frei. Keine Leerzeichen am Ende.</div>
-          <button id="previewBtn" class="btn" type="button">Vorschau aktualisieren</button>
-          <button id="shiftTest" class="btn center" type="button">Schichtplan testen (1 Jahr)</button>
+          <div class="field-help" data-i18n="rhythm_help">Komma‑getrennt: F=Früh, M=Mittag, N=Nacht, -=frei. Keine Leerzeichen am Ende.</div>
+          <button id="previewBtn" class="btn" type="button" data-i18n="preview_update">Vorschau aktualisieren</button>
+          <button id="shiftTest" class="btn center" type="button" data-i18n="test_plan">Schichtplan testen (1 Jahr)</button>
           <div class="row">
-            <span class="label">Aktiv</span>
+            <span class="label" data-i18n="active">Aktiv</span>
             <label class="switch">
               <input id="shiftEnabled" type="checkbox" checked>
               <span class="slider"></span>
@@ -62,76 +62,76 @@
 
     <section class="panel">
       <details id="panelLabels" class="panel-disclosure" open>
-        <summary class="panel-summary">Labels & Farben</summary>
+        <summary class="panel-summary" data-i18n="labels_colors">Labels & Farben</summary>
         <div class="panel-body">
           <div class="row field-inline">
-            <span class="label">Früh‑Label</span>
-            <input id="labelF" type="text" placeholder="Früh">
+            <span class="label" data-i18n="early_label">Früh‑Label</span>
+            <input id="labelF" type="text" placeholder="Früh" data-i18n-placeholder="early">
           </div>
-          <div class="field-help">Anzeige Text Frühschicht..</div>
+          <div class="field-help" data-i18n="early_help">Anzeige Text Frühschicht..</div>
           <label class="row field-inline">
-            <span class="label">Früh‑Farbe</span>
+            <span class="label" data-i18n="early_color">Früh‑Farbe</span>
             <div class="inline-inputs">
               <select id="shiftColorPresetF">
-                <option value="#22c55e">Grün</option>
-                <option value="#3b82f6">Blau</option>
-                <option value="#f97316">Orange</option>
-                <option value="#eab308">Gelb</option>
-                <option value="#ec4899">Pink</option>
-                <option value="#14b8a6">Türkis</option>
-                <option value="#06b6d4">Cyan</option>
-                <option value="#a3e635">Limette</option>
-                <option value="#8b5cf6">Violett</option>
-                <option value="#ef4444">Rot</option>
-                <option value="custom">Custom</option>
+                <option value="#22c55e" data-i18n="color_green">Grün</option>
+                <option value="#3b82f6" data-i18n="color_blue">Blau</option>
+                <option value="#f97316" data-i18n="color_orange">Orange</option>
+                <option value="#eab308" data-i18n="color_yellow">Gelb</option>
+                <option value="#ec4899" data-i18n="color_pink">Pink</option>
+                <option value="#14b8a6" data-i18n="color_teal">Türkis</option>
+                <option value="#06b6d4" data-i18n="color_cyan">Cyan</option>
+                <option value="#a3e635" data-i18n="color_lime">Limette</option>
+                <option value="#8b5cf6" data-i18n="color_purple">Violett</option>
+                <option value="#ef4444" data-i18n="color_red">Rot</option>
+                <option value="custom" data-i18n="color_custom">Custom</option>
               </select>
               <input id="shiftColorCustomF" class="color-custom" type="color" value="#22c55e">
             </div>
           </label>
           <div class="row field-inline">
-            <span class="label">Mittag‑Label</span>
-            <input id="labelM" type="text" placeholder="Mittag">
+            <span class="label" data-i18n="noon_label">Mittag‑Label</span>
+            <input id="labelM" type="text" placeholder="Mittag" data-i18n-placeholder="noon">
           </div>
-          <div class="field-help">Anzeige Text Mittagschicht..</div>
+          <div class="field-help" data-i18n="noon_help">Anzeige Text Mittagschicht..</div>
           <label class="row field-inline">
-            <span class="label">Mittag‑Farbe</span>
+            <span class="label" data-i18n="noon_color">Mittag‑Farbe</span>
             <div class="inline-inputs">
               <select id="shiftColorPresetM">
-                <option value="#22c55e">Grün</option>
-                <option value="#3b82f6">Blau</option>
-                <option value="#f97316">Orange</option>
-                <option value="#eab308">Gelb</option>
-                <option value="#ec4899">Pink</option>
-                <option value="#14b8a6">Türkis</option>
-                <option value="#06b6d4">Cyan</option>
-                <option value="#a3e635">Limette</option>
-                <option value="#8b5cf6">Violett</option>
-                <option value="#ef4444">Rot</option>
-                <option value="custom">Custom</option>
+                <option value="#22c55e" data-i18n="color_green">Grün</option>
+                <option value="#3b82f6" data-i18n="color_blue">Blau</option>
+                <option value="#f97316" data-i18n="color_orange">Orange</option>
+                <option value="#eab308" data-i18n="color_yellow">Gelb</option>
+                <option value="#ec4899" data-i18n="color_pink">Pink</option>
+                <option value="#14b8a6" data-i18n="color_teal">Türkis</option>
+                <option value="#06b6d4" data-i18n="color_cyan">Cyan</option>
+                <option value="#a3e635" data-i18n="color_lime">Limette</option>
+                <option value="#8b5cf6" data-i18n="color_purple">Violett</option>
+                <option value="#ef4444" data-i18n="color_red">Rot</option>
+                <option value="custom" data-i18n="color_custom">Custom</option>
               </select>
               <input id="shiftColorCustomM" class="color-custom" type="color" value="#3b82f6">
             </div>
           </label>
           <div class="row field-inline">
-            <span class="label">Nacht‑Label</span>
-            <input id="labelN" type="text" placeholder="Nacht">
+            <span class="label" data-i18n="night_label">Nacht‑Label</span>
+            <input id="labelN" type="text" placeholder="Nacht" data-i18n-placeholder="night">
           </div>
-          <div class="field-help">Anzeige Text Nachtschicht..</div>
+          <div class="field-help" data-i18n="night_help">Anzeige Text Nachtschicht..</div>
           <label class="row field-inline">
-            <span class="label">Nacht‑Farbe</span>
+            <span class="label" data-i18n="night_color">Nacht‑Farbe</span>
             <div class="inline-inputs">
               <select id="shiftColorPresetN">
-                <option value="#22c55e">Grün</option>
-                <option value="#3b82f6">Blau</option>
-                <option value="#f97316">Orange</option>
-                <option value="#eab308">Gelb</option>
-                <option value="#ec4899">Pink</option>
-                <option value="#14b8a6">Türkis</option>
-                <option value="#06b6d4">Cyan</option>
-                <option value="#a3e635">Limette</option>
-                <option value="#8b5cf6">Violett</option>
-                <option value="#ef4444">Rot</option>
-                <option value="custom">Custom</option>
+                <option value="#22c55e" data-i18n="color_green">Grün</option>
+                <option value="#3b82f6" data-i18n="color_blue">Blau</option>
+                <option value="#f97316" data-i18n="color_orange">Orange</option>
+                <option value="#eab308" data-i18n="color_yellow">Gelb</option>
+                <option value="#ec4899" data-i18n="color_pink">Pink</option>
+                <option value="#14b8a6" data-i18n="color_teal">Türkis</option>
+                <option value="#06b6d4" data-i18n="color_cyan">Cyan</option>
+                <option value="#a3e635" data-i18n="color_lime">Limette</option>
+                <option value="#8b5cf6" data-i18n="color_purple">Violett</option>
+                <option value="#ef4444" data-i18n="color_red">Rot</option>
+                <option value="custom" data-i18n="color_custom">Custom</option>
               </select>
               <input id="shiftColorCustomN" class="color-custom" type="color" value="#ef4444">
             </div>
@@ -142,16 +142,17 @@
 
     <section class="panel">
       <div class="row">
-        <span class="label">Vorschau (4 Wochen)</span>
+        <span class="label" data-i18n="preview_4w">Vorschau (4 Wochen)</span>
       </div>
       <div id="shiftPreview" class="shift-preview-grid"></div>
     </section>
 
     <section class="panel danger">
-      <button id="deleteShift" class="btn danger" type="button">Schichtplan löschen</button>
+      <button id="deleteShift" class="btn danger" type="button" data-i18n="delete_shift">Schichtplan löschen</button>
     </section>
   </div>
 
+  <script src="js/lng.js"></script>
   <script src="js/schicht-editor.js"></script>
 </body>
 </html>

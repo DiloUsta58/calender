@@ -13,37 +13,37 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
 
-  <title>App Einstellungen</title>
+  <title data-i18n="app_settings">App Einstellungen</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="calendar settings-page">
   <header class="calendar-header">
-    <a class="settings-back" href="index.html">Zurück</a>
-    <h2 class="settings-title">App Einstellungen</h2>
+    <a class="settings-back" href="index.html" data-i18n="back">Zurück</a>
+    <h2 class="settings-title" data-i18n="app_settings">App Einstellungen</h2>
     <div></div>
   </header>
 
   <section class="settings-section">
     <details class="settings-disclosure" open>
-      <summary class="settings-summary">Feiertage</summary>
+      <summary class="settings-summary" data-i18n="holidays">Feiertage</summary>
       <div class="settings-list">
         <label class="menu-toggle">
           <input type="checkbox" id="toggleIslamic">
-          Islamische Feiertage
+          <span data-i18n="islamic_holidays">Islamische Feiertage</span>
         </label>
         <label class="menu-toggle">
           <input type="checkbox" id="toggleGerman">
-          Deutsche Feiertage
+          <span data-i18n="german_holidays">Deutsche Feiertage</span>
         </label>
         <label class="menu-toggle">
           <input type="checkbox" id="toggleTurkish">
-          Türkische Feiertage
+          <span data-i18n="turkish_holidays">Türkische Feiertage</span>
         </label>
         <label class="menu-toggle">
           <input type="checkbox" id="toggleArabic">
-          Arabische Feiertage
+          <span data-i18n="arabic_holidays">Arabische Feiertage</span>
         </label>
       </div>
     </details>
@@ -51,17 +51,20 @@
 
   <section class="settings-section">
     <details class="settings-disclosure" open>
-      <summary class="settings-summary">Sprache</summary>
+      <summary class="settings-summary" data-i18n="language">Sprache</summary>
       <div class="settings-list">
         <label class="settings-field">
-          <span>App‑Sprache</span>
-          <select id="languageSelect">
-            <option value="de">Deutsch</option>
-            <option value="tr">Türkisch</option>
-            <option value="en">Englisch</option>
-            <option value="fr">Französisch</option>
-            <option value="ar">Arabisch</option>
-          </select>
+          <span data-i18n="app_language">App‑Sprache</span>
+          <div class="lang-picker">
+            <img id="langFlag" class="lang-flag" src="flags/flagde.png" alt="DE">
+            <select id="languageSelect">
+              <option value="de" data-i18n="lang_de">Deutsch</option>
+              <option value="tr" data-i18n="lang_tr">Türkisch</option>
+              <option value="en" data-i18n="lang_en">Englisch</option>
+              <option value="fr" data-i18n="lang_fr">Französisch</option>
+              <option value="ar" data-i18n="lang_ar">Arabisch</option>
+            </select>
+          </div>
         </label>
       </div>
     </details>
@@ -69,9 +72,10 @@
 </div>
 
 <footer class="calendar-footer">
-  © Calender+ <span id="versionLabel">v1.0.0</span> · Alle Rechte vorbehalten
+  © Calender+ <span id="versionLabel">v1.0.0</span> · <span data-i18n="rights">Alle Rechte vorbehalten</span>
 </footer>
 
+<script src="js/lng.js"></script>
 <script src="js/settings.js"></script>
 </body>
 </html>

@@ -250,6 +250,20 @@ body {
   font-size: 13px;
 }
 
+.lang-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-flag {
+  width: 28px;
+  height: auto;
+  border-radius: 3px;
+  border: none;
+  object-fit: cover;
+}
+
 .settings-back {
   text-decoration: none;
   padding: 6px 12px;

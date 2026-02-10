@@ -46,9 +46,12 @@ const existing = loadPlan();
 modelEl.value = existing?.model || "3";
 startEl.value = existing?.startDate || todayIso;
 enabledEl.checked = existing?.enabled ?? true;
-labelF.value = existing?.labels?.F || "Früh";
-labelM.value = existing?.labels?.M || "Mittag";
-labelN.value = existing?.labels?.N || "Nacht";
+const defaultLabelF = (window.i18n && window.i18n.t) ? window.i18n.t("early") : "Früh";
+const defaultLabelM = (window.i18n && window.i18n.t) ? window.i18n.t("noon") : "Mittag";
+const defaultLabelN = (window.i18n && window.i18n.t) ? window.i18n.t("night") : "Nacht";
+labelF.value = existing?.labels?.F || defaultLabelF;
+labelM.value = existing?.labels?.M || defaultLabelM;
+labelN.value = existing?.labels?.N || defaultLabelN;
 const defaultColors = {
   F: existing?.shiftColors?.F || "#22c55e",
   M: existing?.shiftColors?.M || "#3b82f6",
@@ -178,6 +181,16 @@ function renderPreview() {
 
 renderPreview();
 
+if (window.i18n && window.i18n.t) {
+  document.title = window.i18n.t("shift_plan");
+}
+
+document.addEventListener("languageChanged", () => {
+  if (window.i18n && window.i18n.t) {
+    document.title = window.i18n.t("shift_plan");
+  }
+});
+
 function initPanelState(panelEl, storageKey) {
   if (!panelEl) return;
   const saved = localStorage.getItem(storageKey);
@@ -218,13 +231,13 @@ testBtn?.addEventListener("click", () => {
   const plan = { model, startDate, enabled, labels, pattern, startCode, shiftColors };
 
   if (!plan.pattern?.length) {
-    alert("Kein Schichtmuster vorhanden.");
+    alert(t("no_pattern"));
     return;
   }
 
   const start = new Date(startDate);
   if (Number.isNaN(start.getTime())) {
-    alert("Startdatum ist ungültig.");
+    alert(t("invalid_start"));
     return;
   }
 
@@ -247,9 +260,9 @@ testBtn?.addEventListener("click", () => {
   }
 
   if (issues.length) {
-    alert(`Schicht-Test: Probleme gefunden:\n${issues.join("\n")}`);
+    alert(`${t("test_issues")}\n${issues.join("\n")}`);
   } else {
-    alert("Schicht-Test: OK (keine Sprünge in 1 Jahr).");
+    alert(t("test_ok"));
   }
 });
 
@@ -278,7 +291,7 @@ byId("saveShift").addEventListener("click", () => {
 });
 
 byId("deleteShift").addEventListener("click", () => {
-  const ok = confirm("Schichtplan wirklich löschen?");
+  const ok = confirm(t("confirm_delete_shift"));
   if (!ok) return;
   localStorage.removeItem(SHIFT_KEY);
   window.location.href = "index.html";

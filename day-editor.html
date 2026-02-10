@@ -2,47 +2,47 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Ereignis</title>
+  <title data-i18n="event_title">Ereignis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/day-editor.css">
 </head>
 <body>
   <div class="editor">
     <header class="editor-header">
-      <a class="btn" href="index.html">Abbrechen</a>
-      <h1 id="editorTitle">Ereignis</h1>
-      <button id="saveBtn" class="btn primary" type="button">Übernehmen</button>
+      <a class="btn" href="index.html" data-i18n="cancel">Abbrechen</a>
+      <h1 id="editorTitle" data-i18n="event_title">Ereignis</h1>
+      <button id="saveBtn" class="btn primary" type="button" data-i18n="apply">Übernehmen</button>
     </header>
 
     <section class="panel">
       <label class="field">
-        <span id="titleLabel" class="label">Titel</span>
-        <input id="titleInput" type="text" placeholder="Titel">
+        <span id="titleLabel" class="label" data-i18n="title">Titel</span>
+        <input id="titleInput" type="text" placeholder="Titel" data-i18n-placeholder="title">
       </label>
       <label id="locationField" class="field">
-        <span id="locationLabel" class="label">Ort</span>
-        <input id="locationInput" type="text" placeholder="Ort">
+        <span id="locationLabel" class="label" data-i18n="location">Ort</span>
+        <input id="locationInput" type="text" placeholder="Ort" data-i18n-placeholder="location">
       </label>
     </section>
 
     <section class="panel">
       <div class="row">
-        <span class="label">Wiederholungen</span>
+        <span class="label" data-i18n="repeats">Wiederholungen</span>
         <select id="repeatInput">
-          <option value="none">Einmalig</option>
-          <option value="yearly">Jährlich</option>
+          <option value="none" data-i18n="once">Einmalig</option>
+          <option value="yearly" data-i18n="yearly">Jährlich</option>
         </select>
       </div>
       <label class="row field-inline">
-        <span id="startLabel" class="label">Beginn</span>
+        <span id="startLabel" class="label" data-i18n="start">Beginn</span>
         <div class="inline-inputs">
           <input id="startInput" type="date">
           <input id="startTimeInput" type="time">
         </div>
       </label>
-      <div id="birthdayHint" class="hint">Bitte vollständiges Datum eingeben (TT.MM.JJJJ)</div>
+      <div id="birthdayHint" class="hint" data-i18n="full_date_hint">Bitte vollständiges Datum eingeben (TT.MM.JJJJ)</div>
       <label id="endField" class="row field-inline">
-        <span id="endLabel" class="label">Ende</span>
+        <span id="endLabel" class="label" data-i18n="end">Ende</span>
         <div class="inline-inputs">
           <input id="endInput" type="date">
           <input id="endTimeInput" type="time">
@@ -50,20 +50,20 @@
       </label>
       <input id="typeInput" type="hidden" value="appointment">
       <label class="row field-inline">
-        <span class="label">Farbe</span>
+        <span class="label" data-i18n="color">Farbe</span>
         <div class="inline-inputs">
           <select id="colorPreset">
-            <option value="#3b82f6">Blau</option>
-            <option value="#22c55e">Grün</option>
-            <option value="#ef4444">Rot</option>
-            <option value="#f97316">Orange</option>
-            <option value="#eab308">Gelb</option>
-            <option value="#8b5cf6">Violett</option>
-            <option value="#ec4899">Pink</option>
-            <option value="#14b8a6">Türkis</option>
-            <option value="#06b6d4">Cyan</option>
-            <option value="#a3e635">Limette</option>
-            <option value="custom">Custom (RGB)</option>
+            <option value="#3b82f6" data-i18n="color_blue">Blau</option>
+            <option value="#22c55e" data-i18n="color_green">Grün</option>
+            <option value="#ef4444" data-i18n="color_red">Rot</option>
+            <option value="#f97316" data-i18n="color_orange">Orange</option>
+            <option value="#eab308" data-i18n="color_yellow">Gelb</option>
+            <option value="#8b5cf6" data-i18n="color_purple">Violett</option>
+            <option value="#ec4899" data-i18n="color_pink">Pink</option>
+            <option value="#14b8a6" data-i18n="color_teal">Türkis</option>
+            <option value="#06b6d4" data-i18n="color_cyan">Cyan</option>
+            <option value="#a3e635" data-i18n="color_lime">Limette</option>
+            <option value="custom" data-i18n="color_custom">Custom (RGB)</option>
           </select>
           <input id="colorCustom" type="color" value="#3b82f6">
         </div>
@@ -72,16 +72,17 @@
 
     <section class="panel">
       <label class="field">
-        <span class="label">Notizen</span>
-        <textarea id="notesInput" rows="4" placeholder="Notizen"></textarea>
+        <span class="label" data-i18n="notes">Notizen</span>
+        <textarea id="notesInput" rows="4" placeholder="Notizen" data-i18n-placeholder="notes"></textarea>
       </label>
     </section>
 
     <section class="panel danger">
-      <button id="deleteBtn" class="btn danger" type="button">Eintrag löschen</button>
+      <button id="deleteBtn" class="btn danger" type="button" data-i18n="delete_entry">Eintrag löschen</button>
     </section>
   </div>
 
+  <script src="js/lng.js"></script>
   <script src="js/day-editor.js"></script>
 </body>
 </html>

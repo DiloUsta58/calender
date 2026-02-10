@@ -17,6 +17,16 @@ let includeArabic = JSON.parse(localStorage.getItem(ARABIC_KEY)) ?? false;
 
 loadVersion();
 
+if (window.i18n && window.i18n.t) {
+  document.title = window.i18n.t("app_settings");
+}
+
+document.addEventListener("languageChanged", () => {
+  if (window.i18n && window.i18n.t) {
+    document.title = window.i18n.t("app_settings");
+  }
+});
+
 if (islamicToggle) {
   islamicToggle.checked = includeIslamic;
   islamicToggle.addEventListener("change", () => {
