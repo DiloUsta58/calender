@@ -9,9 +9,9 @@
 <body>
   <div class="editor">
     <header class="editor-header">
-      <a class="btn ghost" href="index.html">Abbrechen</a>
-      <h1>Ereignis</h1>
-      <button id="saveBtn" class="btn primary" type="button">Fertig</button>
+      <a class="btn" href="index.html">Abbrechen</a>
+      <h1 id="editorTitle">Ereignis</h1>
+      <button id="saveBtn" class="btn primary" type="button">Übernehmen</button>
     </header>
 
     <section class="panel">
@@ -48,15 +48,7 @@
           <input id="endTimeInput" type="time">
         </div>
       </label>
-      <label class="row field-inline">
-        <span class="label">Typ</span>
-        <select id="typeInput">
-          <option value="appointment">Termin</option>
-          <option value="birthday">Geburtstag</option>
-          <option value="shift">Schicht</option>
-          <option value="vacation">Urlaub</option>
-        </select>
-      </label>
+      <input id="typeInput" type="hidden" value="appointment">
       <label class="row field-inline">
         <span class="label">Farbe</span>
         <div class="inline-inputs">

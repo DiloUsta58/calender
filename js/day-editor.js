@@ -31,6 +31,7 @@ const { date, type, index } = getParams();
 const events = loadEvents();
 const indexNum = index !== null ? Number(index) : null;
 const existing = Number.isInteger(indexNum) ? events[indexNum] : null;
+const editorTitle = document.getElementById("editorTitle");
 
 const todayIso = new Date().toISOString().slice(0, 10);
 const startDate = existing?.date || date || todayIso;
@@ -42,7 +43,20 @@ setValue("endInput", existing?.endDate || startDate);
 setValue("startTimeInput", existing?.startTime || "");
 setValue("endTimeInput", existing?.endTime || "");
 setValue("notesInput", existing?.notes);
-setValue("typeInput", existing?.type || type || "appointment");
+const initialType = existing?.type || type || "appointment";
+setValue("typeInput", initialType);
+
+function setEditorTitle(eventType) {
+  const titleMap = {
+    appointment: "Termin",
+    birthday: "Geburtstag",
+    shift: "Schicht",
+    vacation: "Urlaub"
+  };
+  const label = titleMap[eventType] || "Ereignis";
+  if (editorTitle) editorTitle.textContent = label;
+  document.title = label;
+}
 setValue("repeatInput", existing?.repeat || (existing?.type === "birthday" ? "yearly" : "none"));
 
 const deleteBtn = document.getElementById("deleteBtn");
@@ -91,8 +105,8 @@ function applyTypeUi(eventType) {
 }
 
 const typeInput = document.getElementById("typeInput");
-applyTypeUi(typeInput.value);
-typeInput.addEventListener("change", () => applyTypeUi(typeInput.value));
+applyTypeUi(initialType);
+setEditorTitle(initialType);
 
 // Ensure repeat selection reflects existing value after UI reset
 const repeatInputInit = document.getElementById("repeatInput");

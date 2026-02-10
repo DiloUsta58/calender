@@ -752,8 +752,13 @@ body {
 }
 
 @media (max-width: 520px) {
-  body { padding: 10px; }
-  .calendar { padding: 10px; }
+  body { padding: 10px; height: 100dvh; }
+  .calendar {
+    padding: 10px;
+    height: calc(100dvh - 20px);
+    display: flex;
+    flex-direction: column;
+  }
   .calendar-header h2 { font-size: 17px; }
   .calendar-actions { width: 100%; justify-content: space-between; }
   .calendar-header button { padding: 5px 8px; font-size: 12px; }
@@ -764,7 +769,13 @@ body {
   .month-controls select { font-size: 11px; padding: 4px 6px; }
   .year-input-wrap input { width: 84px; font-size: 11px; }
   .year-input-wrap button { display: inline-flex; font-size: 11px; }
-  .calendar-grid { grid-template-columns: 24px repeat(7, 1fr); grid-auto-rows: minmax(92px, auto); }
+  .calendar-grid {
+    grid-template-columns: 24px repeat(7, 1fr);
+    grid-auto-rows: 1fr;
+    flex: 1;
+    min-height: 0;
+    align-content: stretch;
+  }
   .day { padding: 6px; }
   .day-head { margin-bottom: 4px; }
   .day-weekday { font-size: 11px; }
@@ -778,6 +789,9 @@ body {
     border-radius: 6px;
     white-space: nowrap;
     overflow: hidden;
+  }
+  .calendar-footer {
+    display: none;
   }
 }
 
