@@ -33,7 +33,7 @@ const GERMAN_KEY = "calendar_german_holidays";
 const TURKISH_KEY = "calendar_turkish_holidays";
 const ARABIC_KEY = "calendar_arabic_holidays";
 const SHIFT_KEY = "calendar_shift_plan";
-const APP_VERSION = "1.0.4";
+const APP_VERSION = "1.0.5";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -308,9 +308,7 @@ document.addEventListener("click", (e) => {
 
 renderCalendar(currentDate);
 setupMonthPicker();
-if (versionLabel) {
-  versionLabel.textContent = `v${APP_VERSION}`;
-}
+loadVersion();
 
 if (toggleMonthPicker && calendarRoot) {
   toggleMonthPicker.addEventListener("click", () => {
@@ -660,4 +658,19 @@ function parseDateSafe(value) {
   }
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function loadVersion() {
+  if (!versionLabel) return;
+  const fallback = `v${APP_VERSION}`;
+  versionLabel.textContent = fallback;
+  fetch(`version.json?ts=${Date.now()}`, { cache: "no-store" })
+    .then(r => (r.ok ? r.json() : null))
+    .then(data => {
+      const v = data?.version ? `v${data.version}` : fallback;
+      versionLabel.textContent = v;
+    })
+    .catch(() => {
+      versionLabel.textContent = fallback;
+    });
 }
