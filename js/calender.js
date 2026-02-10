@@ -33,7 +33,7 @@ const GERMAN_KEY = "calendar_german_holidays";
 const TURKISH_KEY = "calendar_turkish_holidays";
 const ARABIC_KEY = "calendar_arabic_holidays";
 const SHIFT_KEY = "calendar_shift_plan";
-const APP_VERSION = "1.0.3";
+const APP_VERSION = "1.0.4";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },

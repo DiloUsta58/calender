@@ -1,7 +1,7 @@
 {
   "name": "Kalender+",
   "short_name": "Kalender+",
-  "description": "Kalender mit Terminen, Geburtstagen, Schichtplan sowie deutschen und türkischen Feiertagen.",
+  "description": "Kalender mit Terminen, Geburtstagen, Schichtplan, Feiertagen.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
