@@ -11,6 +11,18 @@ const HOLIDAYS = {
     { date: `${year}-05-19`, name: "Atatürk Günü" },
     { date: `${year}-08-30`, name: "Zafer Bayramı" },
     { date: `${year}-10-29`, name: "Cumhuriyet Bayramı" }
+  ],
+  MA: (year) => [
+    { date: `${year}-01-11`, name: "Unabhängigkeitstag" },
+    { date: `${year}-01-11`, name: "Tag des Unabhängigkeitsmanifests" },
+    { date: `${year}-01-14`, name: "Amazigh-Neujahr" },
+    { date: `${year}-05-01`, name: "Tag der Arbeit" },
+    { date: `${year}-07-30`, name: "Thronfest" },
+    { date: `${year}-08-14`, name: "Oued Eddahab Tag" },
+    { date: `${year}-08-20`, name: "Revolution des Königs und des Volkes" },
+    { date: `${year}-08-21`, name: "Jugendtag" },
+    { date: `${year}-11-06`, name: "Jahrestag des Grünen Marsches" },
+    { date: `${year}-11-18`, name: "Unabhängigkeitstag" }
   ]
 };
 
@@ -19,6 +31,7 @@ const EVENTS_KEY = "calendar_events";
 const ISLAMIC_KEY = "calendar_islamic_holidays";
 const GERMAN_KEY = "calendar_german_holidays";
 const TURKISH_KEY = "calendar_turkish_holidays";
+const ARABIC_KEY = "calendar_arabic_holidays";
 const SHIFT_KEY = "calendar_shift_plan";
 const APP_VERSION = "1.0.3";
 
@@ -36,7 +49,8 @@ function saveEvents() {
 const grid = document.querySelector(".calendar-grid");
 const monthLabel = document.getElementById("monthLabel");
 const monthSelect = document.getElementById("monthSelect");
-const yearSelect = document.getElementById("yearSelect");
+const yearInput = document.getElementById("yearInput");
+const yearApply = document.getElementById("yearApply");
 const toggleMonthPicker = document.getElementById("toggleMonthPicker");
 const calendarRoot = document.querySelector(".calendar");
 const entryOverlay = document.getElementById("entryOverlay");
@@ -52,6 +66,7 @@ let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
 let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
 let includeTurkish = JSON.parse(localStorage.getItem(TURKISH_KEY)) ?? true;
+let includeArabic = JSON.parse(localStorage.getItem(ARABIC_KEY)) ?? false;
 let shiftPlan = JSON.parse(localStorage.getItem(SHIFT_KEY)) || null;
 
 const MONTH_NAMES = [
@@ -60,33 +75,37 @@ const MONTH_NAMES = [
 ];
 
 function setupMonthPicker() {
-  if (!monthSelect || !yearSelect) return;
+  if (!monthSelect || !yearInput) return;
   monthSelect.innerHTML = MONTH_NAMES
     .map((name, i) => `<option value="${i}">${name}</option>`)
     .join("");
 
-  const currentYear = new Date().getFullYear();
-  const startYear = currentYear - 5;
-  const endYear = currentYear + 5;
-  const years = [];
-  for (let y = startYear; y <= endYear; y++) years.push(y);
-  yearSelect.innerHTML = years
-    .map(y => `<option value="${y}">${y}</option>`)
-    .join("");
+  yearInput.value = String(currentDate.getFullYear());
+  monthSelect.value = String(currentDate.getMonth());
 
   monthSelect.addEventListener("change", () => {
     const m = Number(monthSelect.value);
-    const y = Number(yearSelect.value);
+    const y = Number(yearInput.value);
     currentDate = new Date(y, m, 1);
     renderCalendar(currentDate);
   });
 
-  yearSelect.addEventListener("change", () => {
+  const applyYear = () => {
+    const y = Number(yearInput.value);
+    if (!Number.isFinite(y) || y < 1900 || y > 2100) return;
     const m = Number(monthSelect.value);
-    const y = Number(yearSelect.value);
     currentDate = new Date(y, m, 1);
     renderCalendar(currentDate);
+  };
+
+  yearInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      applyYear();
+    }
   });
+
+  yearApply?.addEventListener("click", applyYear);
 }
 
 function renderCalendar(date) {
@@ -99,9 +118,9 @@ function renderCalendar(date) {
 
   monthLabel.textContent =
     date.toLocaleDateString("de-DE", { month: "long", year: "numeric" });
-  if (monthSelect && yearSelect) {
+  if (monthSelect && yearInput) {
     monthSelect.value = String(month);
-    yearSelect.value = String(year);
+    yearInput.value = String(year);
   }
 
   const firstDay = new Date(year, month, 1);
@@ -200,7 +219,8 @@ function buildDayCell(cellDate, inCurrentMonth) {
 
   const holidayList = [
     ...(includeGerman ? HOLIDAYS.DE(year) : []),
-    ...(includeTurkish ? HOLIDAYS.TR(year) : [])
+    ...(includeTurkish ? HOLIDAYS.TR(year) : []),
+    ...(includeArabic ? HOLIDAYS.MA(year) : [])
   ];
 
   holidayList
@@ -423,7 +443,8 @@ function buildOverlayListHtml(iso) {
 
   const holidayList = [
     ...(includeGerman ? HOLIDAYS.DE(year) : []),
-    ...(includeTurkish ? HOLIDAYS.TR(year) : [])
+    ...(includeTurkish ? HOLIDAYS.TR(year) : []),
+    ...(includeArabic ? HOLIDAYS.MA(year) : [])
   ];
   holidayList
     .filter(h => h.date === iso)
@@ -522,7 +543,7 @@ function getShiftEntryForDate(year, month, day) {
   const start = parseDateSafe(shiftPlan.startDate);
   if (!start) return null;
   const target = new Date(year, month - 1, day);
-  const diff = Math.floor((target - start) / 86400000);
+  const diff = diffDaysUtc(start, target);
   const len = shiftPlan.pattern.length;
   const offset = getShiftStartOffset(shiftPlan);
   const idx = ((diff + offset) % len + len) % len;
@@ -545,6 +566,12 @@ function getShiftStartOffset(plan) {
     return idx >= 0 ? idx : 0;
   }
   return 0;
+}
+
+function diffDaysUtc(a, b) {
+  const aUtc = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const bUtc = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.floor((bUtc - aUtc) / 86400000);
 }
 
 function getISOWeek(date) {

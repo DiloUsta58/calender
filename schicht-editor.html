@@ -9,124 +9,135 @@
 <body>
   <div class="editor">
     <header class="editor-header">
-      <a class="btn ghost" href="index.html">Abbrechen</a>
+      <a class="btn" href="index.html">Abbrechen</a>
       <h1>Schichtplan</h1>
-      <button id="saveShift" class="btn primary" type="button">Fertig</button>
+      <button id="saveShift" class="btn primary" type="button">Übernehmen</button>
     </header>
 
     <section class="panel">
-      <div class="row field-inline">
-        <span class="label">Modell</span>
-        <select id="shiftModel">
-          <option value="1">1‑Schicht (nur Früh)</option>
-          <option value="2">2‑Schicht (Früh/Mittag)</option>
-          <option value="3">3‑Schicht (Früh/Mittag/Nacht)</option>
-          <option value="4">4‑Schicht</option>
-          <option value="5">5‑Schicht</option>
-          <option value="custom">Eigenes Muster</option>
-        </select>
-      </div>
-      <label class="row field-inline">
-        <span class="label">Datum der 1. Schicht</span>
-        <input id="shiftStart" type="date">
-      </label>
-      <label class="row field-inline">
-        <span class="label">Schicht am Startdatum</span>
-        <select id="shiftStartCode">
-          <option value="F">Früh</option>
-          <option value="M">Mittag</option>
-          <option value="N">Nacht</option>
-          <option value="-">Frei</option>
-        </select>
-      </label>
-      <label class="field">
-        <span class="label">Schichtrhythmus (Komma‑getrennt)</span>
-        <input id="shiftPattern" type="text" placeholder="z.B. M,N,-,-,-,-,F,F,M,M,N,N,-,-,-,-,F,F,M">
-      </label>
-      <div class="field-help">Komma‑getrennt: F=Früh, M=Mittag, N=Nacht, -=frei. Keine Leerzeichen am Ende.</div>
-      <button id="previewBtn" class="btn" type="button">Vorschau aktualisieren</button>
-      <div class="row">
-        <span class="label">Aktiv</span>
-        <label class="switch">
-          <input id="shiftEnabled" type="checkbox" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
+      <details id="panelModel" class="panel-disclosure" open>
+        <summary class="panel-summary">Modell & Zeitraum</summary>
+        <div class="panel-body">
+          <div class="row field-inline">
+            <span class="label">Modell</span>
+            <select id="shiftModel">
+              <option value="1">1‑Schicht (nur Früh)</option>
+              <option value="2">2‑Schicht (Früh/Mittag)</option>
+              <option value="3">3‑Schicht (Früh/Mittag/Nacht)</option>
+              <option value="4">4‑Schicht</option>
+              <option value="5">5‑Schicht</option>
+              <option value="custom">Eigenes Muster</option>
+            </select>
+          </div>
+          <label class="row field-inline">
+            <span class="label">Datum der 1. Schicht</span>
+            <input id="shiftStart" type="date">
+          </label>
+          <label class="row field-inline">
+            <span class="label">Schicht am Startdatum</span>
+            <select id="shiftStartCode">
+              <option value="F">Früh</option>
+              <option value="M">Mittag</option>
+              <option value="N">Nacht</option>
+              <option value="-">Frei</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="label">Schichtrhythmus (Komma‑getrennt)</span>
+            <input id="shiftPattern" type="text" placeholder="z.B. M,N,-,-,-,-,F,F,M,M,N,N,-,-,-,-,F,F,M">
+          </label>
+          <div class="field-help">Komma‑getrennt: F=Früh, M=Mittag, N=Nacht, -=frei. Keine Leerzeichen am Ende.</div>
+          <button id="previewBtn" class="btn" type="button">Vorschau aktualisieren</button>
+          <button id="shiftTest" class="btn center" type="button">Schichtplan testen (1 Jahr)</button>
+          <div class="row">
+            <span class="label">Aktiv</span>
+            <label class="switch">
+              <input id="shiftEnabled" type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </details>
     </section>
 
     <section class="panel">
-      <div class="row field-inline">
-        <span class="label">Früh‑Label</span>
-        <input id="labelF" type="text" placeholder="F (06–14)">
-      </div>
-      <div class="field-help">Anzeige Text Frühschicht..</div>
-      <label class="row field-inline">
-        <span class="label">Früh‑Farbe</span>
-        <div class="inline-inputs">
-          <select id="shiftColorPresetF">
-            <option value="#22c55e">Grün</option>
-            <option value="#3b82f6">Blau</option>
-            <option value="#f97316">Orange</option>
-            <option value="#eab308">Gelb</option>
-            <option value="#ec4899">Pink</option>
-            <option value="#14b8a6">Türkis</option>
-            <option value="#06b6d4">Cyan</option>
-            <option value="#a3e635">Limette</option>
-            <option value="#8b5cf6">Violett</option>
-            <option value="#ef4444">Rot</option>
-            <option value="custom">Custom</option>
-          </select>
-          <input id="shiftColorCustomF" class="color-custom" type="color" value="#22c55e">
+      <details id="panelLabels" class="panel-disclosure" open>
+        <summary class="panel-summary">Labels & Farben</summary>
+        <div class="panel-body">
+          <div class="row field-inline">
+            <span class="label">Früh‑Label</span>
+            <input id="labelF" type="text" placeholder="Früh">
+          </div>
+          <div class="field-help">Anzeige Text Frühschicht..</div>
+          <label class="row field-inline">
+            <span class="label">Früh‑Farbe</span>
+            <div class="inline-inputs">
+              <select id="shiftColorPresetF">
+                <option value="#22c55e">Grün</option>
+                <option value="#3b82f6">Blau</option>
+                <option value="#f97316">Orange</option>
+                <option value="#eab308">Gelb</option>
+                <option value="#ec4899">Pink</option>
+                <option value="#14b8a6">Türkis</option>
+                <option value="#06b6d4">Cyan</option>
+                <option value="#a3e635">Limette</option>
+                <option value="#8b5cf6">Violett</option>
+                <option value="#ef4444">Rot</option>
+                <option value="custom">Custom</option>
+              </select>
+              <input id="shiftColorCustomF" class="color-custom" type="color" value="#22c55e">
+            </div>
+          </label>
+          <div class="row field-inline">
+            <span class="label">Mittag‑Label</span>
+            <input id="labelM" type="text" placeholder="Mittag">
+          </div>
+          <div class="field-help">Anzeige Text Mittagschicht..</div>
+          <label class="row field-inline">
+            <span class="label">Mittag‑Farbe</span>
+            <div class="inline-inputs">
+              <select id="shiftColorPresetM">
+                <option value="#22c55e">Grün</option>
+                <option value="#3b82f6">Blau</option>
+                <option value="#f97316">Orange</option>
+                <option value="#eab308">Gelb</option>
+                <option value="#ec4899">Pink</option>
+                <option value="#14b8a6">Türkis</option>
+                <option value="#06b6d4">Cyan</option>
+                <option value="#a3e635">Limette</option>
+                <option value="#8b5cf6">Violett</option>
+                <option value="#ef4444">Rot</option>
+                <option value="custom">Custom</option>
+              </select>
+              <input id="shiftColorCustomM" class="color-custom" type="color" value="#3b82f6">
+            </div>
+          </label>
+          <div class="row field-inline">
+            <span class="label">Nacht‑Label</span>
+            <input id="labelN" type="text" placeholder="Nacht">
+          </div>
+          <div class="field-help">Anzeige Text Nachtschicht..</div>
+          <label class="row field-inline">
+            <span class="label">Nacht‑Farbe</span>
+            <div class="inline-inputs">
+              <select id="shiftColorPresetN">
+                <option value="#22c55e">Grün</option>
+                <option value="#3b82f6">Blau</option>
+                <option value="#f97316">Orange</option>
+                <option value="#eab308">Gelb</option>
+                <option value="#ec4899">Pink</option>
+                <option value="#14b8a6">Türkis</option>
+                <option value="#06b6d4">Cyan</option>
+                <option value="#a3e635">Limette</option>
+                <option value="#8b5cf6">Violett</option>
+                <option value="#ef4444">Rot</option>
+                <option value="custom">Custom</option>
+              </select>
+              <input id="shiftColorCustomN" class="color-custom" type="color" value="#ef4444">
+            </div>
+          </label>
         </div>
-      </label>
-      <div class="row field-inline">
-        <span class="label">Mittag‑Label</span>
-        <input id="labelM" type="text" placeholder="M (14–22)">
-      </div>
-      <div class="field-help">Anzeige Text Mittagschicht..</div>
-      <label class="row field-inline">
-        <span class="label">Mittag‑Farbe</span>
-        <div class="inline-inputs">
-          <select id="shiftColorPresetM">
-            <option value="#22c55e">Grün</option>
-            <option value="#3b82f6">Blau</option>
-            <option value="#f97316">Orange</option>
-            <option value="#eab308">Gelb</option>
-            <option value="#ec4899">Pink</option>
-            <option value="#14b8a6">Türkis</option>
-            <option value="#06b6d4">Cyan</option>
-            <option value="#a3e635">Limette</option>
-            <option value="#8b5cf6">Violett</option>
-            <option value="#ef4444">Rot</option>
-            <option value="custom">Custom</option>
-          </select>
-          <input id="shiftColorCustomM" class="color-custom" type="color" value="#3b82f6">
-        </div>
-      </label>
-      <div class="row field-inline">
-        <span class="label">Nacht‑Label</span>
-        <input id="labelN" type="text" placeholder="N (22–06)">
-      </div>
-      <div class="field-help">Anzeige Text Nachtschicht..</div>
-      <label class="row field-inline">
-        <span class="label">Nacht‑Farbe</span>
-        <div class="inline-inputs">
-          <select id="shiftColorPresetN">
-            <option value="#22c55e">Grün</option>
-            <option value="#3b82f6">Blau</option>
-            <option value="#f97316">Orange</option>
-            <option value="#eab308">Gelb</option>
-            <option value="#ec4899">Pink</option>
-            <option value="#14b8a6">Türkis</option>
-            <option value="#06b6d4">Cyan</option>
-            <option value="#a3e635">Limette</option>
-            <option value="#8b5cf6">Violett</option>
-            <option value="#ef4444">Rot</option>
-            <option value="custom">Custom</option>
-          </select>
-          <input id="shiftColorCustomN" class="color-custom" type="color" value="#ef4444">
-        </div>
-      </label>
+      </details>
     </section>
 
     <section class="panel">

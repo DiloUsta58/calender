@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="icon" href="icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/icon-48x48.png">
+  <link rel="icon" type="image/png" sizes="72x72" href="icons/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+
+  <title>App Einstellungen</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="calendar settings-page">
+  <header class="calendar-header">
+    <a class="settings-back" href="index.html">Zurück</a>
+    <h2 class="settings-title">App Einstellungen</h2>
+    <div></div>
+  </header>
+
+  <section class="settings-section">
+    <details class="settings-disclosure" open>
+      <summary class="settings-summary">Feiertage</summary>
+      <div class="settings-list">
+        <label class="menu-toggle">
+          <input type="checkbox" id="toggleIslamic">
+          Islamische Feiertage
+        </label>
+        <label class="menu-toggle">
+          <input type="checkbox" id="toggleGerman">
+          Deutsche Feiertage
+        </label>
+        <label class="menu-toggle">
+          <input type="checkbox" id="toggleTurkish">
+          Türkische Feiertage
+        </label>
+        <label class="menu-toggle">
+          <input type="checkbox" id="toggleArabic">
+          Arabische Feiertage
+        </label>
+      </div>
+    </details>
+  </section>
+
+  <section class="settings-section">
+    <details class="settings-disclosure" open>
+      <summary class="settings-summary">Sprache</summary>
+      <div class="settings-list">
+        <label class="settings-field">
+          <span>App‑Sprache</span>
+          <select id="languageSelect">
+            <option value="de">Deutsch</option>
+            <option value="tr">Türkisch</option>
+            <option value="en">Englisch</option>
+            <option value="fr">Französisch</option>
+            <option value="ar">Arabisch</option>
+          </select>
+        </label>
+      </div>
+    </details>
+  </section>
+</div>
+
+<footer class="calendar-footer">
+  © Calender+ <span id="versionLabel">v1.0.0</span> · Alle Rechte vorbehalten
+</footer>
+
+<script src="js/settings.js"></script>
+</body>
+</html>

@@ -7,7 +7,7 @@
 	<link rel="icon" href="icons/favicon.ico">
 	<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
 	<link rel="icon" type="image/png" sizes="48x48" href="icons/icon-48x48.png">
-	<link rel="icon" type="image/png" sizes="72x72" href="icons/icon-72x72.png>
+	<link rel="icon" type="image/png" sizes="72x72" href="icons/icon-72x72.png">
 	<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
 
 	<link rel="manifest" href="manifest.json">
@@ -27,30 +27,19 @@
       <button id="toggleMonthPicker" class="compact-toggle" type="button">Monat wählen</button>
       <div class="month-controls">
         <select id="monthSelect"></select>
-        <select id="yearSelect"></select>
+        <div class="year-input-wrap">
+          <input id="yearInput" type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr">
+          <button id="yearApply" type="button">Übernehmen</button>
+        </div>
       </div>
     </div>
     <div class="calendar-actions">
       <button id="prevMonth">◀</button>
       <button id="todayBtn">Heute</button>
       <button id="nextMonth">▶</button>
+      <a class="settings-link" href="settings.html" aria-label="Einstellungen">⚙</a>
     </div>
   </header>
-
-  <div class="calendar-menu">
-    <label class="menu-toggle">
-      <input type="checkbox" id="toggleIslamic">
-      Islamische Feiertage
-    </label>
-    <label class="menu-toggle">
-      <input type="checkbox" id="toggleGerman">
-      Deutsche Feiertage
-    </label>
-    <label class="menu-toggle">
-      <input type="checkbox" id="toggleTurkish">
-      Türkische Feiertage
-    </label>
-  </div>
 
   <div class="calendar-grid">
     <!-- Tage werden per JS erzeugt -->

@@ -36,6 +36,9 @@ const previewEl = byId("shiftPreview");
 const patternEl = byId("shiftPattern");
 const startCodeEl = byId("shiftStartCode");
 const previewBtn = byId("previewBtn");
+const testBtn = byId("shiftTest");
+const panelModel = byId("panelModel");
+const panelLabels = byId("panelLabels");
 
 const todayIso = new Date().toISOString().slice(0, 10);
 const existing = loadPlan();
@@ -43,9 +46,9 @@ const existing = loadPlan();
 modelEl.value = existing?.model || "3";
 startEl.value = existing?.startDate || todayIso;
 enabledEl.checked = existing?.enabled ?? true;
-labelF.value = existing?.labels?.F || "F (06–14)";
-labelM.value = existing?.labels?.M || "M (14–22)";
-labelN.value = existing?.labels?.N || "N (22–06)";
+labelF.value = existing?.labels?.F || "Früh";
+labelM.value = existing?.labels?.M || "Mittag";
+labelN.value = existing?.labels?.N || "Nacht";
 const defaultColors = {
   F: existing?.shiftColors?.F || "#22c55e",
   M: existing?.shiftColors?.M || "#3b82f6",
@@ -85,7 +88,7 @@ wirePreset(colorPresetN, colorCustomN);
 function getShiftForDate(dateObj, plan) {
   if (!plan || !plan.enabled || !plan.pattern?.length) return null;
   const start = new Date(plan.startDate);
-  const diff = Math.floor((dateObj - start) / 86400000);
+  const diff = diffDaysUtc(start, dateObj);
   const len = plan.pattern.length;
   const offset = getStartOffset(plan);
   const idx = ((diff + offset) % len + len) % len;
@@ -102,6 +105,16 @@ function getStartOffset(plan) {
     return idx >= 0 ? idx : 0;
   }
   return 0;
+}
+
+function getPatternIndexForDate(dateObj, plan) {
+  if (!plan || !plan.enabled || !plan.pattern?.length) return null;
+  const start = new Date(plan.startDate);
+  if (Number.isNaN(start.getTime())) return null;
+  const diff = diffDaysUtc(start, dateObj);
+  const len = plan.pattern.length;
+  const offset = getStartOffset(plan);
+  return ((diff + offset) % len + len) % len;
 }
 
 function renderPreview() {
@@ -165,6 +178,19 @@ function renderPreview() {
 
 renderPreview();
 
+function initPanelState(panelEl, storageKey) {
+  if (!panelEl) return;
+  const saved = localStorage.getItem(storageKey);
+  if (saved === "open") panelEl.open = true;
+  if (saved === "closed") panelEl.open = false;
+  panelEl.addEventListener("toggle", () => {
+    localStorage.setItem(storageKey, panelEl.open ? "open" : "closed");
+  });
+}
+
+initPanelState(panelModel, "shift_panel_model");
+initPanelState(panelLabels, "shift_panel_labels");
+
 patternEl.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -173,6 +199,59 @@ patternEl.addEventListener("keydown", (e) => {
 });
 
 previewBtn?.addEventListener("click", renderPreview);
+testBtn?.addEventListener("click", () => {
+  const model = modelEl.value;
+  const startDate = startEl.value || todayIso;
+  const enabled = enabledEl.checked;
+  const labels = {
+    F: labelF.value.trim() || "F",
+    M: labelM.value.trim() || "M",
+    N: labelN.value.trim() || "N"
+  };
+  const shiftColors = {
+    F: colorCustomF.value || "#22c55e",
+    M: colorCustomM.value || "#3b82f6",
+    N: colorCustomN.value || "#ef4444"
+  };
+  const pattern = model === "custom" ? parsePattern(patternEl.value) : (MODEL_PATTERNS[model] || []);
+  const startCode = startCodeEl.value;
+  const plan = { model, startDate, enabled, labels, pattern, startCode, shiftColors };
+
+  if (!plan.pattern?.length) {
+    alert("Kein Schichtmuster vorhanden.");
+    return;
+  }
+
+  const start = new Date(startDate);
+  if (Number.isNaN(start.getTime())) {
+    alert("Startdatum ist ungültig.");
+    return;
+  }
+
+  const issues = [];
+  const daysToCheck = 370;
+  for (let i = 0; i < daysToCheck; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const next = new Date(d);
+    next.setDate(d.getDate() + 1);
+
+    const idx = getPatternIndexForDate(d, plan);
+    const nextIdx = getPatternIndexForDate(next, plan);
+    if (idx === null || nextIdx === null) {
+      issues.push(`${d.toLocaleDateString("de-DE")}: Index fehlte`);
+    } else if (nextIdx !== (idx + 1) % plan.pattern.length) {
+      issues.push(`${d.toLocaleDateString("de-DE")}: Sprung ${idx}→${nextIdx}`);
+    }
+    if (issues.length >= 5) break;
+  }
+
+  if (issues.length) {
+    alert(`Schicht-Test: Probleme gefunden:\n${issues.join("\n")}`);
+  } else {
+    alert("Schicht-Test: OK (keine Sprünge in 1 Jahr).");
+  }
+});
 
 byId("saveShift").addEventListener("click", () => {
   const model = modelEl.value;
@@ -217,4 +296,10 @@ function startOfWeekMonday(date) {
   const day = (d.getDay() + 6) % 7; // Monday=0
   d.setDate(d.getDate() - day);
   return d;
+}
+
+function diffDaysUtc(a, b) {
+  const aUtc = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const bUtc = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.floor((bUtc - aUtc) / 86400000);
 }
