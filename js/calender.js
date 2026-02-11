@@ -33,6 +33,10 @@ const GERMAN_KEY = "calendar_german_holidays";
 const TURKISH_KEY = "calendar_turkish_holidays";
 const ARABIC_KEY = "calendar_arabic_holidays";
 const SHIFT_KEY = "calendar_shift_plan";
+const CALENDAR_FONT_SIZE_KEY = "calendar_font_size";
+const POPUP_FONT_SIZE_KEY = "calendar_popup_font_size";
+const WEEK_START_KEY = "calendar_week_start";
+const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
 const APP_VERSION = "1.0.6";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
@@ -62,6 +66,7 @@ const overlayAddMenu = document.getElementById("overlayAddMenu");
 const overlayCard = entryOverlay?.querySelector(".overlay-card");
 const versionLabel = document.getElementById("versionLabel");
 const todayDisplay = document.getElementById("todayDisplay");
+const clockPanel = document.getElementById("clockPanel");
 
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
@@ -69,12 +74,39 @@ let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
 let includeTurkish = JSON.parse(localStorage.getItem(TURKISH_KEY)) ?? true;
 let includeArabic = JSON.parse(localStorage.getItem(ARABIC_KEY)) ?? false;
 let shiftPlan = JSON.parse(localStorage.getItem(SHIFT_KEY)) || null;
+let calendarFontSize = Number(localStorage.getItem(CALENDAR_FONT_SIZE_KEY) || 12);
+let popupFontSize = Number(localStorage.getItem(POPUP_FONT_SIZE_KEY) || 17);
+let weekStart = Number(localStorage.getItem(WEEK_START_KEY) || 1);
+let showWeekNumbers = JSON.parse(localStorage.getItem(SHOW_WEEK_NUMBERS_KEY));
+if (showWeekNumbers === null) showWeekNumbers = true;
 let monthPickerReady = false;
+let headerTimerId = null;
 
 const DEFAULT_MONTHS = [
   "Januar", "Februar", "März", "April", "Mai", "Juni",
   "Juli", "August", "September", "Oktober", "November", "Dezember"
 ];
+
+if (!Number.isFinite(calendarFontSize) || calendarFontSize < 6 || calendarFontSize > 25) {
+  calendarFontSize = 12;
+}
+if (!Number.isFinite(popupFontSize) || popupFontSize < 14 || popupFontSize > 20) {
+  popupFontSize = 17;
+}
+if (!Number.isInteger(weekStart) || weekStart < 0 || weekStart > 6) {
+  weekStart = 1;
+}
+
+function applyDisplaySettings() {
+  if (calendarRoot) {
+    calendarRoot.style.setProperty("--calendar-font-size", `${calendarFontSize}px`);
+    calendarRoot.style.setProperty("--entry-font-size", `${calendarFontSize}px`);
+    calendarRoot.style.setProperty("--overlay-font-size", `${popupFontSize}px`);
+  }
+  if (grid) {
+    grid.classList.toggle("hide-week-numbers", !showWeekNumbers);
+  }
+}
 
 function setupMonthPicker() {
   if (!monthSelect || !yearInput) return;
@@ -138,8 +170,7 @@ function renderCalendar(date) {
   const lastDay  = new Date(year, month + 1, 0);
   const prevLastDay = new Date(year, month, 0);
 
-  // Montag = 0
-  const startOffset = (firstDay.getDay() + 6) % 7;
+  const startOffset = (firstDay.getDay() - weekStart + 7) % 7;
 
   const totalDays = lastDay.getDate();
   const totalCells = startOffset + totalDays;
@@ -150,17 +181,21 @@ function renderCalendar(date) {
     ? window.i18n.getLangData("weekday_short", ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"])
     : ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
-  const cornerCell = document.createElement("div");
-  cornerCell.className = "week-corner";
-  cornerCell.textContent = "KW";
-  grid.appendChild(cornerCell);
+  if (showWeekNumbers) {
+    const cornerCell = document.createElement("div");
+    cornerCell.className = "week-corner";
+    cornerCell.textContent = "KW";
+    grid.appendChild(cornerCell);
+  }
 
   for (let i = 0; i < 7; i++) {
+    const dayIndex = (weekStart + i) % 7; // 0=So ... 6=Sa
+    const weekdayIdxMondayFirst = (dayIndex + 6) % 7; // Mo=0 ... So=6
     const head = document.createElement("div");
     head.className = "weekday-head";
-    if (i === 5) head.classList.add("saturday");
-    if (i === 6) head.classList.add("sunday");
-    const label = weekdayNames[i] || "";
+    if (dayIndex === 6) head.classList.add("saturday");
+    if (dayIndex === 0) head.classList.add("sunday");
+    const label = weekdayNames[weekdayIdxMondayFirst] || "";
     head.textContent = label.endsWith(".") ? label : `${label}.`;
     grid.appendChild(head);
   }
@@ -170,11 +205,13 @@ function renderCalendar(date) {
 
   for (let w = 0; w < weeks; w++) {
     const weekStartDate = new Date(year, month, 1 - startOffset + (w * 7));
-    const weekNumber = getISOWeek(weekStartDate);
-    const weekCell = document.createElement("div");
-    weekCell.className = "week-number";
-    weekCell.textContent = weekNumber;
-    grid.appendChild(weekCell);
+    if (showWeekNumbers) {
+      const weekNumber = getWeekNumber(weekStartDate, weekStart);
+      const weekCell = document.createElement("div");
+      weekCell.className = "week-number";
+      weekCell.textContent = weekNumber;
+      grid.appendChild(weekCell);
+    }
 
     for (let d = 0; d < 7; d++) {
       const cellIndex = w * 7 + d;
@@ -333,19 +370,23 @@ document.addEventListener("click", (e) => {
   grid.querySelectorAll(".day.menu-open").forEach(d => d.classList.remove("menu-open"));
 });
 
+applyDisplaySettings();
 renderCalendar(currentDate);
 setupMonthPicker();
 loadVersion();
 renderTodayDisplay();
+startHeaderTimer();
 
 if (window.i18n && window.i18n.t) {
   document.title = window.i18n.t("app_title");
 }
 
 document.addEventListener("languageChanged", () => {
+  applyDisplaySettings();
   setupMonthPicker();
   renderCalendar(currentDate);
   renderTodayDisplay();
+  updateHeaderClockAndCountdown();
   if (window.i18n && window.i18n.t) {
     document.title = window.i18n.t("app_title");
   }
@@ -357,9 +398,97 @@ function renderTodayDisplay() {
     ? window.i18n.getLangData("locale", "de-DE")
     : "de-DE";
   const now = new Date();
-  const dayMonth = now.toLocaleDateString(locale, { day: "numeric", month: "long" });
-  const year = now.getFullYear();
-  todayDisplay.innerHTML = `<strong>${dayMonth}</strong><span>${year}</span>`;
+  const day = now.toLocaleDateString(locale, { day: "numeric" });
+  const month = now.toLocaleDateString(locale, { month: "long" });
+  const year = now.toLocaleDateString(locale, { year: "numeric" });
+  todayDisplay.innerHTML = `
+    <span class="today-day">${day}.</span>
+    <span class="today-month">${month}</span>
+    <span class="today-year">${year}</span>
+  `;
+}
+
+function startHeaderTimer() {
+  updateHeaderClockAndCountdown();
+  if (headerTimerId) clearInterval(headerTimerId);
+  headerTimerId = setInterval(updateHeaderClockAndCountdown, 1000);
+}
+
+function updateHeaderClockAndCountdown() {
+  if (!clockPanel) return;
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+  const lines = [`<div class="clock-now">${time}</div>`];
+  const upcoming = getBirthdayCountdownsForCurrentMonth(now);
+  upcoming.forEach(item => {
+    lines.push(
+      `<div class="clock-countdown">` +
+      `<span class="clock-left">${item.timeLeft}</span>` +
+      `<span class="clock-sep">-</span>` +
+      `<span class="clock-name">${escapeHtml(item.name)} (Geburtstag)</span>` +
+      `</div>`
+    );
+  });
+  clockPanel.innerHTML = lines.join("");
+}
+
+function getBirthdayCountdownsForCurrentMonth(now) {
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth(); // 0-based
+  const candidates = [];
+
+  events.forEach(e => {
+    if (e.type !== "birthday" || !e.date) return;
+    const birth = parseDateSafe(e.date);
+    if (!birth) return;
+    if (birth.getMonth() !== month) return;
+
+    const validYear = isBirthdayValidForYear(e, birth, year);
+    if (!validYear) return;
+
+    const target = new Date(year, month, birth.getDate(), 0, 0, 0);
+    if (target < now) return;
+
+    candidates.push({
+      name: e.title || ((window.i18n && window.i18n.t) ? window.i18n.t("birthday") : "Geburtstag"),
+      target
+    });
+  });
+
+  candidates.sort((a, b) => a.target - b.target);
+
+  return candidates.map(c => ({
+    name: c.name,
+    timeLeft: formatCountdown(c.target - now)
+  }));
+}
+
+function isBirthdayValidForYear(event, birthDate, year) {
+  if (event.repeat === "yearly") return true;
+  if (event.repeat === "once") {
+    const onceYear = Number(event.repeatYear);
+    const targetYear = Number.isFinite(onceYear) && onceYear > 0 ? onceYear : birthDate.getFullYear();
+    return targetYear === year;
+  }
+  return birthDate.getFullYear() === year;
+}
+
+function formatCountdown(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const dd = Math.floor(total / 86400);
+  const hh = Math.floor((total % 86400) / 3600);
+  const mm = Math.floor((total % 3600) / 60);
+  const ss = total % 60;
+  return `${String(dd).padStart(2, "0")}:${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 if (toggleMonthPicker && calendarRoot) {
@@ -641,6 +770,17 @@ function getISOWeek(date) {
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
+function getWeekNumber(date, startDay) {
+  if (startDay === 1) return getISOWeek(date);
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const yearStartOffset = (yearStart.getDay() - startDay + 7) % 7;
+  const firstWeekStart = new Date(yearStart);
+  firstWeekStart.setDate(yearStart.getDate() - yearStartOffset);
+  return Math.floor((d - firstWeekStart) / 86400000 / 7) + 1;
+}
+
 function eventMatchesDate(e, year, month, day, iso) {
   if (e.type !== "birthday") {
     return isDateInRange(iso, e.date, e.endDate);
@@ -666,11 +806,13 @@ function formatBirthdayTitle(e, year) {
   const birth = parseDateSafe(e.date);
   const age = birth ? (year - birth.getFullYear()) : NaN;
   const name = e.title || ((window.i18n && window.i18n.t) ? window.i18n.t("birthday") : "Geburtstag");
+  const prefix = "🎂 ";
+  const displayName = name.startsWith(prefix) ? name : `${prefix}${name}`;
   if (Number.isFinite(age) && age > 0) {
     const suffix = (window.i18n && window.i18n.t) ? window.i18n.t("birthday_suffix") : "Geburtstag";
-    return `${name} (${age}. ${suffix})`;
+    return `${displayName} (${age}. ${suffix})`;
   }
-  return name;
+  return displayName;
 }
 
 function formatRangeTitle(e) {
