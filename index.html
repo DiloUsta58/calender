@@ -22,22 +22,27 @@
 <div class="calendar">
 
   <header class="calendar-header">
-    <div class="month-picker">
-      <h2 id="monthLabel"></h2>
-      <button id="toggleMonthPicker" class="compact-toggle" type="button" data-i18n="select_month">Monat wählen</button>
-      <div class="month-controls">
-        <select id="monthSelect"></select>
-        <div class="year-input-wrap">
-          <input id="yearInput" type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr" data-i18n-placeholder="year">
-          <button id="yearApply" type="button" data-i18n="apply">Übernehmen</button>
+    <div class="header-left">
+      <div id="todayDisplay" class="today-display"></div>
+    </div>
+    <div class="header-right">
+      <div class="calendar-actions">
+        <button id="prevMonth">◀</button>
+        <button id="todayBtn" data-i18n="today">Heute</button>
+        <button id="nextMonth">▶</button>
+        <a class="settings-link" href="settings.html" aria-label="Einstellungen" data-i18n-aria-label="settings">⚙</a>
+      </div>
+      <div class="month-picker">
+        <h2 id="monthLabel"></h2>
+        <button id="toggleMonthPicker" class="compact-toggle" type="button" data-i18n="select_month">Monat wählen</button>
+        <div class="month-controls">
+          <select id="monthSelect"></select>
+          <div class="year-input-wrap">
+            <input id="yearInput" type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr" data-i18n-placeholder="year">
+            <button id="yearApply" type="button" data-i18n="apply">Übernehmen</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="calendar-actions">
-      <button id="prevMonth">◀</button>
-      <button id="todayBtn" data-i18n="today">Heute</button>
-      <button id="nextMonth">▶</button>
-      <a class="settings-link" href="settings.html" aria-label="Einstellungen" data-i18n-aria-label="settings">⚙</a>
     </div>
   </header>
 
@@ -48,7 +53,7 @@
 </div>
 
 <footer class="calendar-footer">
-  © Calender+ <span id="versionLabel">v1.0.5</span> · <span data-i18n="rights">Alle Rechte vorbehalten</span>
+  © Calender+ <span id="versionLabel">v1.0.6</span> · <span data-i18n="rights">Alle Rechte vorbehalten</span>
 </footer>
 
 <div id="entryOverlay" class="overlay" aria-hidden="true">

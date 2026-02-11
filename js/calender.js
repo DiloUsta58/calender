@@ -33,7 +33,7 @@ const GERMAN_KEY = "calendar_german_holidays";
 const TURKISH_KEY = "calendar_turkish_holidays";
 const ARABIC_KEY = "calendar_arabic_holidays";
 const SHIFT_KEY = "calendar_shift_plan";
-const APP_VERSION = "1.0.5";
+const APP_VERSION = "1.0.6";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -61,6 +61,7 @@ const overlayAdd = document.getElementById("overlayAdd");
 const overlayAddMenu = document.getElementById("overlayAddMenu");
 const overlayCard = entryOverlay?.querySelector(".overlay-card");
 const versionLabel = document.getElementById("versionLabel");
+const todayDisplay = document.getElementById("todayDisplay");
 
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
@@ -117,8 +118,8 @@ function setupMonthPicker() {
 
 function renderCalendar(date) {
 
-  // alte Tage/Platzhalter löschen (Wochentage bleiben)
-  grid.querySelectorAll(".day, .pad, .week-number").forEach(d => d.remove());
+  // alte Tage/Platzhalter/Kopfzeile löschen
+  grid.querySelectorAll(".day, .pad, .week-number, .week-corner, .weekday-head").forEach(d => d.remove());
 
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -144,6 +145,25 @@ function renderCalendar(date) {
   const totalCells = startOffset + totalDays;
   const endPad = (7 - (totalCells % 7)) % 7;
   const weeks = (totalCells + endPad) / 7;
+
+  const weekdayNames = (window.i18n && window.i18n.getLangData)
+    ? window.i18n.getLangData("weekday_short", ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"])
+    : ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+
+  const cornerCell = document.createElement("div");
+  cornerCell.className = "week-corner";
+  cornerCell.textContent = "KW";
+  grid.appendChild(cornerCell);
+
+  for (let i = 0; i < 7; i++) {
+    const head = document.createElement("div");
+    head.className = "weekday-head";
+    if (i === 5) head.classList.add("saturday");
+    if (i === 6) head.classList.add("sunday");
+    const label = weekdayNames[i] || "";
+    head.textContent = label.endsWith(".") ? label : `${label}.`;
+    grid.appendChild(head);
+  }
 
   let currentDay = 1;
   let nextMonthDay = 1;
@@ -254,14 +274,8 @@ function buildDayCell(cellDate, inCurrentMonth) {
 
   if (isHoliday) cell.classList.add("holiday-day");
 
-  const weekdayNames = (window.i18n && window.i18n.getLangData)
-    ? window.i18n.getLangData("weekday_short", ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"])
-    : ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
-  const weekdayIndex = (dayOfWeek + 6) % 7; // Monday=0
-
   cell.innerHTML = `
     <div class="day-head">
-      <div class="day-weekday">${weekdayNames[weekdayIndex]}</div>
       <div class="day-number">${day}</div>
     </div>
   `;
@@ -322,6 +336,7 @@ document.addEventListener("click", (e) => {
 renderCalendar(currentDate);
 setupMonthPicker();
 loadVersion();
+renderTodayDisplay();
 
 if (window.i18n && window.i18n.t) {
   document.title = window.i18n.t("app_title");
@@ -330,10 +345,22 @@ if (window.i18n && window.i18n.t) {
 document.addEventListener("languageChanged", () => {
   setupMonthPicker();
   renderCalendar(currentDate);
+  renderTodayDisplay();
   if (window.i18n && window.i18n.t) {
     document.title = window.i18n.t("app_title");
   }
 });
+
+function renderTodayDisplay() {
+  if (!todayDisplay) return;
+  const locale = (window.i18n && window.i18n.getLangData)
+    ? window.i18n.getLangData("locale", "de-DE")
+    : "de-DE";
+  const now = new Date();
+  const dayMonth = now.toLocaleDateString(locale, { day: "numeric", month: "long" });
+  const year = now.getFullYear();
+  todayDisplay.innerHTML = `<strong>${dayMonth}</strong><span>${year}</span>`;
+}
 
 if (toggleMonthPicker && calendarRoot) {
   toggleMonthPicker.addEventListener("click", () => {
