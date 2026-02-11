@@ -37,7 +37,8 @@ const CALENDAR_FONT_SIZE_KEY = "calendar_font_size";
 const POPUP_FONT_SIZE_KEY = "calendar_popup_font_size";
 const WEEK_START_KEY = "calendar_week_start";
 const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
-const APP_VERSION = "1.0.6";
+const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
+const APP_VERSION = "1.0.7";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -79,6 +80,8 @@ let popupFontSize = Number(localStorage.getItem(POPUP_FONT_SIZE_KEY) || 17);
 let weekStart = Number(localStorage.getItem(WEEK_START_KEY) || 1);
 let showWeekNumbers = JSON.parse(localStorage.getItem(SHOW_WEEK_NUMBERS_KEY));
 if (showWeekNumbers === null) showWeekNumbers = true;
+let showVacationCountdown = JSON.parse(localStorage.getItem(SHOW_VACATION_COUNTDOWN_KEY));
+if (showVacationCountdown === null) showVacationCountdown = true;
 let monthPickerReady = false;
 let headerTimerId = null;
 
@@ -419,46 +422,60 @@ function updateHeaderClockAndCountdown() {
   const now = new Date();
   const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
   const lines = [`<div class="clock-now">${time}</div>`];
-  const upcoming = getBirthdayCountdownsForCurrentMonth(now);
+  const upcoming = getUpcomingCountdownsForCurrentMonth(now);
   upcoming.forEach(item => {
     lines.push(
       `<div class="clock-countdown">` +
       `<span class="clock-left">${item.timeLeft}</span>` +
       `<span class="clock-sep">-</span>` +
-      `<span class="clock-name">${escapeHtml(item.name)} (Geburtstag)</span>` +
+      `<span class="clock-name">${escapeHtml(item.name)} (${escapeHtml(item.kind)})</span>` +
       `</div>`
     );
   });
   clockPanel.innerHTML = lines.join("");
 }
 
-function getBirthdayCountdownsForCurrentMonth(now) {
+function getUpcomingCountdownsForCurrentMonth(now) {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth(); // 0-based
   const candidates = [];
+  const birthdayLabel = (window.i18n && window.i18n.t) ? window.i18n.t("birthday") : "Geburtstag";
+  const vacationLabel = (window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub";
 
   events.forEach(e => {
-    if (e.type !== "birthday" || !e.date) return;
-    const birth = parseDateSafe(e.date);
-    if (!birth) return;
-    if (birth.getMonth() !== month) return;
-
-    const validYear = isBirthdayValidForYear(e, birth, year);
-    if (!validYear) return;
-
-    const target = new Date(year, month, birth.getDate(), 0, 0, 0);
-    if (target < now) return;
-
-    candidates.push({
-      name: e.title || ((window.i18n && window.i18n.t) ? window.i18n.t("birthday") : "Geburtstag"),
-      target
-    });
+    if (!e?.date) return;
+    if (e.type === "birthday") {
+      const birth = parseDateSafe(e.date);
+      if (!birth || birth.getMonth() !== month) return;
+      const validYear = isBirthdayValidForYear(e, birth, year);
+      if (!validYear) return;
+      const target = new Date(year, month, birth.getDate(), 0, 0, 0);
+      if (target < now) return;
+      candidates.push({
+        name: e.title || birthdayLabel,
+        kind: birthdayLabel,
+        target
+      });
+      return;
+    }
+    if (e.type === "vacation" && showVacationCountdown) {
+      const start = parseDateSafe(e.date);
+      if (!start) return;
+      const target = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0);
+      if (target < now) return;
+      candidates.push({
+        name: e.title || vacationLabel,
+        kind: vacationLabel,
+        target
+      });
+    }
   });
 
   candidates.sort((a, b) => a.target - b.target);
 
   return candidates.map(c => ({
     name: c.name,
+    kind: c.kind,
     timeLeft: formatCountdown(c.target - now)
   }));
 }

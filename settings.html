@@ -72,10 +72,10 @@
 
   <section class="settings-section">
     <details class="settings-disclosure" open>
-      <summary class="settings-summary">Anzeige</summary>
+      <summary class="settings-summary" data-i18n="display">Anzeige</summary>
       <div class="settings-list">
         <label class="settings-field">
-          <span>Schriftgröße</span>
+          <span data-i18n="font_size">Schriftgröße</span>
           <select id="calendarFontSizeSelect">
             <option value="6">6px</option>
             <option value="7">7px</option>
@@ -100,7 +100,7 @@
           </select>
         </label>
         <label class="settings-field">
-          <span>Schriftgröße im Popup</span>
+          <span data-i18n="font_size_popup">Schriftgröße im Popup</span>
           <select id="popupFontSizeSelect">
             <option value="14">14px</option>
             <option value="15">15px</option>
@@ -112,20 +112,24 @@
           </select>
         </label>
         <label class="settings-field">
-          <span>Woche beginnt am</span>
+          <span data-i18n="week_starts_on">Woche beginnt am</span>
           <select id="weekStartSelect">
-            <option value="0">Sonntag</option>
-            <option value="1">Montag</option>
-            <option value="2">Dienstag</option>
-            <option value="3">Mittwoch</option>
-            <option value="4">Donnerstag</option>
-            <option value="5">Freitag</option>
-            <option value="6">Samstag</option>
+            <option value="0" data-i18n="weekday_sunday">Sonntag</option>
+            <option value="1" data-i18n="weekday_monday">Montag</option>
+            <option value="2" data-i18n="weekday_tuesday">Dienstag</option>
+            <option value="3" data-i18n="weekday_wednesday">Mittwoch</option>
+            <option value="4" data-i18n="weekday_thursday">Donnerstag</option>
+            <option value="5" data-i18n="weekday_friday">Freitag</option>
+            <option value="6" data-i18n="weekday_saturday">Samstag</option>
           </select>
         </label>
         <label class="menu-toggle">
           <input type="checkbox" id="toggleWeekNumbers" checked>
-          <span>Wochenzahlen anzeigen</span>
+          <span data-i18n="show_week_numbers">Wochenzahlen anzeigen</span>
+        </label>
+        <label class="menu-toggle">
+          <input type="checkbox" id="toggleVacationCountdown" checked>
+          <span data-i18n="show_vacation_countdown">Urlaub-Countdown anzeigen</span>
         </label>
       </div>
     </details>

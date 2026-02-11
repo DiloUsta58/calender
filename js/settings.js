@@ -6,6 +6,7 @@ const CALENDAR_FONT_SIZE_KEY = "calendar_font_size";
 const POPUP_FONT_SIZE_KEY = "calendar_popup_font_size";
 const WEEK_START_KEY = "calendar_week_start";
 const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
+const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const APP_VERSION = "1.0.4";
 
 const islamicToggle = document.getElementById("toggleIslamic");
@@ -16,6 +17,7 @@ const calendarFontSizeSelect = document.getElementById("calendarFontSizeSelect")
 const popupFontSizeSelect = document.getElementById("popupFontSizeSelect");
 const weekStartSelect = document.getElementById("weekStartSelect");
 const weekNumbersToggle = document.getElementById("toggleWeekNumbers");
+const vacationCountdownToggle = document.getElementById("toggleVacationCountdown");
 const versionLabel = document.getElementById("versionLabel");
 
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
@@ -27,6 +29,8 @@ let popupFontSize = Number(localStorage.getItem(POPUP_FONT_SIZE_KEY) || 17);
 let weekStart = Number(localStorage.getItem(WEEK_START_KEY) || 1);
 let showWeekNumbers = JSON.parse(localStorage.getItem(SHOW_WEEK_NUMBERS_KEY));
 if (showWeekNumbers === null) showWeekNumbers = true;
+let showVacationCountdown = JSON.parse(localStorage.getItem(SHOW_VACATION_COUNTDOWN_KEY));
+if (showVacationCountdown === null) showVacationCountdown = true;
 
 loadVersion();
 
@@ -110,6 +114,14 @@ if (weekNumbersToggle) {
   weekNumbersToggle.addEventListener("change", () => {
     showWeekNumbers = weekNumbersToggle.checked;
     localStorage.setItem(SHOW_WEEK_NUMBERS_KEY, JSON.stringify(showWeekNumbers));
+  });
+}
+
+if (vacationCountdownToggle) {
+  vacationCountdownToggle.checked = !!showVacationCountdown;
+  vacationCountdownToggle.addEventListener("change", () => {
+    showVacationCountdown = vacationCountdownToggle.checked;
+    localStorage.setItem(SHOW_VACATION_COUNTDOWN_KEY, JSON.stringify(showVacationCountdown));
   });
 }
 
