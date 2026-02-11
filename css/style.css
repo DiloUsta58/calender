@@ -892,7 +892,7 @@ body {
   .year-input-wrap button { display: inline-flex; font-size: 11px; }
   .calendar-grid {
     --weekday-row-height: 24px;
-    grid-template-columns: 20px repeat(7, minmax(33px, 1fr));
+    grid-template-columns: 10px repeat(7, minmax(33px, 1fr));
     grid-template-rows: var(--weekday-row-height);
     grid-auto-rows: 1fr;
     flex: 1;
