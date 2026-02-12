@@ -29,13 +29,66 @@
     <details class="settings-disclosure" open>
       <summary class="settings-summary" data-i18n="holidays">Feiertage</summary>
       <div class="settings-list">
+        <div class="settings-subdisclosure">
+          <div class="settings-subhead-row">
+            <div class="settings-subtitle" data-i18n="germany_holidays_school">Feiertage / Schulferien Deutschland</div>
+            <select id="germanRegionSelect" class="inline-region-select" data-i18n-aria-label="region" aria-label="Region">
+              <option value="Baden-Württemberg">Baden-Württemberg</option>
+              <option value="Bayern">Bayern</option>
+              <option value="Berlin">Berlin</option>
+              <option value="Brandenburg">Brandenburg</option>
+              <option value="Bremen">Bremen</option>
+              <option value="Hamburg">Hamburg</option>
+              <option value="Hessen">Hessen</option>
+              <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+              <option value="Niedersachsen">Niedersachsen</option>
+              <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+              <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+              <option value="Saarland">Saarland</option>
+              <option value="Sachsen">Sachsen</option>
+              <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+              <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+              <option value="Thüringen">Thüringen</option>
+            </select>
+          </div>
+          <div class="settings-list settings-sublist">
+            <label class="menu-toggle">
+              <input type="checkbox" id="toggleGerman">
+              <span data-i18n="german_holidays">Deutsche Feiertage</span>
+            </label>
+            <label class="menu-toggle">
+              <input type="checkbox" id="toggleSchoolHolidays">
+              <span data-i18n="school_holidays_sub">Schulferien</span>
+            </label>
+            <label class="settings-field">
+              <span>Winterferien Farbe</span>
+              <input id="colorWinterHoliday" type="color" value="#60a5fa">
+            </label>
+            <label class="settings-field">
+              <span>Osterferien Farbe</span>
+              <input id="colorEasterHoliday" type="color" value="#34d399">
+            </label>
+            <label class="settings-field">
+              <span>Pfingstferien Farbe</span>
+              <input id="colorPentecostHoliday" type="color" value="#fbbf24">
+            </label>
+            <label class="settings-field">
+              <span>Sommerferien Farbe</span>
+              <input id="colorSummerHoliday" type="color" value="#f97316">
+            </label>
+            <label class="settings-field">
+              <span>Herbstferien Farbe</span>
+              <input id="colorAutumnHoliday" type="color" value="#a78bfa">
+            </label>
+            <label class="settings-field">
+              <span>Weihnachtsferien Farbe</span>
+              <input id="colorChristmasHoliday" type="color" value="#ef4444">
+            </label>
+          </div>
+        </div>
         <label class="menu-toggle">
           <input type="checkbox" id="toggleIslamic">
           <span data-i18n="islamic_holidays">Islamische Feiertage</span>
-        </label>
-        <label class="menu-toggle">
-          <input type="checkbox" id="toggleGerman">
-          <span data-i18n="german_holidays">Deutsche Feiertage</span>
         </label>
         <label class="menu-toggle">
           <input type="checkbox" id="toggleTurkish">
@@ -130,6 +183,17 @@
         <label class="menu-toggle">
           <input type="checkbox" id="toggleVacationCountdown" checked>
           <span data-i18n="show_vacation_countdown">Urlaub-Countdown anzeigen</span>
+        </label>
+        <label class="settings-field vacation-mode-field">
+          <span data-i18n="vacation_countdown_mode">• Urlaub-Countdown Modus</span>
+          <select id="vacationCountdownModeSelect">
+            <option value="queue" data-i18n="vacation_mode_queue">Warteschlange</option>
+            <option value="all" data-i18n="vacation_mode_all">Alle anzeigen</option>
+          </select>
+        </label>
+        <label class="menu-toggle">
+          <input type="checkbox" id="toggleBirthdayCountdown" checked>
+          <span data-i18n="show_birthday_countdown">Geburtstag-Countdown anzeigen</span>
         </label>
       </div>
     </details>
