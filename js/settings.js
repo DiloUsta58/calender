@@ -10,6 +10,12 @@ const SCHOOL_COLOR_PENTECOST_KEY = "calendar_school_color_pentecost";
 const SCHOOL_COLOR_SUMMER_KEY = "calendar_school_color_summer";
 const SCHOOL_COLOR_AUTUMN_KEY = "calendar_school_color_autumn";
 const SCHOOL_COLOR_CHRISTMAS_KEY = "calendar_school_color_christmas";
+const SCHOOL_SHOW_WINTER_KEY = "calendar_school_show_winter";
+const SCHOOL_SHOW_EASTER_KEY = "calendar_school_show_easter";
+const SCHOOL_SHOW_PENTECOST_KEY = "calendar_school_show_pentecost";
+const SCHOOL_SHOW_SUMMER_KEY = "calendar_school_show_summer";
+const SCHOOL_SHOW_AUTUMN_KEY = "calendar_school_show_autumn";
+const SCHOOL_SHOW_CHRISTMAS_KEY = "calendar_school_show_christmas";
 const CALENDAR_FONT_SIZE_KEY = "calendar_font_size";
 const POPUP_FONT_SIZE_KEY = "calendar_popup_font_size";
 const WEEK_START_KEY = "calendar_week_start";
@@ -24,6 +30,12 @@ const germanToggle = document.getElementById("toggleGerman");
 const turkishToggle = document.getElementById("toggleTurkish");
 const arabicToggle = document.getElementById("toggleArabic");
 const schoolHolidaysToggle = document.getElementById("toggleSchoolHolidays");
+const winterHolidayTypeToggle = document.getElementById("toggleWinterHolidayType");
+const easterHolidayTypeToggle = document.getElementById("toggleEasterHolidayType");
+const pentecostHolidayTypeToggle = document.getElementById("togglePentecostHolidayType");
+const summerHolidayTypeToggle = document.getElementById("toggleSummerHolidayType");
+const autumnHolidayTypeToggle = document.getElementById("toggleAutumnHolidayType");
+const christmasHolidayTypeToggle = document.getElementById("toggleChristmasHolidayType");
 const germanRegionSelect = document.getElementById("germanRegionSelect");
 const colorWinterHoliday = document.getElementById("colorWinterHoliday");
 const colorEasterHoliday = document.getElementById("colorEasterHoliday");
@@ -52,6 +64,18 @@ let schoolColorPentecost = localStorage.getItem(SCHOOL_COLOR_PENTECOST_KEY) || "
 let schoolColorSummer = localStorage.getItem(SCHOOL_COLOR_SUMMER_KEY) || "#f97316";
 let schoolColorAutumn = localStorage.getItem(SCHOOL_COLOR_AUTUMN_KEY) || "#a78bfa";
 let schoolColorChristmas = localStorage.getItem(SCHOOL_COLOR_CHRISTMAS_KEY) || "#ef4444";
+let schoolShowWinter = JSON.parse(localStorage.getItem(SCHOOL_SHOW_WINTER_KEY));
+let schoolShowEaster = JSON.parse(localStorage.getItem(SCHOOL_SHOW_EASTER_KEY));
+let schoolShowPentecost = JSON.parse(localStorage.getItem(SCHOOL_SHOW_PENTECOST_KEY));
+let schoolShowSummer = JSON.parse(localStorage.getItem(SCHOOL_SHOW_SUMMER_KEY));
+let schoolShowAutumn = JSON.parse(localStorage.getItem(SCHOOL_SHOW_AUTUMN_KEY));
+let schoolShowChristmas = JSON.parse(localStorage.getItem(SCHOOL_SHOW_CHRISTMAS_KEY));
+if (schoolShowWinter === null) schoolShowWinter = true;
+if (schoolShowEaster === null) schoolShowEaster = true;
+if (schoolShowPentecost === null) schoolShowPentecost = true;
+if (schoolShowSummer === null) schoolShowSummer = true;
+if (schoolShowAutumn === null) schoolShowAutumn = true;
+if (schoolShowChristmas === null) schoolShowChristmas = true;
 let calendarFontSize = Number(localStorage.getItem(CALENDAR_FONT_SIZE_KEY) || 12);
 let popupFontSize = Number(localStorage.getItem(POPUP_FONT_SIZE_KEY) || 17);
 let weekStart = Number(localStorage.getItem(WEEK_START_KEY) || 1);
@@ -66,6 +90,26 @@ let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) ||
 function updateVacationModeState() {
   if (!vacationCountdownModeSelect) return;
   vacationCountdownModeSelect.disabled = !showVacationCountdown;
+}
+
+function updateSchoolHolidayControlsState() {
+  const disabled = !includeSchoolHolidays;
+  [
+    winterHolidayTypeToggle,
+    easterHolidayTypeToggle,
+    pentecostHolidayTypeToggle,
+    summerHolidayTypeToggle,
+    autumnHolidayTypeToggle,
+    christmasHolidayTypeToggle,
+    colorWinterHoliday,
+    colorEasterHoliday,
+    colorPentecostHoliday,
+    colorSummerHoliday,
+    colorAutumnHoliday,
+    colorChristmasHoliday
+  ].forEach(el => {
+    if (el) el.disabled = disabled;
+  });
 }
 
 loadVersion();
@@ -114,11 +158,58 @@ if (arabicToggle) {
 
 if (schoolHolidaysToggle) {
   schoolHolidaysToggle.checked = includeSchoolHolidays;
+  updateSchoolHolidayControlsState();
   schoolHolidaysToggle.addEventListener("change", () => {
     includeSchoolHolidays = schoolHolidaysToggle.checked;
     localStorage.setItem(SCHOOL_HOLIDAYS_KEY, JSON.stringify(includeSchoolHolidays));
+    updateSchoolHolidayControlsState();
   });
 }
+
+if (winterHolidayTypeToggle) {
+  winterHolidayTypeToggle.checked = !!schoolShowWinter;
+  winterHolidayTypeToggle.addEventListener("change", () => {
+    schoolShowWinter = winterHolidayTypeToggle.checked;
+    localStorage.setItem(SCHOOL_SHOW_WINTER_KEY, JSON.stringify(schoolShowWinter));
+  });
+}
+if (easterHolidayTypeToggle) {
+  easterHolidayTypeToggle.checked = !!schoolShowEaster;
+  easterHolidayTypeToggle.addEventListener("change", () => {
+    schoolShowEaster = easterHolidayTypeToggle.checked;
+    localStorage.setItem(SCHOOL_SHOW_EASTER_KEY, JSON.stringify(schoolShowEaster));
+  });
+}
+if (pentecostHolidayTypeToggle) {
+  pentecostHolidayTypeToggle.checked = !!schoolShowPentecost;
+  pentecostHolidayTypeToggle.addEventListener("change", () => {
+    schoolShowPentecost = pentecostHolidayTypeToggle.checked;
+    localStorage.setItem(SCHOOL_SHOW_PENTECOST_KEY, JSON.stringify(schoolShowPentecost));
+  });
+}
+if (summerHolidayTypeToggle) {
+  summerHolidayTypeToggle.checked = !!schoolShowSummer;
+  summerHolidayTypeToggle.addEventListener("change", () => {
+    schoolShowSummer = summerHolidayTypeToggle.checked;
+    localStorage.setItem(SCHOOL_SHOW_SUMMER_KEY, JSON.stringify(schoolShowSummer));
+  });
+}
+if (autumnHolidayTypeToggle) {
+  autumnHolidayTypeToggle.checked = !!schoolShowAutumn;
+  autumnHolidayTypeToggle.addEventListener("change", () => {
+    schoolShowAutumn = autumnHolidayTypeToggle.checked;
+    localStorage.setItem(SCHOOL_SHOW_AUTUMN_KEY, JSON.stringify(schoolShowAutumn));
+  });
+}
+if (christmasHolidayTypeToggle) {
+  christmasHolidayTypeToggle.checked = !!schoolShowChristmas;
+  christmasHolidayTypeToggle.addEventListener("change", () => {
+    schoolShowChristmas = christmasHolidayTypeToggle.checked;
+    localStorage.setItem(SCHOOL_SHOW_CHRISTMAS_KEY, JSON.stringify(schoolShowChristmas));
+  });
+}
+
+updateSchoolHolidayControlsState();
 
 if (germanRegionSelect) {
   germanRegionSelect.value = germanRegion;

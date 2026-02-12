@@ -38,6 +38,12 @@ const SCHOOL_COLOR_PENTECOST_KEY = "calendar_school_color_pentecost";
 const SCHOOL_COLOR_SUMMER_KEY = "calendar_school_color_summer";
 const SCHOOL_COLOR_AUTUMN_KEY = "calendar_school_color_autumn";
 const SCHOOL_COLOR_CHRISTMAS_KEY = "calendar_school_color_christmas";
+const SCHOOL_SHOW_WINTER_KEY = "calendar_school_show_winter";
+const SCHOOL_SHOW_EASTER_KEY = "calendar_school_show_easter";
+const SCHOOL_SHOW_PENTECOST_KEY = "calendar_school_show_pentecost";
+const SCHOOL_SHOW_SUMMER_KEY = "calendar_school_show_summer";
+const SCHOOL_SHOW_AUTUMN_KEY = "calendar_school_show_autumn";
+const SCHOOL_SHOW_CHRISTMAS_KEY = "calendar_school_show_christmas";
 const TURKISH_KEY = "calendar_turkish_holidays";
 const ARABIC_KEY = "calendar_arabic_holidays";
 const SHIFT_KEY = "calendar_shift_plan";
@@ -48,6 +54,7 @@ const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
 const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
+const VIEW_DATE_SESSION_KEY = "calendar_view_date";
 const APP_VERSION = "1.0.8";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
@@ -58,6 +65,30 @@ let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 
 function saveEvents() {
   localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+}
+
+function getInitialCalendarDate() {
+  try {
+    const raw = sessionStorage.getItem(VIEW_DATE_SESSION_KEY);
+    if (raw && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      const d = parseDateSafe(raw);
+      if (d) return new Date(d.getFullYear(), d.getMonth(), 1);
+    }
+  } catch (_) {
+    // ignore
+  }
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
+
+function persistCalendarViewDate(date) {
+  try {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    sessionStorage.setItem(VIEW_DATE_SESSION_KEY, `${y}-${m}-01`);
+  } catch (_) {
+    // ignore
+  }
 }
 
 // Initialisierung
@@ -86,7 +117,7 @@ const versionLabel = document.getElementById("versionLabel");
 const todayDisplay = document.getElementById("todayDisplay");
 const clockPanel = document.getElementById("clockPanel");
 
-let currentDate = new Date();
+let currentDate = getInitialCalendarDate();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
 let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
 let includeSchoolHolidays = JSON.parse(localStorage.getItem(SCHOOL_HOLIDAYS_KEY)) ?? false;
@@ -99,6 +130,17 @@ let schoolHolidayColors = {
   autumn: localStorage.getItem(SCHOOL_COLOR_AUTUMN_KEY) || "#a78bfa",
   christmas: localStorage.getItem(SCHOOL_COLOR_CHRISTMAS_KEY) || "#ef4444"
 };
+let schoolHolidayVisible = {
+  winter: JSON.parse(localStorage.getItem(SCHOOL_SHOW_WINTER_KEY)),
+  easter: JSON.parse(localStorage.getItem(SCHOOL_SHOW_EASTER_KEY)),
+  pentecost: JSON.parse(localStorage.getItem(SCHOOL_SHOW_PENTECOST_KEY)),
+  summer: JSON.parse(localStorage.getItem(SCHOOL_SHOW_SUMMER_KEY)),
+  autumn: JSON.parse(localStorage.getItem(SCHOOL_SHOW_AUTUMN_KEY)),
+  christmas: JSON.parse(localStorage.getItem(SCHOOL_SHOW_CHRISTMAS_KEY))
+};
+Object.keys(schoolHolidayVisible).forEach(k => {
+  if (schoolHolidayVisible[k] === null) schoolHolidayVisible[k] = true;
+});
 let includeTurkish = JSON.parse(localStorage.getItem(TURKISH_KEY)) ?? true;
 let includeArabic = JSON.parse(localStorage.getItem(ARABIC_KEY)) ?? false;
 let shiftPlan = JSON.parse(localStorage.getItem(SHIFT_KEY)) || null;
@@ -356,6 +398,7 @@ function renderCalendar(date) {
 
   const year = date.getFullYear();
   const month = date.getMonth();
+  persistCalendarViewDate(new Date(year, month, 1));
 
   const locale = (window.i18n && window.i18n.getLangData)
     ? window.i18n.getLangData("locale", "de-DE")
@@ -815,12 +858,12 @@ function getGermanSchoolHolidaysByRegion(year, regionName) {
   const exact = getExactSchoolHolidayData(year, region);
   if (exact) {
     const list = [];
-    addHolidayRangesIso(list, exact.winter, year, `Winterferien (${region})`);
-    addHolidayRangesIso(list, exact.easter, year, `Osterferien (${region})`);
-    addHolidayRangesIso(list, exact.pentecost, year, `Pfingstferien (${region})`);
-    addHolidayRangesIso(list, exact.summer, year, `Sommerferien (${region})`);
-    addHolidayRangesIso(list, exact.autumn, year, `Herbstferien (${region})`);
-    addHolidayRangesIso(list, exact.christmas, year, `Weihnachtsferien (${region})`);
+    if (isSchoolHolidayTypeVisible("winter")) addHolidayRangesIso(list, exact.winter, year, `Winterferien (${region})`);
+    if (isSchoolHolidayTypeVisible("easter")) addHolidayRangesIso(list, exact.easter, year, `Osterferien (${region})`);
+    if (isSchoolHolidayTypeVisible("pentecost")) addHolidayRangesIso(list, exact.pentecost, year, `Pfingstferien (${region})`);
+    if (isSchoolHolidayTypeVisible("summer")) addHolidayRangesIso(list, exact.summer, year, `Sommerferien (${region})`);
+    if (isSchoolHolidayTypeVisible("autumn")) addHolidayRangesIso(list, exact.autumn, year, `Herbstferien (${region})`);
+    if (isSchoolHolidayTypeVisible("christmas")) addHolidayRangesIso(list, exact.christmas, year, `Weihnachtsferien (${region})`);
     return list;
   }
 
@@ -834,27 +877,35 @@ function getGermanSchoolHolidaysByRegion(year, regionName) {
   const easter = getEasterSunday(year);
 
   // NRW has no fixed winter holiday block; avoid incorrect February week rendering.
-  if (region !== "Nordrhein-Westfalen") {
+  if (region !== "Nordrhein-Westfalen" && isSchoolHolidayTypeVisible("winter")) {
     const winterStart = shiftDate(getMondayOnOrAfter(new Date(year, 0, 27)), cfg.winter * 7);
     const winterEnd = shiftDate(winterStart, 6);
     addHolidayRange(list, winterStart, winterEnd, year, `Winterferien (${region})`);
   }
 
-  const easterStart = shiftDate(easter, -12 + (cfg.easter * 2));
-  const easterEnd = shiftDate(easterStart, 13);
-  addHolidayRange(list, easterStart, easterEnd, year, `Osterferien (${region})`);
+  if (isSchoolHolidayTypeVisible("easter")) {
+    const easterStart = shiftDate(easter, -12 + (cfg.easter * 2));
+    const easterEnd = shiftDate(easterStart, 13);
+    addHolidayRange(list, easterStart, easterEnd, year, `Osterferien (${region})`);
+  }
 
-  const summerStart = shiftDate(getMondayOnOrAfter(new Date(year, 5, 20)), cfg.summer * 7);
-  const summerEnd = shiftDate(summerStart, 41);
-  addHolidayRange(list, summerStart, summerEnd, year, `Sommerferien (${region})`);
+  if (isSchoolHolidayTypeVisible("summer")) {
+    const summerStart = shiftDate(getMondayOnOrAfter(new Date(year, 5, 20)), cfg.summer * 7);
+    const summerEnd = shiftDate(summerStart, 41);
+    addHolidayRange(list, summerStart, summerEnd, year, `Sommerferien (${region})`);
+  }
 
-  const autumnStart = shiftDate(getMondayOnOrAfter(new Date(year, 9, 6)), cfg.autumn * 7);
-  const autumnEnd = shiftDate(autumnStart, 9);
-  addHolidayRange(list, autumnStart, autumnEnd, year, `Herbstferien (${region})`);
+  if (isSchoolHolidayTypeVisible("autumn")) {
+    const autumnStart = shiftDate(getMondayOnOrAfter(new Date(year, 9, 6)), cfg.autumn * 7);
+    const autumnEnd = shiftDate(autumnStart, 9);
+    addHolidayRange(list, autumnStart, autumnEnd, year, `Herbstferien (${region})`);
+  }
 
-  const christmasStart = shiftDate(new Date(year, 11, 22), cfg.xmas);
-  const christmasEnd = shiftDate(new Date(year + 1, 0, 6), cfg.xmas);
-  addHolidayRange(list, christmasStart, christmasEnd, year, `Weihnachtsferien (${region})`);
+  if (isSchoolHolidayTypeVisible("christmas")) {
+    const christmasStart = shiftDate(new Date(year, 11, 22), cfg.xmas);
+    const christmasEnd = shiftDate(new Date(year + 1, 0, 6), cfg.xmas);
+    addHolidayRange(list, christmasStart, christmasEnd, year, `Weihnachtsferien (${region})`);
+  }
 
   return list;
 }
@@ -865,6 +916,12 @@ function getCalendarHolidayList(year) {
     year,
     includeGerman ? 1 : 0,
     includeSchoolHolidays ? 1 : 0,
+    schoolHolidayVisible.winter ? 1 : 0,
+    schoolHolidayVisible.easter ? 1 : 0,
+    schoolHolidayVisible.pentecost ? 1 : 0,
+    schoolHolidayVisible.summer ? 1 : 0,
+    schoolHolidayVisible.autumn ? 1 : 0,
+    schoolHolidayVisible.christmas ? 1 : 0,
     includeTurkish ? 1 : 0,
     includeArabic ? 1 : 0,
     region
@@ -900,6 +957,11 @@ function getSchoolHolidayType(name) {
 function getSchoolHolidayColor(name) {
   const t = getSchoolHolidayType(name);
   return t ? (schoolHolidayColors[t] || "") : "";
+}
+
+function isSchoolHolidayTypeVisible(type) {
+  if (!type) return true;
+  return schoolHolidayVisible[type] !== false;
 }
 
 function buildDayCell(cellDate, inCurrentMonth) {
