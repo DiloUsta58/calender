@@ -48,7 +48,7 @@ const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
 const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
-const APP_VERSION = "1.0.7";
+const APP_VERSION = "1.0.8";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
