@@ -37,9 +37,18 @@
         <h2 id="monthLabel"></h2>
         <button id="toggleMonthPicker" class="compact-toggle" type="button" data-i18n="select_month">Monat wählen</button>
         <div class="month-controls">
-          <select id="monthSelect"></select>
+          <div id="monthSelectWrap" class="custom-month-select">
+            <select id="monthSelect" class="native-month-select"></select>
+            <button id="monthSelectBtn" class="custom-month-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"></button>
+            <div id="monthSelectList" class="custom-month-list" role="listbox" aria-label="Monat"></div>
+          </div>
           <div class="year-input-wrap">
-            <input id="yearInput" type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr" data-i18n-placeholder="year">
+            <input id="yearInput" class="native-year-input" type="number" inputmode="numeric" min="1900" max="2100" placeholder="Jahr" data-i18n-placeholder="year">
+            <div id="yearSelectWrap" class="custom-year-select">
+              <input id="yearInputCustom" class="custom-year-input" type="text" inputmode="numeric" placeholder="Jahr" data-i18n-placeholder="year" aria-label="Jahr">
+              <button id="yearSelectBtn" class="custom-year-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">▾</button>
+              <div id="yearSelectList" class="custom-year-list" role="listbox" aria-label="Jahr"></div>
+            </div>
             <button id="yearApply" type="button" data-i18n="apply">Übernehmen</button>
           </div>
         </div>

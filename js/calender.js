@@ -30,6 +30,14 @@ const HOLIDAYS = {
 const EVENTS_KEY = "calendar_events";
 const ISLAMIC_KEY = "calendar_islamic_holidays";
 const GERMAN_KEY = "calendar_german_holidays";
+const SCHOOL_HOLIDAYS_KEY = "calendar_school_holidays";
+const GERMAN_REGION_KEY = "calendar_german_region";
+const SCHOOL_COLOR_WINTER_KEY = "calendar_school_color_winter";
+const SCHOOL_COLOR_EASTER_KEY = "calendar_school_color_easter";
+const SCHOOL_COLOR_PENTECOST_KEY = "calendar_school_color_pentecost";
+const SCHOOL_COLOR_SUMMER_KEY = "calendar_school_color_summer";
+const SCHOOL_COLOR_AUTUMN_KEY = "calendar_school_color_autumn";
+const SCHOOL_COLOR_CHRISTMAS_KEY = "calendar_school_color_christmas";
 const TURKISH_KEY = "calendar_turkish_holidays";
 const ARABIC_KEY = "calendar_arabic_holidays";
 const SHIFT_KEY = "calendar_shift_plan";
@@ -38,6 +46,8 @@ const POPUP_FONT_SIZE_KEY = "calendar_popup_font_size";
 const WEEK_START_KEY = "calendar_week_start";
 const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
 const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
+const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
+const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const APP_VERSION = "1.0.7";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
@@ -54,7 +64,14 @@ function saveEvents() {
 const grid = document.querySelector(".calendar-grid");
 const monthLabel = document.getElementById("monthLabel");
 const monthSelect = document.getElementById("monthSelect");
+const monthSelectWrap = document.getElementById("monthSelectWrap");
+const monthSelectBtn = document.getElementById("monthSelectBtn");
+const monthSelectList = document.getElementById("monthSelectList");
 const yearInput = document.getElementById("yearInput");
+const yearSelectWrap = document.getElementById("yearSelectWrap");
+const yearInputCustom = document.getElementById("yearInputCustom");
+const yearSelectBtn = document.getElementById("yearSelectBtn");
+const yearSelectList = document.getElementById("yearSelectList");
 const yearApply = document.getElementById("yearApply");
 const toggleMonthPicker = document.getElementById("toggleMonthPicker");
 const calendarRoot = document.querySelector(".calendar");
@@ -72,6 +89,16 @@ const clockPanel = document.getElementById("clockPanel");
 let currentDate = new Date();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
 let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
+let includeSchoolHolidays = JSON.parse(localStorage.getItem(SCHOOL_HOLIDAYS_KEY)) ?? false;
+let germanRegion = localStorage.getItem(GERMAN_REGION_KEY) || "Nordrhein-Westfalen";
+let schoolHolidayColors = {
+  winter: localStorage.getItem(SCHOOL_COLOR_WINTER_KEY) || "#60a5fa",
+  easter: localStorage.getItem(SCHOOL_COLOR_EASTER_KEY) || "#34d399",
+  pentecost: localStorage.getItem(SCHOOL_COLOR_PENTECOST_KEY) || "#fbbf24",
+  summer: localStorage.getItem(SCHOOL_COLOR_SUMMER_KEY) || "#f97316",
+  autumn: localStorage.getItem(SCHOOL_COLOR_AUTUMN_KEY) || "#a78bfa",
+  christmas: localStorage.getItem(SCHOOL_COLOR_CHRISTMAS_KEY) || "#ef4444"
+};
 let includeTurkish = JSON.parse(localStorage.getItem(TURKISH_KEY)) ?? true;
 let includeArabic = JSON.parse(localStorage.getItem(ARABIC_KEY)) ?? false;
 let shiftPlan = JSON.parse(localStorage.getItem(SHIFT_KEY)) || null;
@@ -82,6 +109,9 @@ let showWeekNumbers = JSON.parse(localStorage.getItem(SHOW_WEEK_NUMBERS_KEY));
 if (showWeekNumbers === null) showWeekNumbers = true;
 let showVacationCountdown = JSON.parse(localStorage.getItem(SHOW_VACATION_COUNTDOWN_KEY));
 if (showVacationCountdown === null) showVacationCountdown = true;
+let showBirthdayCountdown = JSON.parse(localStorage.getItem(SHOW_BIRTHDAY_COUNTDOWN_KEY));
+if (showBirthdayCountdown === null) showBirthdayCountdown = true;
+let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) || "queue";
 let monthPickerReady = false;
 let headerTimerId = null;
 
@@ -111,6 +141,165 @@ function applyDisplaySettings() {
   }
 }
 
+function closeCustomMonthSelect() {
+  if (!monthSelectWrap || !monthSelectBtn) return;
+  monthSelectWrap.classList.remove("open");
+  monthSelectBtn.setAttribute("aria-expanded", "false");
+}
+
+function closeCustomYearSelect() {
+  if (!yearSelectWrap || !yearSelectBtn) return;
+  yearSelectWrap.classList.remove("open");
+  yearSelectBtn.setAttribute("aria-expanded", "false");
+}
+
+function syncCustomMonthSelect() {
+  if (!monthSelect || !monthSelectBtn || !monthSelectList) return;
+  const selected = monthSelect.options[monthSelect.selectedIndex];
+  monthSelectBtn.textContent = selected ? selected.textContent : "";
+
+  monthSelectList.querySelectorAll(".custom-month-option").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.value === monthSelect.value);
+  });
+}
+
+function buildCustomMonthSelect() {
+  if (!monthSelect || !monthSelectWrap || !monthSelectBtn || !monthSelectList) return;
+
+  monthSelectList.innerHTML = "";
+  Array.from(monthSelect.options).forEach(option => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "custom-month-option";
+    item.dataset.value = option.value;
+    item.textContent = option.textContent || "";
+    item.addEventListener("click", () => {
+      monthSelect.value = option.value;
+      monthSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      closeCustomMonthSelect();
+    });
+    monthSelectList.appendChild(item);
+  });
+  syncCustomMonthSelect();
+
+  if (monthSelectWrap.dataset.ready === "1") return;
+
+  monthSelectBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = monthSelectWrap.classList.toggle("open");
+    monthSelectBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+
+  monthSelectList.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!monthSelectWrap.contains(e.target)) {
+      closeCustomMonthSelect();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeCustomMonthSelect();
+    }
+  });
+
+  monthSelectWrap.dataset.ready = "1";
+}
+
+function getEnteredYear() {
+  const source = yearInputCustom?.value || yearInput?.value || "";
+  const y = Number(source);
+  return Number.isFinite(y) ? y : NaN;
+}
+
+function syncCustomYearInput() {
+  if (!yearInput || !yearInputCustom) return;
+  yearInputCustom.value = String(yearInput.value || "");
+}
+
+function syncCustomYearOptions() {
+  if (!yearSelectList || !yearInput) return;
+  yearSelectList.querySelectorAll(".custom-year-option").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.value === yearInput.value);
+  });
+}
+
+function buildCustomYearOptions(centerYear) {
+  if (!yearSelectList || !yearInput) return;
+  const base = Number.isFinite(centerYear) ? centerYear : currentDate.getFullYear();
+  const from = Math.max(1900, base - 60);
+  const to = Math.min(2100, base + 40);
+  yearSelectList.innerHTML = "";
+  for (let y = to; y >= from; y--) {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "custom-year-option";
+    item.dataset.value = String(y);
+    item.textContent = String(y);
+    item.addEventListener("click", () => {
+      yearInput.value = String(y);
+      syncCustomYearInput();
+      syncCustomYearOptions();
+      closeCustomYearSelect();
+      const m = Number(monthSelect?.value || currentDate.getMonth());
+      currentDate = new Date(y, m, 1);
+      renderCalendar(currentDate);
+    });
+    yearSelectList.appendChild(item);
+  }
+  syncCustomYearOptions();
+}
+
+function setupCustomYearInput() {
+  if (!yearInput || !yearInputCustom || !yearSelectWrap || !yearSelectBtn || !yearSelectList) return;
+  syncCustomYearInput();
+  buildCustomYearOptions(Number(yearInput.value));
+
+  if (yearSelectWrap.dataset.ready === "1") return;
+
+  yearInputCustom.addEventListener("input", () => {
+    const digitsOnly = yearInputCustom.value.replace(/[^\d]/g, "").slice(0, 4);
+    yearInputCustom.value = digitsOnly;
+    yearInput.value = digitsOnly;
+    syncCustomYearOptions();
+  });
+
+  yearInputCustom.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      yearApply?.click();
+    }
+  });
+
+  yearSelectBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    buildCustomYearOptions(Number(yearInput.value));
+    const isOpen = yearSelectWrap.classList.toggle("open");
+    yearSelectBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+
+  yearSelectList.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!yearSelectWrap.contains(e.target)) {
+      closeCustomYearSelect();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeCustomYearSelect();
+    }
+  });
+
+  yearSelectWrap.dataset.ready = "1";
+}
+
 function setupMonthPicker() {
   if (!monthSelect || !yearInput) return;
   const months = (window.i18n && window.i18n.getLangData)
@@ -122,18 +311,27 @@ function setupMonthPicker() {
 
   yearInput.value = String(currentDate.getFullYear());
   monthSelect.value = String(currentDate.getMonth());
+  buildCustomMonthSelect();
+  setupCustomYearInput();
+  syncCustomYearInput();
+  syncCustomYearOptions();
 
   if (!monthPickerReady) {
     monthSelect.addEventListener("change", () => {
       const m = Number(monthSelect.value);
-      const y = Number(yearInput.value);
+      const yRaw = getEnteredYear();
+      const y = Number.isFinite(yRaw) ? yRaw : currentDate.getFullYear();
       currentDate = new Date(y, m, 1);
       renderCalendar(currentDate);
+      syncCustomMonthSelect();
     });
 
     const applyYear = () => {
-      const y = Number(yearInput.value);
+      const y = getEnteredYear();
       if (!Number.isFinite(y) || y < 1900 || y > 2100) return;
+      yearInput.value = String(y);
+      syncCustomYearInput();
+      syncCustomYearOptions();
       const m = Number(monthSelect.value);
       currentDate = new Date(y, m, 1);
       renderCalendar(currentDate);
@@ -167,6 +365,9 @@ function renderCalendar(date) {
   if (monthSelect && yearInput) {
     monthSelect.value = String(month);
     yearInput.value = String(year);
+    syncCustomMonthSelect();
+    syncCustomYearInput();
+    syncCustomYearOptions();
   }
 
   const firstDay = new Date(year, month, 1);
@@ -240,6 +441,467 @@ function renderCalendar(date) {
   }
 }
 
+const GERMAN_REGIONS = new Set([
+  "Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hessen",
+  "Mecklenburg-Vorpommern", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz",
+  "Saarland", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen"
+]);
+
+const SCHOOL_REGION_OFFSETS = {
+  "Baden-Württemberg": { winter: 0, easter: 0, summer: 3, autumn: 1, xmas: 0 },
+  "Bayern": { winter: 1, easter: 1, summer: 4, autumn: 2, xmas: 1 },
+  "Berlin": { winter: 2, easter: 2, summer: 0, autumn: 0, xmas: 0 },
+  "Brandenburg": { winter: 3, easter: 2, summer: 1, autumn: 0, xmas: 1 },
+  "Bremen": { winter: 1, easter: 0, summer: 2, autumn: 1, xmas: 0 },
+  "Hamburg": { winter: 2, easter: 1, summer: 2, autumn: 1, xmas: 0 },
+  "Hessen": { winter: 1, easter: 0, summer: 5, autumn: 1, xmas: 0 },
+  "Mecklenburg-Vorpommern": { winter: 4, easter: 3, summer: 0, autumn: 2, xmas: 1 },
+  "Niedersachsen": { winter: 0, easter: 1, summer: 1, autumn: 2, xmas: 0 },
+  "Nordrhein-Westfalen": { winter: 0, easter: 0, summer: 2, autumn: 1, xmas: 0 },
+  "Rheinland-Pfalz": { winter: 1, easter: 1, summer: 3, autumn: 1, xmas: 0 },
+  "Saarland": { winter: 2, easter: 1, summer: 4, autumn: 1, xmas: 1 },
+  "Sachsen": { winter: 3, easter: 3, summer: 5, autumn: 2, xmas: 1 },
+  "Sachsen-Anhalt": { winter: 3, easter: 2, summer: 1, autumn: 2, xmas: 1 },
+  "Schleswig-Holstein": { winter: 0, easter: 1, summer: 0, autumn: 0, xmas: 0 },
+  "Thüringen": { winter: 2, easter: 2, summer: 5, autumn: 2, xmas: 1 }
+};
+
+const EXACT_SCHOOL_CACHE_KEY = "calendar_school_holidays_exact_v1";
+
+const EXACT_SCHOOL_HOLIDAYS = {
+  2026: {
+    "Baden-Württemberg": {
+      easter: [["2026-03-30", "2026-04-11"]],
+      pentecost: [["2026-05-26", "2026-06-05"]],
+      summer: [["2026-07-30", "2026-09-12"]],
+      autumn: [["2026-10-26", "2026-10-31"]],
+      christmas: [["2026-12-23", "2027-01-09"]]
+    },
+    "Bayern": {
+      winter: [["2026-02-16", "2026-02-20"]],
+      easter: [["2026-03-30", "2026-04-10"]],
+      pentecost: [["2026-05-26", "2026-06-05"]],
+      summer: [["2026-08-03", "2026-09-14"]],
+      autumn: [["2026-11-02", "2026-11-06"], ["2026-11-18", "2026-11-18"]],
+      christmas: [["2026-12-24", "2027-01-08"]]
+    },
+    "Berlin": {
+      winter: [["2026-02-02", "2026-02-07"]],
+      easter: [["2026-03-30", "2026-04-10"], ["2026-05-15", "2026-05-15"]],
+      pentecost: [["2026-05-26", "2026-05-26"]],
+      summer: [["2026-07-09", "2026-08-22"]],
+      autumn: [["2026-10-19", "2026-10-31"]],
+      christmas: [["2026-12-23", "2027-01-02"]]
+    },
+    "Brandenburg": {
+      winter: [["2026-02-02", "2026-02-07"]],
+      easter: [["2026-03-30", "2026-04-10"], ["2026-05-15", "2026-05-15"]],
+      pentecost: [["2026-05-26", "2026-05-26"]],
+      summer: [["2026-07-09", "2026-08-22"]],
+      autumn: [["2026-10-19", "2026-10-30"]],
+      christmas: [["2026-12-23", "2027-01-02"]]
+    },
+    "Bremen": {
+      winter: [["2026-02-02", "2026-02-03"]],
+      easter: [["2026-03-23", "2026-04-07"]],
+      pentecost: [["2026-05-15", "2026-05-15"], ["2026-05-26", "2026-05-26"]],
+      summer: [["2026-07-02", "2026-08-12"]],
+      autumn: [["2026-10-12", "2026-10-24"]],
+      christmas: [["2026-12-23", "2027-01-09"]]
+    },
+    "Hamburg": {
+      winter: [["2026-01-30", "2026-01-30"]],
+      easter: [["2026-03-02", "2026-03-13"]],
+      pentecost: [["2026-05-11", "2026-05-15"]],
+      summer: [["2026-07-09", "2026-08-19"]],
+      autumn: [["2026-10-19", "2026-10-30"]],
+      christmas: [["2026-12-21", "2027-01-01"]]
+    },
+    "Hessen": {
+      easter: [["2026-03-30", "2026-04-10"]],
+      summer: [["2026-06-29", "2026-08-07"]],
+      autumn: [["2026-10-05", "2026-10-17"]],
+      christmas: [["2026-12-23", "2027-01-12"]]
+    },
+    "Mecklenburg-Vorpommern": {
+      winter: [["2026-02-09", "2026-02-20"]],
+      easter: [["2026-03-30", "2026-04-08"]],
+      pentecost: [["2026-05-15", "2026-05-15"], ["2026-05-22", "2026-05-26"]],
+      summer: [["2026-07-13", "2026-08-22"]],
+      autumn: [["2026-10-15", "2026-10-24"]],
+      christmas: [["2026-12-21", "2027-01-02"]]
+    },
+    "Niedersachsen": {
+      winter: [["2026-02-02", "2026-02-03"]],
+      easter: [["2026-03-23", "2026-04-07"]],
+      pentecost: [["2026-05-15", "2026-05-15"], ["2026-05-26", "2026-05-26"]],
+      summer: [["2026-07-02", "2026-08-12"]],
+      autumn: [["2026-10-12", "2026-10-24"]],
+      christmas: [["2026-12-23", "2027-01-09"]]
+    },
+    "Nordrhein-Westfalen": {
+      easter: [["2026-03-30", "2026-04-11"]],
+      pentecost: [["2026-05-26", "2026-05-26"]],
+      summer: [["2026-07-20", "2026-09-01"]],
+      autumn: [["2026-10-17", "2026-10-31"]],
+      christmas: [["2026-12-23", "2027-01-06"]]
+    },
+    "Rheinland-Pfalz": {
+      easter: [["2026-03-30", "2026-04-10"]],
+      summer: [["2026-06-29", "2026-08-07"]],
+      autumn: [["2026-10-05", "2026-10-16"]],
+      christmas: [["2026-12-23", "2027-01-08"]]
+    },
+    "Saarland": {
+      winter: [["2026-02-16", "2026-02-20"]],
+      easter: [["2026-04-07", "2026-04-17"]],
+      summer: [["2026-06-29", "2026-08-07"]],
+      autumn: [["2026-10-05", "2026-10-16"]],
+      christmas: [["2026-12-21", "2026-12-31"]]
+    },
+    "Sachsen": {
+      winter: [["2026-02-09", "2026-02-21"]],
+      easter: [["2026-04-03", "2026-04-10"], ["2026-05-15", "2026-05-15"]],
+      summer: [["2026-07-04", "2026-08-14"]],
+      autumn: [["2026-10-12", "2026-10-24"]],
+      christmas: [["2026-12-23", "2027-01-02"]]
+    },
+    "Sachsen-Anhalt": {
+      winter: [["2026-01-31", "2026-02-06"]],
+      easter: [["2026-03-30", "2026-04-04"]],
+      pentecost: [["2026-05-26", "2026-05-29"]],
+      summer: [["2026-07-04", "2026-08-14"]],
+      autumn: [["2026-10-19", "2026-10-30"]],
+      christmas: [["2026-12-23", "2027-01-02"]]
+    },
+    "Schleswig-Holstein": {
+      winter: [["2026-02-02", "2026-02-03"]],
+      easter: [["2026-03-26", "2026-04-10"]],
+      pentecost: [["2026-05-15", "2026-05-15"]],
+      summer: [["2026-07-04", "2026-08-15"]],
+      autumn: [["2026-10-12", "2026-10-24"]],
+      christmas: [["2026-12-21", "2027-01-06"]]
+    },
+    "Thüringen": {
+      winter: [["2026-02-16", "2026-02-21"]],
+      easter: [["2026-04-07", "2026-04-17"]],
+      pentecost: [["2026-05-15", "2026-05-15"]],
+      summer: [["2026-07-04", "2026-08-14"]],
+      autumn: [["2026-10-12", "2026-10-24"]],
+      christmas: [["2026-12-23", "2027-01-02"]]
+    }
+  }
+};
+
+const holidayCache = new Map();
+const schoolHolidayFetchInFlight = new Map();
+let exactSchoolHolidayCache = loadExactSchoolHolidayCache();
+
+function normalizeGermanRegion(region) {
+  return GERMAN_REGIONS.has(region) ? region : "Nordrhein-Westfalen";
+}
+
+function pad2(num) {
+  return String(num).padStart(2, "0");
+}
+
+function toIsoDate(date) {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+}
+
+function shiftDate(date, days) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function getMondayOnOrAfter(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  while (d.getDay() !== 1) d.setDate(d.getDate() + 1);
+  return d;
+}
+
+function addHolidayIfSameYear(list, date, year, name) {
+  if (date.getFullYear() !== year) return;
+  list.push({ date: toIsoDate(date), name });
+}
+
+function addHolidayRange(list, startDate, endDate, year, name) {
+  const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  if (end < start) return;
+  const cursor = new Date(start);
+  while (cursor <= end) {
+    if (cursor.getFullYear() === year) {
+      list.push({ date: toIsoDate(cursor), name });
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+}
+
+function addHolidayRangesIso(list, ranges, year, name) {
+  if (!Array.isArray(ranges)) return;
+  ranges.forEach(range => {
+    if (!Array.isArray(range) || range.length !== 2) return;
+    const start = parseDateSafe(range[0]);
+    const end = parseDateSafe(range[1]);
+    if (!start || !end) return;
+    addHolidayRange(list, start, end, year, name);
+  });
+}
+
+function loadExactSchoolHolidayCache() {
+  const out = JSON.parse(JSON.stringify(EXACT_SCHOOL_HOLIDAYS || {}));
+  try {
+    const raw = localStorage.getItem(EXACT_SCHOOL_CACHE_KEY);
+    if (!raw) return out;
+    const saved = JSON.parse(raw);
+    if (!saved || typeof saved !== "object") return out;
+    Object.keys(saved).forEach(y => {
+      if (!out[y]) out[y] = {};
+      Object.keys(saved[y] || {}).forEach(region => {
+        out[y][region] = saved[y][region];
+      });
+    });
+  } catch (_) {
+    // Ignore cache parse errors.
+  }
+  return out;
+}
+
+function persistExactSchoolHolidayCache() {
+  try {
+    localStorage.setItem(EXACT_SCHOOL_CACHE_KEY, JSON.stringify(exactSchoolHolidayCache));
+  } catch (_) {
+    // Ignore storage quota errors.
+  }
+}
+
+function getExactSchoolHolidayData(year, region) {
+  const y = String(year);
+  return exactSchoolHolidayCache?.[y]?.[region] || null;
+}
+
+function addRangeUnique(targetList, startIso, endIso) {
+  if (!Array.isArray(targetList)) return;
+  if (!targetList.some(r => Array.isArray(r) && r[0] === startIso && r[1] === endIso)) {
+    targetList.push([startIso, endIso]);
+  }
+}
+
+function ensureExactSchoolHolidaysFromApi(year, region) {
+  if (year < 2026) return;
+  const y = String(year);
+  if (getExactSchoolHolidayData(year, region)) return;
+  const key = `${y}|${region}`;
+  if (schoolHolidayFetchInFlight.has(key)) return;
+
+  const url = `api/school_holidays.php?year=${encodeURIComponent(y)}&region=${encodeURIComponent(region)}`;
+  const p = fetch(url, { cache: "no-store" })
+    .then(r => (r.ok ? r.json() : []))
+    .then(payload => {
+      const mapped = {
+        winter: [],
+        easter: [],
+        pentecost: [],
+        summer: [],
+        autumn: [],
+        christmas: []
+      };
+      const rows = payload?.data || {};
+      Object.keys(mapped).forEach(type => {
+        const ranges = Array.isArray(rows[type]) ? rows[type] : [];
+        ranges.forEach(range => {
+          if (!Array.isArray(range) || range.length !== 2) return;
+          const startIso = range[0];
+          const endIso = range[1];
+          if (!startIso || !endIso) return;
+          addRangeUnique(mapped[type], startIso, endIso);
+        });
+      });
+
+      if (!exactSchoolHolidayCache[y]) exactSchoolHolidayCache[y] = {};
+      exactSchoolHolidayCache[y][region] = mapped;
+      persistExactSchoolHolidayCache();
+      holidayCache.clear();
+      renderCalendar(currentDate);
+    })
+    .catch(() => {})
+    .finally(() => {
+      schoolHolidayFetchInFlight.delete(key);
+    });
+
+  schoolHolidayFetchInFlight.set(key, p);
+}
+
+function getEasterSunday(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+
+function getBussUndBettag(year) {
+  const d = new Date(year, 10, 23); // 23. November
+  while (d.getDay() !== 3) d.setDate(d.getDate() - 1); // Mittwoch
+  return d;
+}
+
+function getGermanPublicHolidaysByRegion(year, regionName) {
+  const region = normalizeGermanRegion(regionName);
+  const list = [];
+  const easter = getEasterSunday(year);
+
+  // Bundeseinheitliche Feiertage
+  list.push({ date: `${year}-01-01`, name: "Neujahr" });
+  list.push({ date: `${year}-05-01`, name: "Tag der Arbeit" });
+  list.push({ date: `${year}-10-03`, name: "Tag der Einheit" });
+  list.push({ date: `${year}-12-25`, name: "1. Weihnachtstag" });
+  list.push({ date: `${year}-12-26`, name: "2. Weihnachtstag" });
+  addHolidayIfSameYear(list, shiftDate(easter, -2), year, "Karfreitag");
+  addHolidayIfSameYear(list, shiftDate(easter, 1), year, "Ostermontag");
+  addHolidayIfSameYear(list, shiftDate(easter, 39), year, "Christi Himmelfahrt");
+  addHolidayIfSameYear(list, shiftDate(easter, 50), year, "Pfingstmontag");
+
+  if (["Baden-Württemberg", "Bayern", "Sachsen-Anhalt"].includes(region)) {
+    list.push({ date: `${year}-01-06`, name: "Heilige Drei Könige" });
+  }
+  if (["Baden-Württemberg", "Bayern", "Hessen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland"].includes(region)) {
+    addHolidayIfSameYear(list, shiftDate(easter, 60), year, "Fronleichnam");
+  }
+  if (["Baden-Württemberg", "Bayern", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland"].includes(region)) {
+    list.push({ date: `${year}-11-01`, name: "Allerheiligen" });
+  }
+  if (["Bayern", "Saarland"].includes(region)) {
+    list.push({ date: `${year}-08-15`, name: "Mariä Himmelfahrt" });
+  }
+  if ((region === "Berlin" && year >= 2019) || (region === "Mecklenburg-Vorpommern" && year >= 2023)) {
+    list.push({ date: `${year}-03-08`, name: "Internationaler Frauentag" });
+  }
+  if (region === "Thüringen" && year >= 2019) {
+    list.push({ date: `${year}-09-20`, name: "Weltkindertag" });
+  }
+  if (["Brandenburg", "Bremen", "Hamburg", "Mecklenburg-Vorpommern", "Niedersachsen", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen"].includes(region)) {
+    list.push({ date: `${year}-10-31`, name: "Reformationstag" });
+  }
+  if (region === "Sachsen") {
+    addHolidayIfSameYear(list, getBussUndBettag(year), year, "Buß- und Bettag");
+  }
+  if (region === "Brandenburg") {
+    addHolidayIfSameYear(list, easter, year, "Ostersonntag");
+    addHolidayIfSameYear(list, shiftDate(easter, 49), year, "Pfingstsonntag");
+  }
+
+  const dedupe = new Map();
+  list.forEach(h => {
+    dedupe.set(`${h.date}|${h.name}`, h);
+  });
+  return Array.from(dedupe.values());
+}
+
+function getGermanSchoolHolidaysByRegion(year, regionName) {
+  const region = normalizeGermanRegion(regionName);
+  const exact = getExactSchoolHolidayData(year, region);
+  if (exact) {
+    const list = [];
+    addHolidayRangesIso(list, exact.winter, year, `Winterferien (${region})`);
+    addHolidayRangesIso(list, exact.easter, year, `Osterferien (${region})`);
+    addHolidayRangesIso(list, exact.pentecost, year, `Pfingstferien (${region})`);
+    addHolidayRangesIso(list, exact.summer, year, `Sommerferien (${region})`);
+    addHolidayRangesIso(list, exact.autumn, year, `Herbstferien (${region})`);
+    addHolidayRangesIso(list, exact.christmas, year, `Weihnachtsferien (${region})`);
+    return list;
+  }
+
+  if (year >= 2026) {
+    ensureExactSchoolHolidaysFromApi(year, region);
+    return [];
+  }
+
+  const cfg = SCHOOL_REGION_OFFSETS[region] || SCHOOL_REGION_OFFSETS["Nordrhein-Westfalen"];
+  const list = [];
+  const easter = getEasterSunday(year);
+
+  // NRW has no fixed winter holiday block; avoid incorrect February week rendering.
+  if (region !== "Nordrhein-Westfalen") {
+    const winterStart = shiftDate(getMondayOnOrAfter(new Date(year, 0, 27)), cfg.winter * 7);
+    const winterEnd = shiftDate(winterStart, 6);
+    addHolidayRange(list, winterStart, winterEnd, year, `Winterferien (${region})`);
+  }
+
+  const easterStart = shiftDate(easter, -12 + (cfg.easter * 2));
+  const easterEnd = shiftDate(easterStart, 13);
+  addHolidayRange(list, easterStart, easterEnd, year, `Osterferien (${region})`);
+
+  const summerStart = shiftDate(getMondayOnOrAfter(new Date(year, 5, 20)), cfg.summer * 7);
+  const summerEnd = shiftDate(summerStart, 41);
+  addHolidayRange(list, summerStart, summerEnd, year, `Sommerferien (${region})`);
+
+  const autumnStart = shiftDate(getMondayOnOrAfter(new Date(year, 9, 6)), cfg.autumn * 7);
+  const autumnEnd = shiftDate(autumnStart, 9);
+  addHolidayRange(list, autumnStart, autumnEnd, year, `Herbstferien (${region})`);
+
+  const christmasStart = shiftDate(new Date(year, 11, 22), cfg.xmas);
+  const christmasEnd = shiftDate(new Date(year + 1, 0, 6), cfg.xmas);
+  addHolidayRange(list, christmasStart, christmasEnd, year, `Weihnachtsferien (${region})`);
+
+  return list;
+}
+
+function getCalendarHolidayList(year) {
+  const region = normalizeGermanRegion(germanRegion);
+  const key = [
+    year,
+    includeGerman ? 1 : 0,
+    includeSchoolHolidays ? 1 : 0,
+    includeTurkish ? 1 : 0,
+    includeArabic ? 1 : 0,
+    region
+  ].join("|");
+  if (holidayCache.has(key)) {
+    return holidayCache.get(key);
+  }
+
+  const list = [];
+  if (includeGerman) list.push(...getGermanPublicHolidaysByRegion(year, region));
+  if (includeSchoolHolidays) list.push(...getGermanSchoolHolidaysByRegion(year, region));
+  if (includeTurkish) list.push(...HOLIDAYS.TR(year));
+  if (includeArabic) list.push(...HOLIDAYS.MA(year));
+
+  const dedupe = new Map();
+  list.forEach(h => dedupe.set(`${h.date}|${h.name}`, h));
+  const result = Array.from(dedupe.values());
+  holidayCache.set(key, result);
+  return result;
+}
+
+function getSchoolHolidayType(name) {
+  const n = String(name || "");
+  if (n.startsWith("Winterferien")) return "winter";
+  if (n.startsWith("Osterferien")) return "easter";
+  if (n.startsWith("Pfingstferien")) return "pentecost";
+  if (n.startsWith("Sommerferien")) return "summer";
+  if (n.startsWith("Herbstferien")) return "autumn";
+  if (n.startsWith("Weihnachtsferien")) return "christmas";
+  return "";
+}
+
+function getSchoolHolidayColor(name) {
+  const t = getSchoolHolidayType(name);
+  return t ? (schoolHolidayColors[t] || "") : "";
+}
+
 function buildDayCell(cellDate, inCurrentMonth) {
   const year = cellDate.getFullYear();
   const month = cellDate.getMonth();
@@ -288,17 +950,19 @@ function buildDayCell(cellDate, inCurrentMonth) {
       entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="${editTitle}"${colorStyle}>${fullText}</div>`;
     });
 
-  const holidayList = [
-    ...(includeGerman ? HOLIDAYS.DE(year) : []),
-    ...(includeTurkish ? HOLIDAYS.TR(year) : []),
-    ...(includeArabic ? HOLIDAYS.MA(year) : [])
-  ];
+  const holidayList = getCalendarHolidayList(year);
 
   holidayList
     .filter(h => h.date === iso)
     .forEach(h => {
       isHoliday = true;
-      entries.innerHTML += `<div class="entry holiday">${h.name}</div>`;
+      const schoolBg = getSchoolHolidayColor(h.name);
+      if (schoolBg) {
+        const schoolFg = getContrastColor(schoolBg);
+        entries.innerHTML += `<div class="entry holiday school-holiday" style="background:${schoolBg};color:${schoolFg};">${h.name}</div>`;
+      } else {
+        entries.innerHTML += `<div class="entry holiday">${h.name}</div>`;
+      }
     });
 
   if (includeIslamic) {
@@ -423,28 +1087,61 @@ function updateHeaderClockAndCountdown() {
   const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
   const lines = [`<div class="clock-now">${time}</div>`];
   const upcoming = getUpcomingCountdownsForCurrentMonth(now);
+  let lastVacationLineIndex = -1;
   upcoming.forEach(item => {
+    const kindText = item.kindDetail || item.kind;
+    const lineIndex = lines.length;
     lines.push(
       `<div class="clock-countdown">` +
       `<span class="clock-left">${item.timeLeft}</span>` +
       `<span class="clock-sep">-</span>` +
-      `<span class="clock-name">${escapeHtml(item.name)} (${escapeHtml(item.kind)})</span>` +
+      `<span class="clock-name">${escapeHtml(item.name)} (${escapeHtml(kindText)})</span>` +
       `</div>`
     );
+    if (item.kind === ((window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub")) {
+      lastVacationLineIndex = lineIndex;
+    }
   });
+  const vacationTotal = getTotalVacationDaysFromEntries();
+  if (vacationTotal > 0 && lastVacationLineIndex >= 0) {
+    const entriesLabel = (window.i18n && window.i18n.t) ? window.i18n.t("entries_label") : "Einträge";
+    const vacationLabel = (window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub";
+    const daysLabel = (window.i18n && window.i18n.t) ? window.i18n.t("days") : "Tage";
+    const summaryLine = `<div class="clock-countdown clock-summary"><span class="clock-name">${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationTotal} ${escapeHtml(daysLabel)}</span></div>`;
+    lines.splice(lastVacationLineIndex + 1, 0, `<div class="clock-divider" aria-hidden="true"></div>`, summaryLine);
+  }
   clockPanel.innerHTML = lines.join("");
+}
+
+function getTotalVacationDaysFromEntries() {
+  let total = 0;
+  events.forEach(e => {
+    if (!e || e.type !== "vacation" || !e.date) return;
+    const start = parseDateSafe(e.date);
+    const end = parseDateSafe(e.endDate || e.date);
+    if (!start || !end) return;
+    const startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+    const endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+    const days = Math.max(1, Math.floor((Math.max(startUtc, endUtc) - Math.min(startUtc, endUtc)) / 86400000) + 1);
+    total += days;
+  });
+  return total;
 }
 
 function getUpcomingCountdownsForCurrentMonth(now) {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth(); // 0-based
   const candidates = [];
+  const vacationQueue = [];
   const birthdayLabel = (window.i18n && window.i18n.t) ? window.i18n.t("birthday") : "Geburtstag";
   const vacationLabel = (window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub";
+  const daysLabel = (window.i18n && window.i18n.t) ? window.i18n.t("days") : "Tage";
+  const mode = vacationCountdownMode === "all" ? "all" : "queue";
+  const nowDayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
 
   events.forEach(e => {
     if (!e?.date) return;
-    if (e.type === "birthday") {
+    if (e.type === "birthday" && showBirthdayCountdown) {
       const birth = parseDateSafe(e.date);
       if (!birth || birth.getMonth() !== month) return;
       const validYear = isBirthdayValidForYear(e, birth, year);
@@ -461,22 +1158,43 @@ function getUpcomingCountdownsForCurrentMonth(now) {
     if (e.type === "vacation" && showVacationCountdown) {
       const start = parseDateSafe(e.date);
       if (!start) return;
+      const end = parseDateSafe(e.endDate || e.date);
+      if (!end) return;
       const target = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0);
-      if (target < now) return;
-      candidates.push({
+      const startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+      const endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+      const rangeStartUtc = Math.min(startUtc, endUtc);
+      const rangeEndUtc = Math.max(startUtc, endUtc);
+      if (rangeEndUtc < nowDayUtc) return;
+      const totalDays = Math.max(1, Math.floor((Math.max(startUtc, endUtc) - Math.min(startUtc, endUtc)) / 86400000) + 1);
+      vacationQueue.push({
         name: e.title || vacationLabel,
         kind: vacationLabel,
-        target
+        kindDetail: `${vacationLabel} - ${totalDays} ${daysLabel}`,
+        target,
+        rangeStartUtc
       });
     }
   });
+
+  if (vacationQueue.length) {
+    vacationQueue.sort((a, b) => a.rangeStartUtc - b.rangeStartUtc);
+    if (mode === "all") {
+      candidates.push(...vacationQueue);
+    } else {
+      candidates.push(vacationQueue[0]);
+    }
+  }
 
   candidates.sort((a, b) => a.target - b.target);
 
   return candidates.map(c => ({
     name: c.name,
     kind: c.kind,
-    timeLeft: formatCountdown(c.target - now)
+    kindDetail: c.kindDetail,
+    timeLeft: c.kind === ((window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub")
+      ? formatCountdownNoSeconds(c.target - now)
+      : formatCountdown(c.target - now)
   }));
 }
 
@@ -497,6 +1215,14 @@ function formatCountdown(ms) {
   const mm = Math.floor((total % 3600) / 60);
   const ss = total % 60;
   return `${String(dd).padStart(2, "0")}:${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+}
+
+function formatCountdownNoSeconds(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const dd = Math.floor(total / 86400);
+  const hh = Math.floor((total % 86400) / 3600);
+  const mm = Math.floor((total % 3600) / 60);
+  return `${String(dd).padStart(2, "0")}:${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
 }
 
 function escapeHtml(value) {
@@ -643,15 +1369,17 @@ function buildOverlayListHtml(iso) {
     items.push(`<div class="overlay-item shift-item" data-shift-plan="1"${style}><span class="shift-badge-inline">${shiftEntry.code}</span>${shiftEntry.label}</div>`);
   }
 
-  const holidayList = [
-    ...(includeGerman ? HOLIDAYS.DE(year) : []),
-    ...(includeTurkish ? HOLIDAYS.TR(year) : []),
-    ...(includeArabic ? HOLIDAYS.MA(year) : [])
-  ];
+  const holidayList = getCalendarHolidayList(year);
   holidayList
     .filter(h => h.date === iso)
     .forEach(h => {
-      items.push(`<div class="overlay-item holiday">${h.name}</div>`);
+      const schoolBg = getSchoolHolidayColor(h.name);
+      if (schoolBg) {
+        const schoolFg = getContrastColor(schoolBg);
+        items.push(`<div class="overlay-item holiday school-holiday" style="background:${schoolBg};color:${schoolFg};">${h.name}</div>`);
+      } else {
+        items.push(`<div class="overlay-item holiday">${h.name}</div>`);
+      }
     });
 
   if (includeIslamic) {
