@@ -60,30 +60,48 @@
               <input type="checkbox" id="toggleSchoolHolidays">
               <span data-i18n="school_holidays_sub">Schulferien</span>
             </label>
-            <label class="settings-field">
-              <span>Winterferien Farbe</span>
-              <input id="colorWinterHoliday" type="color" value="#60a5fa">
-            </label>
-            <label class="settings-field">
-              <span>Osterferien Farbe</span>
-              <input id="colorEasterHoliday" type="color" value="#34d399">
-            </label>
-            <label class="settings-field">
-              <span>Pfingstferien Farbe</span>
-              <input id="colorPentecostHoliday" type="color" value="#fbbf24">
-            </label>
-            <label class="settings-field">
-              <span>Sommerferien Farbe</span>
-              <input id="colorSummerHoliday" type="color" value="#f97316">
-            </label>
-            <label class="settings-field">
-              <span>Herbstferien Farbe</span>
-              <input id="colorAutumnHoliday" type="color" value="#a78bfa">
-            </label>
-            <label class="settings-field">
-              <span>Weihnachtsferien Farbe</span>
-              <input id="colorChristmasHoliday" type="color" value="#ef4444">
-            </label>
+            <div class="holiday-type-row">
+              <label class="menu-toggle holiday-type-toggle">
+                <input type="checkbox" id="toggleWinterHolidayType" checked>
+                <span data-i18n="show_winter_holidays">Winterferien anzeigen</span>
+              </label>
+              <input id="colorWinterHoliday" type="color" value="#60a5fa" aria-label="Winterferien Farbe">
+            </div>
+            <div class="holiday-type-row">
+              <label class="menu-toggle holiday-type-toggle">
+                <input type="checkbox" id="toggleEasterHolidayType" checked>
+                <span data-i18n="show_easter_holidays">Osterferien anzeigen</span>
+              </label>
+              <input id="colorEasterHoliday" type="color" value="#34d399" aria-label="Osterferien Farbe">
+            </div>
+            <div class="holiday-type-row">
+              <label class="menu-toggle holiday-type-toggle">
+                <input type="checkbox" id="togglePentecostHolidayType" checked>
+                <span data-i18n="show_pentecost_holidays">Pfingstferien anzeigen</span>
+              </label>
+              <input id="colorPentecostHoliday" type="color" value="#fbbf24" aria-label="Pfingstferien Farbe">
+            </div>
+            <div class="holiday-type-row">
+              <label class="menu-toggle holiday-type-toggle">
+                <input type="checkbox" id="toggleSummerHolidayType" checked>
+                <span data-i18n="show_summer_holidays">Sommerferien anzeigen</span>
+              </label>
+              <input id="colorSummerHoliday" type="color" value="#f97316" aria-label="Sommerferien Farbe">
+            </div>
+            <div class="holiday-type-row">
+              <label class="menu-toggle holiday-type-toggle">
+                <input type="checkbox" id="toggleAutumnHolidayType" checked>
+                <span data-i18n="show_autumn_holidays">Herbstferien anzeigen</span>
+              </label>
+              <input id="colorAutumnHoliday" type="color" value="#a78bfa" aria-label="Herbstferien Farbe">
+            </div>
+            <div class="holiday-type-row">
+              <label class="menu-toggle holiday-type-toggle">
+                <input type="checkbox" id="toggleChristmasHolidayType" checked>
+                <span data-i18n="show_christmas_holidays">Weihnachtsferien anzeigen</span>
+              </label>
+              <input id="colorChristmasHoliday" type="color" value="#ef4444" aria-label="Weihnachtsferien Farbe">
+            </div>
           </div>
         </div>
         <label class="menu-toggle">
