@@ -23,7 +23,8 @@ const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
 const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
-const APP_VERSION = "1.0.4";
+const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
+const APP_VERSION = "1.0.9";
 
 const islamicToggle = document.getElementById("toggleIslamic");
 const germanToggle = document.getElementById("toggleGerman");
@@ -50,6 +51,7 @@ const weekNumbersToggle = document.getElementById("toggleWeekNumbers");
 const vacationCountdownToggle = document.getElementById("toggleVacationCountdown");
 const vacationCountdownModeSelect = document.getElementById("vacationCountdownModeSelect");
 const birthdayCountdownToggle = document.getElementById("toggleBirthdayCountdown");
+const vacationShiftDefaultSelect = document.getElementById("vacationShiftDefaultSelect");
 const versionLabel = document.getElementById("versionLabel");
 
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
@@ -86,6 +88,7 @@ if (showVacationCountdown === null) showVacationCountdown = true;
 let showBirthdayCountdown = JSON.parse(localStorage.getItem(SHOW_BIRTHDAY_COUNTDOWN_KEY));
 if (showBirthdayCountdown === null) showBirthdayCountdown = true;
 let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) || "queue";
+let vacationShiftDefault = localStorage.getItem(VACATION_SHIFT_DEFAULT_KEY) || "default";
 
 function updateVacationModeState() {
   if (!vacationCountdownModeSelect) return;
@@ -330,6 +333,19 @@ if (birthdayCountdownToggle) {
   birthdayCountdownToggle.addEventListener("change", () => {
     showBirthdayCountdown = birthdayCountdownToggle.checked;
     localStorage.setItem(SHOW_BIRTHDAY_COUNTDOWN_KEY, JSON.stringify(showBirthdayCountdown));
+  });
+}
+
+if (vacationShiftDefaultSelect) {
+  if (!["default", "exclude_we_1shift"].includes(vacationShiftDefault)) {
+    vacationShiftDefault = "default";
+  }
+  vacationShiftDefaultSelect.value = vacationShiftDefault;
+  vacationShiftDefaultSelect.addEventListener("change", () => {
+    vacationShiftDefault = vacationShiftDefaultSelect.value === "exclude_we_1shift"
+      ? "exclude_we_1shift"
+      : "default";
+    localStorage.setItem(VACATION_SHIFT_DEFAULT_KEY, vacationShiftDefault);
   });
 }
 

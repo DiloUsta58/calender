@@ -54,8 +54,9 @@ const SHOW_WEEK_NUMBERS_KEY = "calendar_show_week_numbers";
 const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
+const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
 const VIEW_DATE_SESSION_KEY = "calendar_view_date";
-const APP_VERSION = "1.0.8";
+const APP_VERSION = "1.0.9";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -998,10 +999,11 @@ function buildDayCell(cellDate, inCurrentMonth) {
     .filter(e => eventMatchesDate(e, year, month + 1, day, iso))
     .forEach(e => {
       const eventIndex = events.indexOf(e);
-      const timeLabel = e.type === "birthday"
+      const eventType = normalizeEventType(e.type);
+      const timeLabel = eventType === "birthday"
         ? ""
         : (e.startTime && e.endTime ? `${e.startTime}–${e.endTime} ` : (e.startTime ? `${e.startTime} ` : ""));
-      const titleLabel = e.type === "birthday"
+      const titleLabel = eventType === "birthday"
         ? formatBirthdayTitle(e, year)
         : formatRangeTitle(e);
       const bg = e.color || "";
@@ -1009,7 +1011,7 @@ function buildDayCell(cellDate, inCurrentMonth) {
       const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
       const fullText = `${timeLabel}${titleLabel}`;
       const editTitle = (window.i18n && window.i18n.t) ? window.i18n.t("click_edit") : "Klicken zum Bearbeiten";
-      entries.innerHTML += `<div class="entry ${e.type}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="${editTitle}"${colorStyle}>${fullText}</div>`;
+      entries.innerHTML += `<div class="entry ${eventType}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="${editTitle}"${colorStyle}>${fullText}</div>`;
     });
 
   const holidayList = getCalendarHolidayList(year);
@@ -1164,12 +1166,14 @@ function updateHeaderClockAndCountdown() {
       lastVacationLineIndex = lineIndex;
     }
   });
-  const vacationTotal = getTotalVacationDaysFromEntries();
-  if (vacationTotal > 0 && lastVacationLineIndex >= 0) {
+  const vacationStats = getTotalVacationDaysFromEntries();
+  if (vacationStats.total > 0 && lastVacationLineIndex >= 0) {
     const entriesLabel = (window.i18n && window.i18n.t) ? window.i18n.t("entries_label") : "Einträge";
     const vacationLabel = (window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub";
     const daysLabel = (window.i18n && window.i18n.t) ? window.i18n.t("days") : "Tage";
-    const summaryLine = `<div class="clock-countdown clock-summary"><span class="clock-name">${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationTotal} ${escapeHtml(daysLabel)}</span></div>`;
+    const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE";
+    const suffix = vacationStats.withoutWeekendApplied ? ` (${escapeHtml(withoutWeLabel)})` : "";
+    const summaryLine = `<div class="clock-countdown clock-summary"><span class="clock-name">${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationStats.total} ${escapeHtml(daysLabel)}${suffix}</span></div>`;
     lines.splice(lastVacationLineIndex + 1, 0, `<div class="clock-divider" aria-hidden="true"></div>`, summaryLine);
   }
   clockPanel.innerHTML = lines.join("");
@@ -1177,18 +1181,115 @@ function updateHeaderClockAndCountdown() {
 
 function getTotalVacationDaysFromEntries() {
   let total = 0;
+  let totalWithWeekend = 0;
+  let withoutWeekendApplied = false;
   events.forEach(e => {
-    if (!e || e.type !== "vacation" || !e.date) return;
+    if (!e || normalizeEventType(e.type) !== "vacation" || !e.date) return;
     const start = parseDateSafe(e.date);
     const end = parseDateSafe(e.endDate || e.date);
     if (!start || !end) return;
-    const startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
-    const endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
-    const days = Math.max(1, Math.floor((Math.max(startUtc, endUtc) - Math.min(startUtc, endUtc)) / 86400000) + 1);
-    total += days;
+    const days = getInclusiveDaysInRange(start, end);
+    const applyWithoutWeekend = getShiftSettingAffectsVacation(e);
+    const effectiveDays = applyWithoutWeekend ? countWeekdaysInRange(start, end) : days;
+    if (applyWithoutWeekend) withoutWeekendApplied = true;
+    total += effectiveDays;
+    totalWithWeekend += days;
   });
-  return total;
+  return { total, totalWithWeekend, withoutWeekendApplied };
 }
+
+function getInclusiveDaysInRange(start, end) {
+  const startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+  const endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+  return Math.max(1, Math.floor((Math.max(startUtc, endUtc) - Math.min(startUtc, endUtc)) / 86400000) + 1);
+}
+
+function normalizeEventType(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (!raw) return "appointment";
+  const map = {
+    appointment: "appointment",
+    termin: "appointment",
+    birthday: "birthday",
+    geburtstag: "birthday",
+    shift: "shift",
+    schicht: "shift",
+    vacation: "vacation",
+    urlaub: "vacation",
+    izin: "vacation",
+    vacances: "vacation",
+    "إجازة": "vacation"
+  };
+  return map[raw] || "appointment";
+}
+
+function countWeekdaysInRange(start, end) {
+  const from = new Date(Math.min(start.getTime(), end.getTime()));
+  const to = new Date(Math.max(start.getTime(), end.getTime()));
+  from.setHours(0, 0, 0, 0);
+  to.setHours(0, 0, 0, 0);
+  let weekdays = 0;
+  const cur = new Date(from);
+  while (cur <= to) {
+    const day = cur.getDay();
+    if (day !== 0 && day !== 6) weekdays++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return weekdays;
+}
+
+function getGlobalVacationShiftDefault() {
+  const raw = localStorage.getItem(VACATION_SHIFT_DEFAULT_KEY);
+  const cleaned = String(raw || "default").trim().replace(/^"+|"+$/g, "");
+  return cleaned === "exclude_we_1shift" ? "exclude_we_1shift" : "default";
+}
+
+function getEffectiveVacationShiftSetting(event) {
+  const own = String(event?.shiftSetting || "").trim().replace(/^"+|"+$/g, "");
+  if (own === "exclude_we_1shift") return "exclude_we_1shift";
+  return getGlobalVacationShiftDefault();
+}
+
+function isOneShiftModeActive() {
+  let livePlan = shiftPlan;
+  try {
+    const raw = localStorage.getItem(SHIFT_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") livePlan = parsed;
+    }
+  } catch (_) {
+    // fallback to cached plan
+  }
+  if (!livePlan) return false;
+  const modelRaw = String(livePlan.model ?? "").trim();
+  const pattern = Array.isArray(livePlan.pattern) ? livePlan.pattern : [];
+  const hasOnlyEarlyPattern = pattern.length > 0 && pattern.every(code => !code || code === "-" || code === "F");
+  const modelIsOne = modelRaw === "1" || modelRaw === "model_1" || modelRaw.startsWith("1") || hasOnlyEarlyPattern;
+  const enabledRaw = livePlan.enabled;
+  const enabled = !(enabledRaw === false || String(enabledRaw).trim().toLowerCase() === "false");
+  return modelIsOne && enabled;
+}
+
+function getShiftSettingAffectsVacation(effectiveEvent) {
+  return getEffectiveVacationShiftSetting(effectiveEvent) === "exclude_we_1shift";
+}
+
+function getVacationDaysForEvent(event, start, end) {
+  if (getShiftSettingAffectsVacation(event)) {
+    return countWeekdaysInRange(start, end);
+  }
+  return getInclusiveDaysInRange(start, end);
+}
+
+function getVacationKindDetailForEvent(event, vacationLabel, daysLabel, start, end) {
+  const days = getVacationDaysForEvent(event, start, end);
+  const suffix = getShiftSettingAffectsVacation(event)
+    ? ` (${(window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE"})`
+    : "";
+  return `${vacationLabel} - ${days} ${daysLabel}${suffix}`;
+}
+
 
 function getUpcomingCountdownsForCurrentMonth(now) {
   const year = currentDate.getFullYear();
@@ -1203,7 +1304,8 @@ function getUpcomingCountdownsForCurrentMonth(now) {
 
   events.forEach(e => {
     if (!e?.date) return;
-    if (e.type === "birthday" && showBirthdayCountdown) {
+    const normalizedType = normalizeEventType(e.type);
+    if (normalizedType === "birthday" && showBirthdayCountdown) {
       const birth = parseDateSafe(e.date);
       if (!birth || birth.getMonth() !== month) return;
       const validYear = isBirthdayValidForYear(e, birth, year);
@@ -1217,7 +1319,7 @@ function getUpcomingCountdownsForCurrentMonth(now) {
       });
       return;
     }
-    if (e.type === "vacation" && showVacationCountdown) {
+    if (normalizedType === "vacation" && showVacationCountdown) {
       const start = parseDateSafe(e.date);
       if (!start) return;
       const end = parseDateSafe(e.endDate || e.date);
@@ -1228,11 +1330,10 @@ function getUpcomingCountdownsForCurrentMonth(now) {
       const rangeStartUtc = Math.min(startUtc, endUtc);
       const rangeEndUtc = Math.max(startUtc, endUtc);
       if (rangeEndUtc < nowDayUtc) return;
-      const totalDays = Math.max(1, Math.floor((Math.max(startUtc, endUtc) - Math.min(startUtc, endUtc)) / 86400000) + 1);
       vacationQueue.push({
         name: e.title || vacationLabel,
         kind: vacationLabel,
-        kindDetail: `${vacationLabel} - ${totalDays} ${daysLabel}`,
+        kindDetail: getVacationKindDetailForEvent(e, vacationLabel, daysLabel, start, end),
         target,
         rangeStartUtc
       });
@@ -1410,10 +1511,11 @@ function buildOverlayListHtml(iso) {
   events
     .filter(e => eventMatchesDate(e, year, month, day, iso))
     .forEach(e => {
-      const timeLabel = e.type === "birthday"
+      const eventType = normalizeEventType(e.type);
+      const timeLabel = eventType === "birthday"
         ? ""
         : (e.startTime && e.endTime ? `${e.startTime}–${e.endTime} ` : (e.startTime ? `${e.startTime} ` : ""));
-      const titleLabel = e.type === "birthday"
+      const titleLabel = eventType === "birthday"
         ? formatBirthdayTitle(e, year)
         : formatRangeTitle(e);
       const bg = e.color || "";
@@ -1589,7 +1691,12 @@ function getWeekNumber(date, startDay) {
 }
 
 function eventMatchesDate(e, year, month, day, iso) {
-  if (e.type !== "birthday") {
+  const eventType = normalizeEventType(e?.type);
+  if (eventType === "vacation" && getShiftSettingAffectsVacation(e)) {
+    const weekDay = new Date(year, month - 1, day).getDay();
+    if (weekDay === 0 || weekDay === 6) return false;
+  }
+  if (eventType !== "birthday") {
     return isDateInRange(iso, e.date, e.endDate);
   }
   if (!e.date) return false;

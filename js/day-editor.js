@@ -1,4 +1,29 @@
 const EVENTS_KEY = "calendar_events";
+const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
+
+function normalizeEventType(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (!raw) return "appointment";
+  const map = {
+    appointment: "appointment",
+    termin: "appointment",
+    birthday: "birthday",
+    geburtstag: "birthday",
+    shift: "shift",
+    schicht: "shift",
+    vacation: "vacation",
+    urlaub: "vacation",
+    izin: "vacation",
+    vacances: "vacation",
+    "إجازة": "vacation"
+  };
+  return map[raw] || "appointment";
+}
+
+function getGlobalVacationShiftDefault() {
+  const value = localStorage.getItem(VACATION_SHIFT_DEFAULT_KEY) || "default";
+  return value === "exclude_we_1shift" ? "exclude_we_1shift" : "default";
+}
 
 function getParams() {
   const params = new URLSearchParams(window.location.search);
@@ -43,8 +68,11 @@ setValue("endInput", existing?.endDate || startDate);
 setValue("startTimeInput", existing?.startTime || "");
 setValue("endTimeInput", existing?.endTime || "");
 setValue("notesInput", existing?.notes);
-const initialType = existing?.type || type || "appointment";
+const initialType = normalizeEventType(existing?.type || type || "appointment");
 setValue("typeInput", initialType);
+const initialShiftSetting = existing?.shiftSetting
+  || (initialType === "vacation" ? getGlobalVacationShiftDefault() : "default");
+setValue("shiftSettingInput", initialShiftSetting);
 
 function setEditorTitle(eventType) {
   const titleMap = {
@@ -74,6 +102,7 @@ function applyTypeUi(eventType) {
   const startTimeInput = document.getElementById("startTimeInput");
   const endTimeInput = document.getElementById("endTimeInput");
   const birthdayHint = document.getElementById("birthdayHint");
+  const shiftSettingRow = document.getElementById("shiftSettingRow");
   if (eventType === "birthday") {
     titleLabel.textContent = t("name");
     locationLabel.textContent = t("birthday_entry");
@@ -83,6 +112,7 @@ function applyTypeUi(eventType) {
     startTimeInput.disabled = true;
     endTimeInput.disabled = true;
     birthdayHint.style.display = "";
+    if (shiftSettingRow) shiftSettingRow.style.display = "none";
     repeatInput.innerHTML = `
       <option value="once">${t("once_current_year")}</option>
       <option value="yearly">${t("yearly_forever")}</option>
@@ -97,6 +127,7 @@ function applyTypeUi(eventType) {
     startTimeInput.disabled = false;
     endTimeInput.disabled = false;
     birthdayHint.style.display = "none";
+    if (shiftSettingRow) shiftSettingRow.style.display = (eventType === "vacation") ? "" : "none";
     repeatInput.innerHTML = `
       <option value="none">${t("once")}</option>
     `;
@@ -146,7 +177,8 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   const startTime = document.getElementById("startTimeInput").value;
   const endTime = document.getElementById("endTimeInput").value;
   const notes = document.getElementById("notesInput").value.trim();
-  const eventType = document.getElementById("typeInput").value;
+  const shiftSetting = document.getElementById("shiftSettingInput").value || "default";
+  const eventType = normalizeEventType(document.getElementById("typeInput").value);
   const color = (colorPreset.value === "custom" ? colorCustom.value : colorPreset.value) || "#3b82f6";
 
   if (!title || !start) return;
@@ -165,6 +197,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
     location,
     repeat: eventType === "birthday" ? repeat : "none",
     repeatYear,
+    shiftSetting: eventType === "vacation" ? shiftSetting : "default",
     color,
     notes
   };
