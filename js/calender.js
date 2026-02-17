@@ -55,6 +55,7 @@ const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
+const CONSIDER_PUBLIC_HOLIDAY_KEY = "calendar_consider_public_holiday";
 const VIEW_DATE_SESSION_KEY = "calendar_view_date";
 const APP_VERSION = "1.0.10";
 
@@ -155,6 +156,8 @@ if (showVacationCountdown === null) showVacationCountdown = true;
 let showBirthdayCountdown = JSON.parse(localStorage.getItem(SHOW_BIRTHDAY_COUNTDOWN_KEY));
 if (showBirthdayCountdown === null) showBirthdayCountdown = true;
 let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) || "queue";
+let considerPublicHoliday = JSON.parse(localStorage.getItem(CONSIDER_PUBLIC_HOLIDAY_KEY));
+if (considerPublicHoliday === null) considerPublicHoliday = true;
 let monthPickerReady = false;
 let headerTimerId = null;
 let touchStartX = 0;
@@ -643,6 +646,7 @@ const EXACT_SCHOOL_HOLIDAYS = {
 };
 
 const holidayCache = new Map();
+const germanPublicHolidayCache = new Map();
 const schoolHolidayFetchInFlight = new Map();
 let exactSchoolHolidayCache = loadExactSchoolHolidayCache();
 
@@ -857,6 +861,25 @@ function getGermanPublicHolidaysByRegion(year, regionName) {
     dedupe.set(`${h.date}|${h.name}`, h);
   });
   return Array.from(dedupe.values());
+}
+
+function getGermanPublicHolidaySet(year, regionName) {
+  const region = normalizeGermanRegion(regionName);
+  const key = `${year}|${region}`;
+  if (germanPublicHolidayCache.has(key)) return germanPublicHolidayCache.get(key);
+  const list = getGermanPublicHolidaysByRegion(year, region);
+  const set = new Set(list.map(h => h.date));
+  germanPublicHolidayCache.set(key, set);
+  return set;
+}
+
+function isGermanPublicHolidayDate(isoDate) {
+  if (!isoDate) return false;
+  const year = Number(String(isoDate).slice(0, 4));
+  if (!Number.isFinite(year)) return false;
+  const region = normalizeGermanRegion(germanRegion);
+  const set = getGermanPublicHolidaySet(year, region);
+  return set.has(isoDate);
 }
 
 function getGermanSchoolHolidaysByRegion(year, regionName) {
@@ -1119,6 +1142,8 @@ if (window.i18n && window.i18n.t) {
 
 document.addEventListener("languageChanged", () => {
   applyDisplaySettings();
+  considerPublicHoliday = JSON.parse(localStorage.getItem(CONSIDER_PUBLIC_HOLIDAY_KEY));
+  if (considerPublicHoliday === null) considerPublicHoliday = true;
   setupMonthPicker();
   renderCalendar(currentDate);
   renderTodayDisplay();
@@ -1196,12 +1221,11 @@ function getTotalVacationDaysFromEntries() {
     const start = parseDateSafe(e.date);
     const end = parseDateSafe(e.endDate || e.date);
     if (!start || !end) return;
-    const days = getInclusiveDaysInRange(start, end);
     const applyWithoutWeekend = getShiftSettingAffectsVacation(e);
-    const effectiveDays = applyWithoutWeekend ? countWeekdaysInRange(start, end) : days;
+    const effectiveDays = getVacationDaysWithHolidays(start, end, applyWithoutWeekend);
     if (applyWithoutWeekend) withoutWeekendApplied = true;
     total += effectiveDays;
-    totalWithWeekend += days;
+    totalWithWeekend += getVacationDaysWithHolidays(start, end, false);
   });
   return { total, totalWithWeekend, withoutWeekendApplied };
 }
@@ -1246,6 +1270,37 @@ function countWeekdaysInRange(start, end) {
   return weekdays;
 }
 
+function countGermanPublicHolidaysInRange(start, end, onlyWeekdays) {
+  if (!considerPublicHoliday) return 0;
+  const region = normalizeGermanRegion(germanRegion);
+  const from = new Date(Math.min(start.getTime(), end.getTime()));
+  const to = new Date(Math.max(start.getTime(), end.getTime()));
+  from.setHours(0, 0, 0, 0);
+  to.setHours(0, 0, 0, 0);
+  let count = 0;
+  const cur = new Date(from);
+  while (cur <= to) {
+    const iso = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, "0")}-${String(cur.getDate()).padStart(2, "0")}`;
+    const set = getGermanPublicHolidaySet(cur.getFullYear(), region);
+    if (set.has(iso)) {
+      if (!onlyWeekdays) {
+        count++;
+      } else {
+        const day = cur.getDay();
+        if (day !== 0 && day !== 6) count++;
+      }
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
+
+function getVacationDaysWithHolidays(start, end, excludeWeekends) {
+  const baseDays = excludeWeekends ? countWeekdaysInRange(start, end) : getInclusiveDaysInRange(start, end);
+  const holidayDays = countGermanPublicHolidaysInRange(start, end, excludeWeekends);
+  return Math.max(0, baseDays - holidayDays);
+}
+
 function getGlobalVacationShiftDefault() {
   const raw = localStorage.getItem(VACATION_SHIFT_DEFAULT_KEY);
   const cleaned = String(raw || "default").trim().replace(/^"+|"+$/g, "");
@@ -1284,16 +1339,15 @@ function getShiftSettingAffectsVacation(effectiveEvent) {
 }
 
 function getVacationDaysForEvent(event, start, end) {
-  if (getShiftSettingAffectsVacation(event)) {
-    return countWeekdaysInRange(start, end);
-  }
-  return getInclusiveDaysInRange(start, end);
+  const excludeWeekends = getShiftSettingAffectsVacation(event);
+  return getVacationDaysWithHolidays(start, end, excludeWeekends);
 }
 
 function getVacationKindDetailForEvent(event, vacationLabel, daysLabel, start, end) {
-  const days = getVacationDaysForEvent(event, start, end);
-  if (getShiftSettingAffectsVacation(event)) {
-    const fullDays = getInclusiveDaysInRange(start, end);
+  const excludeWeekends = getShiftSettingAffectsVacation(event);
+  const days = getVacationDaysWithHolidays(start, end, excludeWeekends);
+  if (excludeWeekends) {
+    const fullDays = getVacationDaysWithHolidays(start, end, false);
     const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE";
     const withWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("with_weekend_short") : "mit WE";
     return `${vacationLabel} - ${days} ${daysLabel} (${withoutWeLabel}) - ${fullDays} ${daysLabel} (${withWeLabel})`;
@@ -1823,6 +1877,9 @@ function getWeekNumber(date, startDay) {
 
 function eventMatchesDate(e, year, month, day, iso) {
   const eventType = normalizeEventType(e?.type);
+  if (eventType === "vacation" && considerPublicHoliday && isGermanPublicHolidayDate(iso)) {
+    return false;
+  }
   if (eventType === "vacation" && getShiftSettingAffectsVacation(e)) {
     const weekDay = new Date(year, month - 1, day).getDay();
     if (weekDay === 0 || weekDay === 6) return false;

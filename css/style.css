@@ -533,9 +533,10 @@ body {
 .settings-summary {
   cursor: pointer;
   list-style: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #e5e7eb;
+  color: #22c55e;
+  font-style: italic;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -551,6 +552,14 @@ body {
   font-size: 14px;
   color: #9ca3af;
   transition: transform .15s ease;
+}
+
+.settings-summary:hover {
+  color: #ffffff;
+}
+
+.settings-summary:hover::after {
+  color: #ffffff;
 }
 
 .settings-disclosure[open] .settings-summary::after {
@@ -570,6 +579,10 @@ body {
 
 .settings-sublist {
   margin-top: 8px;
+}
+
+.holiday-consider-toggle {
+  margin-left: 50px;
 }
 
 .settings-subtitle {
@@ -1312,6 +1325,11 @@ body {
     height: calc(100dvh - 95px); /* Header und Footer berücksichtigen */
     display: flex;
     flex-direction: column;
+  }
+  .calendar.settings-page {
+    height: auto;
+    min-height: calc(100dvh - 95px);
+    overflow: auto;
   }
   .calendar-header h2 { font-size: 17px; }
   .calendar-actions { width: 100%; justify-content: space-between; }

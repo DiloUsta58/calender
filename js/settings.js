@@ -24,6 +24,7 @@ const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
+const CONSIDER_PUBLIC_HOLIDAY_KEY = "calendar_consider_public_holiday";
 const APP_VERSION = "1.0.10";
 
 const islamicToggle = document.getElementById("toggleIslamic");
@@ -52,7 +53,23 @@ const vacationCountdownToggle = document.getElementById("toggleVacationCountdown
 const vacationCountdownModeSelect = document.getElementById("vacationCountdownModeSelect");
 const birthdayCountdownToggle = document.getElementById("toggleBirthdayCountdown");
 const vacationShiftDefaultSelect = document.getElementById("vacationShiftDefaultSelect");
+const considerPublicHolidayToggle = document.getElementById("toggleExcludePublicHolidayVacations");
 const versionLabel = document.getElementById("versionLabel");
+
+function initPanelState(panelEl, storageKey) {
+  if (!panelEl || !storageKey) return;
+  const saved = localStorage.getItem(storageKey);
+  if (saved === "open") panelEl.open = true;
+  if (saved === "closed") panelEl.open = false;
+  panelEl.addEventListener("toggle", () => {
+    localStorage.setItem(storageKey, panelEl.open ? "open" : "closed");
+  });
+}
+
+document.querySelectorAll(".settings-disclosure").forEach(panel => {
+  const key = panel.dataset.settingsKey;
+  if (key) initPanelState(panel, key);
+});
 
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
 let includeGerman = JSON.parse(localStorage.getItem(GERMAN_KEY)) ?? true;
@@ -89,6 +106,8 @@ let showBirthdayCountdown = JSON.parse(localStorage.getItem(SHOW_BIRTHDAY_COUNTD
 if (showBirthdayCountdown === null) showBirthdayCountdown = true;
 let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) || "queue";
 let vacationShiftDefault = localStorage.getItem(VACATION_SHIFT_DEFAULT_KEY) || "default";
+let considerPublicHoliday = JSON.parse(localStorage.getItem(CONSIDER_PUBLIC_HOLIDAY_KEY));
+if (considerPublicHoliday === null) considerPublicHoliday = true;
 
 function updateVacationModeState() {
   if (!vacationCountdownModeSelect) return;
@@ -333,6 +352,14 @@ if (birthdayCountdownToggle) {
   birthdayCountdownToggle.addEventListener("change", () => {
     showBirthdayCountdown = birthdayCountdownToggle.checked;
     localStorage.setItem(SHOW_BIRTHDAY_COUNTDOWN_KEY, JSON.stringify(showBirthdayCountdown));
+  });
+}
+
+if (considerPublicHolidayToggle) {
+  considerPublicHolidayToggle.checked = !!considerPublicHoliday;
+  considerPublicHolidayToggle.addEventListener("change", () => {
+    considerPublicHoliday = considerPublicHolidayToggle.checked;
+    localStorage.setItem(CONSIDER_PUBLIC_HOLIDAY_KEY, JSON.stringify(considerPublicHoliday));
   });
 }
 

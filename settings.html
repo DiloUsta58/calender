@@ -26,7 +26,7 @@
   </header>
 
   <section class="settings-section">
-    <details class="settings-disclosure" open>
+    <details class="settings-disclosure" data-settings-key="settings_panel_holidays" open>
       <summary class="settings-summary" data-i18n="holidays">Feiertage</summary>
       <div class="settings-list">
         <div class="settings-subdisclosure">
@@ -55,6 +55,10 @@
             <label class="menu-toggle">
               <input type="checkbox" id="toggleGerman">
               <span data-i18n="german_holidays">Deutsche Feiertage</span>
+            </label>
+            <label class="menu-toggle holiday-consider-toggle">
+              <input type="checkbox" id="toggleExcludePublicHolidayVacations" checked>
+              <span data-i18n="consider_public_holidays">Gesetzliche Feiertage berücksichtigen (Urlaub)</span>
             </label>
             <label class="menu-toggle">
               <input type="checkbox" id="toggleSchoolHolidays">
@@ -121,7 +125,7 @@
   </section>
 
   <section class="settings-section">
-    <details class="settings-disclosure" open>
+    <details class="settings-disclosure" data-settings-key="settings_panel_language" open>
       <summary class="settings-summary" data-i18n="language">Sprache</summary>
       <div class="settings-list">
         <label class="settings-field">
@@ -142,7 +146,7 @@
   </section>
 
   <section class="settings-section">
-    <details class="settings-disclosure" open>
+    <details class="settings-disclosure" data-settings-key="settings_panel_display" open>
       <summary class="settings-summary" data-i18n="display">Anzeige</summary>
       <div class="settings-list">
         <label class="settings-field">
