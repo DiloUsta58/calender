@@ -157,6 +157,9 @@ if (showBirthdayCountdown === null) showBirthdayCountdown = true;
 let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) || "queue";
 let monthPickerReady = false;
 let headerTimerId = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartTime = 0;
 
 const DEFAULT_MONTHS = [
   "Januar", "Februar", "März", "April", "Mai", "Juni",
@@ -1502,6 +1505,56 @@ overlayAddMenu?.addEventListener("click", (e) => {
   }
   window.location.href = `day-editor.html?date=${date}&type=${type}`;
 });
+
+function isMobileSwipeEnabled() {
+  return window.matchMedia("(max-width: 600px)").matches;
+}
+
+function handleMonthSwipe(deltaX, deltaY) {
+  const absX = Math.abs(deltaX);
+  const absY = Math.abs(deltaY);
+  const threshold = 40;
+  if (absX < threshold && absY < threshold) return;
+  if (absX >= absY) {
+    if (deltaX > 0) {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+    } else {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+  } else {
+    if (deltaY > 0) {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+    } else {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+  }
+  renderCalendar(currentDate);
+}
+
+if (calendarRoot) {
+  calendarRoot.addEventListener("touchstart", (e) => {
+    if (!isMobileSwipeEnabled()) return;
+    if (entryOverlay?.classList.contains("show")) return;
+    if (e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  calendarRoot.addEventListener("touchend", (e) => {
+    if (!isMobileSwipeEnabled()) return;
+    if (entryOverlay?.classList.contains("show")) return;
+    if (!touchStartTime) return;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+    touchStartTime = 0;
+    if (dt > 600) return; // ignore long presses
+    handleMonthSwipe(dx, dy);
+  }, { passive: true });
+}
 
 function buildOverlayListHtml(iso) {
   const dateObj = parseDateSafe(iso);
