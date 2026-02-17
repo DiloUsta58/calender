@@ -160,6 +160,7 @@ let headerTimerId = null;
 let touchStartX = 0;
 let touchStartY = 0;
 let touchStartTime = 0;
+let touchHasMoved = false;
 
 const DEFAULT_MONTHS = [
   "Januar", "Februar", "März", "April", "Mai", "Juni",
@@ -1539,7 +1540,20 @@ if (calendarRoot) {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     touchStartTime = Date.now();
+    touchHasMoved = false;
   }, { passive: true });
+
+  calendarRoot.addEventListener("touchmove", (e) => {
+    if (!isMobileSwipeEnabled()) return;
+    if (entryOverlay?.classList.contains("show")) return;
+    if (!touchStartTime || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+      touchHasMoved = true;
+      e.preventDefault();
+    }
+  }, { passive: false });
 
   calendarRoot.addEventListener("touchend", (e) => {
     if (!isMobileSwipeEnabled()) return;
@@ -1551,6 +1565,7 @@ if (calendarRoot) {
     const dy = touch.clientY - touchStartY;
     const dt = Date.now() - touchStartTime;
     touchStartTime = 0;
+    if (!touchHasMoved) return;
     if (dt > 600) return; // ignore long presses
     handleMonthSwipe(dx, dy);
   }, { passive: true });
