@@ -1172,8 +1172,11 @@ function updateHeaderClockAndCountdown() {
     const vacationLabel = (window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub";
     const daysLabel = (window.i18n && window.i18n.t) ? window.i18n.t("days") : "Tage";
     const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE";
-    const suffix = vacationStats.withoutWeekendApplied ? ` (${escapeHtml(withoutWeLabel)})` : "";
-    const summaryLine = `<div class="clock-countdown clock-summary"><span class="clock-name">${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationStats.total} ${escapeHtml(daysLabel)}${suffix}</span></div>`;
+    const withWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("with_weekend_short") : "mit WE";
+    const summaryText = vacationStats.withoutWeekendApplied
+      ? `${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationStats.total} ${escapeHtml(daysLabel)} (${escapeHtml(withoutWeLabel)}) - ${vacationStats.totalWithWeekend} ${escapeHtml(daysLabel)} (${escapeHtml(withWeLabel)})`
+      : `${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationStats.total} ${escapeHtml(daysLabel)}`;
+    const summaryLine = `<div class="clock-countdown clock-summary"><span class="clock-name">${summaryText}</span></div>`;
     lines.splice(lastVacationLineIndex + 1, 0, `<div class="clock-divider" aria-hidden="true"></div>`, summaryLine);
   }
   clockPanel.innerHTML = lines.join("");
@@ -1284,10 +1287,13 @@ function getVacationDaysForEvent(event, start, end) {
 
 function getVacationKindDetailForEvent(event, vacationLabel, daysLabel, start, end) {
   const days = getVacationDaysForEvent(event, start, end);
-  const suffix = getShiftSettingAffectsVacation(event)
-    ? ` (${(window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE"})`
-    : "";
-  return `${vacationLabel} - ${days} ${daysLabel}${suffix}`;
+  if (getShiftSettingAffectsVacation(event)) {
+    const fullDays = getInclusiveDaysInRange(start, end);
+    const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE";
+    const withWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("with_weekend_short") : "mit WE";
+    return `${vacationLabel} - ${days} ${daysLabel} (${withoutWeLabel}) - ${fullDays} ${daysLabel} (${withWeLabel})`;
+  }
+  return `${vacationLabel} - ${days} ${daysLabel}`;
 }
 
 

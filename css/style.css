@@ -91,7 +91,7 @@ body {
 .calendar-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 #prevMonth, #nextMonth {
@@ -115,7 +115,7 @@ body {
   color: #34d399;
 }
 
-.today-display {
+.today-display { /*Aktuelle Daten kompakter anzeigen */
   display: inline-grid;
   grid-template-columns: auto auto;
   grid-template-rows: auto auto;
@@ -126,7 +126,7 @@ body {
   line-height: 1;
 }
 
-.today-day {
+.today-day {  /*Aktuelle Tag  */
   grid-column: 1;
   grid-row: 1 / span 2;
   font-size: 35px;
@@ -311,6 +311,7 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
   background: linear-gradient(180deg, #171d28 0%, #121722 100%);
   box-shadow: 0 14px 34px rgba(0,0,0,.45);
+  color: #34d399;
 }
 
 .custom-year-select.open .custom-year-list {
@@ -329,6 +330,14 @@ body {
   cursor: pointer;
 }
 
+.custom-year-list .custom-year-option {
+  color: #34d399;
+}
+
+.custom-year-list * {
+  color: #34d399;
+}
+
 .custom-year-option:hover {
   background: rgba(255,255,255,0.08);
   color: #ffffff;
@@ -344,7 +353,7 @@ body {
   padding: 4px 8px;
   cursor: pointer;
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
-  color: #3b5fa9;
+  color: #34d399;
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 8px;
   font-size: 12px;
@@ -389,6 +398,16 @@ body {
   padding-right: 24px;
 }
 
+.custom-month-trigger,
+#monthSelectBtn {
+  color: #34d399;
+}
+
+.custom-month-trigger:hover,
+#monthSelectBtn:hover {
+  color: #ffffff;
+}
+
 .custom-month-trigger::after {
   content: "▾";
   position: absolute;
@@ -422,6 +441,7 @@ body {
   border: 1px solid rgba(255,255,255,0.08);
   background: linear-gradient(180deg, #171d28 0%, #121722 100%);
   box-shadow: 0 14px 34px rgba(0,0,0,.45);
+  color: #34d399;
 }
 
 .custom-month-select.open .custom-month-list {
@@ -440,9 +460,13 @@ body {
   cursor: pointer;
 }
 
+.custom-month-list .custom-month-option {
+  color: #34d399;
+}
+
 .custom-month-option:hover {
   background: rgba(255,255,255,0.08);
-  color: #dadcd3;
+  color: #ffffff;
 }
 
 .custom-month-option.active {
@@ -1193,7 +1217,7 @@ body {
   .calendar-menu button,
   .calendar-header button { padding: 6px 10px; font-size: 13px; }
   .calendar-grid { gap: 5px; }
-  .today-day { font-size: 22px; }
+  .today-day { font-size: 35px; }
   .today-month { font-size: 24px; }
   .today-year { font-size: 24px; }
   .clock-panel { min-width: 260px; padding: 7px 9px; }
@@ -1236,8 +1260,8 @@ body {
   .day, .week-number, .week-corner, .weekday-head { border-radius: 0; }
   .day-menu { left: 4px; right: 4px; top: 26px; }
   .entry { font-size: var(--entry-font-size); }
-  .today-display { width: 100%; min-width: 0; column-gap: 6px; }
-  .today-day { font-size: 17px; }
+  .today-display { min-width: 90px; column-gap: 1px; } /*Aktuelle Daten kompakter anzeigen */
+  .today-day { font-size: 35px; }
   .today-month { font-size: 17px; }
   .today-year { font-size: 17px; }
   .clock-panel { min-width: 100%; margin-top: 6px; }
@@ -1248,11 +1272,44 @@ body {
   .weekday-head { font-size: 11px; padding: 0 0 4px 5px; }
 }
 
+@media (max-width: 600px) {
+  .calendar-header {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "today"
+      "clock"
+      "actions"
+      "picker";
+  }
+  .header-left,
+  .header-right {
+    display: contents;
+  }
+  #todayDisplay {
+    grid-area: today;
+  }
+  #clockPanel {
+    grid-area: clock;
+  }
+  .calendar-actions {
+    grid-area: actions;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .month-picker {
+    grid-area: picker;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+}
+
 @media (max-width: 520px) {
   body { padding: 10px; height: 100dvh; }
   .calendar {
-    padding: 10px;
-    height: calc(100dvh - 20px);
+    padding: 10px; /*Innenabstand reduzieren für kleine Bildschirme */
+    height: calc(100dvh - 95px); /* Header und Footer berücksichtigen */
     display: flex;
     flex-direction: column;
   }
@@ -1260,9 +1317,13 @@ body {
   .calendar-actions { width: 100%; justify-content: space-between; }
   .calendar-header button { padding: 5px 8px; font-size: 12px; }
   .settings-link { width: 34px; height: 30px; font-size: 15px; }
-  .compact-toggle { display: inline-flex; }
-  .month-controls { display: none; }
-  .calendar.show-month-controls .month-controls { display: flex; }
+  .compact-toggle { display: none; }
+  .month-controls { display: flex; }
+  .month-controls {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .today-display { min-width: 70px; column-gap: 1px; } /*Aktuelle Daten kompakter anzeigen */
   .month-controls select,
   .custom-month-trigger { font-size: 11px; padding: 4px 6px; }
   .custom-year-input { width: 84px; font-size: 11px; padding: 4px 6px; }
@@ -1283,16 +1344,16 @@ body {
     font-size: 10px;
     padding: 0 0 3px 3px;
   }
-  .today-day { font-size: 14px; }
-  .today-month { font-size: 13px; }
-  .today-year { font-size: 13px; }
+  .today-day { font-size: 26px; }
+  .today-month { font-size: 17px; }
+  .today-year { font-size: 15px; }
   .clock-panel { margin-top: 4px; padding: 6px 8px; }
   .clock-now { font-size: 14px; }
   .clock-countdown { font-size: 10px; }
   #monthLabel { display: none; }
   .day { padding: 6px; }
   .day-head { margin-bottom: 4px; }
-  .day-weekday { font-size: 11px; }
+  .day-weekday { font-size: 50px; }
   .entries { display: flex; flex-direction: column; gap: 4px; }
   .entry {
     font-size: 0;
@@ -1303,16 +1364,16 @@ body {
     white-space: nowrap;
     overflow: hidden;
   }
-  .calendar-footer {
-    display: none;
-  }
+    /*  .calendar-footer {
+ display: none; 
+  }*/
 }
 
 @media (max-width: 400px) {
   .calendar-header button,
   .calendar-menu button { font-size: 12px; padding: 5px 8px; }
-  .calendar-grid { grid-template-columns: 18px repeat(7, minmax(28px, 1fr)); grid-template-rows: var(--weekday-row-height); grid-auto-rows: minmax(86px, auto); }
-  .calendar-grid.hide-week-numbers { grid-template-columns: repeat(7, minmax(28px, 1fr)); }
+  .calendar-grid { grid-template-columns: 15px repeat(7, minmax(33px, 1fr)); grid-template-rows: var(--weekday-row-height); grid-auto-rows: minmax(86px, auto); }
+  .calendar-grid.hide-week-numbers { grid-template-columns: repeat(7, minmax(33px, 1fr)); }
   .entry { height: 5px; }
   .calendar-grid { --weekday-row-height: 22px; }
   .weekday-head { font-size: 9px; padding: 0 0 2px 2px; }
