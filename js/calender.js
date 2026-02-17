@@ -56,7 +56,7 @@ const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
 const VIEW_DATE_SESSION_KEY = "calendar_view_date";
-const APP_VERSION = "1.0.9";
+const APP_VERSION = "1.0.10";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -161,6 +161,7 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchStartTime = 0;
 let touchHasMoved = false;
+let wheelLock = false;
 
 const DEFAULT_MONTHS = [
   "Januar", "Februar", "März", "April", "Mai", "Juni",
@@ -1570,6 +1571,62 @@ if (calendarRoot) {
     handleMonthSwipe(dx, dy);
   }, { passive: true });
 }
+
+function shouldIgnoreNavEvent(target) {
+  if (!target) return false;
+  const el = target.closest("input, textarea, select, button, a, .overlay, .custom-month-list, .custom-year-list");
+  return !!el;
+}
+
+function changeMonthBy(delta) {
+  currentDate.setMonth(currentDate.getMonth() + delta);
+  renderCalendar(currentDate);
+}
+
+if (calendarRoot) {
+  calendarRoot.addEventListener("wheel", (e) => {
+    if (isMobileSwipeEnabled()) return;
+    if (entryOverlay?.classList.contains("show")) return;
+    if (shouldIgnoreNavEvent(e.target)) return;
+    if (wheelLock) return;
+    const absY = Math.abs(e.deltaY);
+    const absX = Math.abs(e.deltaX);
+    const threshold = 18;
+    if (absY < threshold && absX < threshold) return;
+    wheelLock = true;
+    setTimeout(() => { wheelLock = false; }, 180);
+    if (absY >= absX) {
+      changeMonthBy(e.deltaY > 0 ? 1 : -1);
+    } else {
+      changeMonthBy(e.deltaX > 0 ? 1 : -1);
+    }
+    e.preventDefault();
+  }, { passive: false });
+}
+
+if (calendarRoot) {
+  document.addEventListener("wheel", (e) => {
+    if (isMobileSwipeEnabled()) return;
+    if (!calendarRoot.contains(e.target)) return;
+    if (entryOverlay?.classList.contains("show")) return;
+    if (shouldIgnoreNavEvent(e.target)) return;
+    e.preventDefault();
+  }, { passive: false });
+}
+
+document.addEventListener("keydown", (e) => {
+  if (isMobileSwipeEnabled()) return;
+  if (entryOverlay?.classList.contains("show")) return;
+  if (shouldIgnoreNavEvent(e.target)) return;
+  const key = e.key;
+  if (key === "ArrowRight" || key === "ArrowDown") {
+    changeMonthBy(1);
+    e.preventDefault();
+  } else if (key === "ArrowLeft" || key === "ArrowUp") {
+    changeMonthBy(-1);
+    e.preventDefault();
+  }
+});
 
 function buildOverlayListHtml(iso) {
   const dateObj = parseDateSafe(iso);

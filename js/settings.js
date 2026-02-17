@@ -24,7 +24,7 @@ const SHOW_VACATION_COUNTDOWN_KEY = "calendar_show_vacation_countdown";
 const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
-const APP_VERSION = "1.0.9";
+const APP_VERSION = "1.0.10";
 
 const islamicToggle = document.getElementById("toggleIslamic");
 const germanToggle = document.getElementById("toggleGerman");
