@@ -56,8 +56,9 @@ const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
 const CONSIDER_PUBLIC_HOLIDAY_KEY = "calendar_consider_public_holiday";
+const SHOW_EVENT_INFO_BOX_KEY = "calendar_show_event_info_box";
 const VIEW_DATE_SESSION_KEY = "calendar_view_date";
-const APP_VERSION = "1.0.10";
+const APP_VERSION = "1.0.11";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },
@@ -118,6 +119,8 @@ const overlayCard = entryOverlay?.querySelector(".overlay-card");
 const versionLabel = document.getElementById("versionLabel");
 const todayDisplay = document.getElementById("todayDisplay");
 const clockPanel = document.getElementById("clockPanel");
+const eventInfoPanel = document.getElementById("eventInfoPanel");
+const eventInfoBody = document.getElementById("eventInfoBody");
 
 let currentDate = getInitialCalendarDate();
 let includeIslamic = JSON.parse(localStorage.getItem(ISLAMIC_KEY)) || false;
@@ -158,6 +161,8 @@ if (showBirthdayCountdown === null) showBirthdayCountdown = true;
 let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) || "queue";
 let considerPublicHoliday = JSON.parse(localStorage.getItem(CONSIDER_PUBLIC_HOLIDAY_KEY));
 if (considerPublicHoliday === null) considerPublicHoliday = true;
+let showEventInfoBox = JSON.parse(localStorage.getItem(SHOW_EVENT_INFO_BOX_KEY));
+if (showEventInfoBox === null) showEventInfoBox = true;
 let monthPickerReady = false;
 let headerTimerId = null;
 let touchStartX = 0;
@@ -491,6 +496,8 @@ function renderCalendar(date) {
       grid.appendChild(cell);
     }
   }
+
+  renderEventInfoPanel();
 }
 
 const GERMAN_REGIONS = new Set([
@@ -1039,7 +1046,9 @@ function buildDayCell(cellDate, inCurrentMonth) {
       const colorStyle = bg ? ` style="background:${bg};color:${fg};"` : "";
       const fullText = `${timeLabel}${titleLabel}`;
       const editTitle = (window.i18n && window.i18n.t) ? window.i18n.t("click_edit") : "Klicken zum Bearbeiten";
-      entries.innerHTML += `<div class="entry ${eventType}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="${editTitle}"${colorStyle}>${fullText}</div>`;
+      const notes = (e.notes || "").trim();
+      const titleAttr = notes ? `${editTitle}\n${notes.replace(/"/g, "&quot;")}` : editTitle;
+      entries.innerHTML += `<div class="entry ${eventType}" data-date="${iso}" data-index="${eventIndex}" data-full-text="${fullText.replace(/"/g, "&quot;")}" title="${titleAttr}"${colorStyle}>${fullText}</div>`;
     });
 
   const holidayList = getCalendarHolidayList(year);
@@ -1144,10 +1153,13 @@ document.addEventListener("languageChanged", () => {
   applyDisplaySettings();
   considerPublicHoliday = JSON.parse(localStorage.getItem(CONSIDER_PUBLIC_HOLIDAY_KEY));
   if (considerPublicHoliday === null) considerPublicHoliday = true;
+  showEventInfoBox = JSON.parse(localStorage.getItem(SHOW_EVENT_INFO_BOX_KEY));
+  if (showEventInfoBox === null) showEventInfoBox = true;
   setupMonthPicker();
   renderCalendar(currentDate);
   renderTodayDisplay();
   updateHeaderClockAndCountdown();
+  renderEventInfoPanel();
   if (window.i18n && window.i18n.t) {
     document.title = window.i18n.t("app_title");
   }
@@ -1169,8 +1181,91 @@ function renderTodayDisplay() {
   `;
 }
 
+function renderEventInfoPanel() {
+  if (!eventInfoPanel || !eventInfoBody) return;
+  showEventInfoBox = JSON.parse(localStorage.getItem(SHOW_EVENT_INFO_BOX_KEY));
+  if (showEventInfoBox === null) showEventInfoBox = true;
+  if (!showEventInfoBox) {
+    eventInfoPanel.style.display = "none";
+    return;
+  }
+  const now = new Date();
+  eventInfoPanel.style.display = "";
+
+  const items = getMonthEventInfo(currentDate, now);
+  if (!items.length) {
+    const emptyText = (window.i18n && window.i18n.t) ? window.i18n.t("event_info_empty") : "Keine Termine / Geburtstage";
+    eventInfoBody.innerHTML = `<div class="event-info-empty">${emptyText}</div>`;
+    return;
+  }
+
+  eventInfoBody.innerHTML = items.map(item => {
+    const pastClass = item.isPast ? " past" : "";
+    const timeHtml = item.time ? `<span class="event-info-time">${escapeHtml(item.time)}</span>` : "";
+    return (
+      `<div class="event-info-item${pastClass}">` +
+      `<span class="event-info-date">${escapeHtml(item.dateLabel)}</span>` +
+      `${timeHtml}` +
+      `<span class="event-info-title-text">${escapeHtml(item.title)}</span>` +
+      `</div>`
+    );
+  }).join("");
+}
+
+function getMonthEventInfo(viewDate, now) {
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const monthStart = new Date(year, month, 1);
+  const monthEnd = new Date(year, month + 1, 0);
+  const items = [];
+
+  events.forEach(e => {
+    const type = normalizeEventType(e?.type);
+    if (type !== "appointment" && type !== "birthday") return;
+
+    if (type === "birthday") {
+      const birth = parseDateSafe(e.date);
+      if (!birth) return;
+      const inMonth = birth.getMonth() === month;
+      if (!inMonth) return;
+      if (!isBirthdayValidForYear(e, birth, year)) return;
+      const eventDate = new Date(year, month, birth.getDate());
+      const isPast = eventDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      items.push({
+        date: eventDate,
+        dateLabel: formatDateShort(eventDate),
+        title: formatBirthdayTitle(e, year),
+        time: "",
+        isPast
+      });
+      return;
+    }
+
+    const start = parseDateSafe(e.date);
+    if (!start) return;
+    const end = parseDateSafe(e.endDate || e.date) || start;
+    if (end < monthStart || start > monthEnd) return;
+    const labelDate = (start < monthStart) ? monthStart : start;
+    const isPast = end < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const timeLabel = (e.startTime && e.endTime)
+      ? `${e.startTime}–${e.endTime}`
+      : (e.startTime ? e.startTime : "");
+    items.push({
+      date: labelDate,
+      dateLabel: formatDateShort(labelDate),
+      title: e.title || ((window.i18n && window.i18n.t) ? window.i18n.t("appointment") : "Termin"),
+      time: timeLabel,
+      isPast
+    });
+  });
+
+  items.sort((a, b) => a.date - b.date);
+  return items;
+}
+
 function startHeaderTimer() {
   updateHeaderClockAndCountdown();
+  renderEventInfoPanel();
   if (headerTimerId) clearInterval(headerTimerId);
   headerTimerId = setInterval(updateHeaderClockAndCountdown, 1000);
 }

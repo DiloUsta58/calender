@@ -14,7 +14,7 @@
   <meta name="theme-color" content="#0f172a">
 
   <title data-i18n="app_settings">App Einstellungen</title>
-  <link rel="stylesheet" href="css/style.css?v=1.0.10">
+  <link rel="stylesheet" href="css/style.css?v=1.0.11">
 </head>
 <body>
 
@@ -58,7 +58,7 @@
             </label>
             <label class="menu-toggle holiday-consider-toggle">
               <input type="checkbox" id="toggleExcludePublicHolidayVacations" checked>
-              <span data-i18n="consider_public_holidays">Gesetzliche Feiertage berücksichtigen (Urlaub)</span>
+              <span data-i18n="consider_public_holidays">Feiertage berücksichtigen (Urlaub)</span>
             </label>
             <label class="menu-toggle">
               <input type="checkbox" id="toggleSchoolHolidays">
@@ -224,16 +224,20 @@
             <option value="exclude_we_1shift" data-i18n="shift_setting_1shift_no_weekends">Bei 1‑Schicht Wochenenden abziehen</option>
           </select>
         </label>
+        <label class="menu-toggle">
+          <input type="checkbox" id="toggleEventInfoBox" checked>
+          <span data-i18n="show_event_info_box">Ereignisse-Box anzeigen</span>
+        </label>
       </div>
     </details>
   </section>
 </div>
 
 <footer class="calendar-footer">
-   © Dilaver Bölükbaşı 2026<br> Calender+ <span id="versionLabel">v1.0.10</span> · <span data-i18n="rights">Alle Rechte vorbehalten</span>
+   © Dilaver Bölükbaşı 2026<br> Calender+ <span id="versionLabel">v1.0.11</span> · <span data-i18n="rights">Alle Rechte vorbehalten</span>
 </footer>
 
-<script src="js/lng.js?v=1.0.10"></script>
-<script src="js/settings.js?v=1.0.10"></script>
+<script src="js/lng.js?v=1.0.11"></script>
+<script src="js/settings.js?v=1.0.11"></script>
 </body>
 </html>

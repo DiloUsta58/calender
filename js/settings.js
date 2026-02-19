@@ -25,7 +25,8 @@ const SHOW_BIRTHDAY_COUNTDOWN_KEY = "calendar_show_birthday_countdown";
 const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
 const CONSIDER_PUBLIC_HOLIDAY_KEY = "calendar_consider_public_holiday";
-const APP_VERSION = "1.0.10";
+const SHOW_EVENT_INFO_BOX_KEY = "calendar_show_event_info_box";
+const APP_VERSION = "1.0.11";
 
 const islamicToggle = document.getElementById("toggleIslamic");
 const germanToggle = document.getElementById("toggleGerman");
@@ -54,6 +55,7 @@ const vacationCountdownModeSelect = document.getElementById("vacationCountdownMo
 const birthdayCountdownToggle = document.getElementById("toggleBirthdayCountdown");
 const vacationShiftDefaultSelect = document.getElementById("vacationShiftDefaultSelect");
 const considerPublicHolidayToggle = document.getElementById("toggleExcludePublicHolidayVacations");
+const eventInfoBoxToggle = document.getElementById("toggleEventInfoBox");
 const versionLabel = document.getElementById("versionLabel");
 
 function initPanelState(panelEl, storageKey) {
@@ -108,6 +110,15 @@ let vacationCountdownMode = localStorage.getItem(VACATION_COUNTDOWN_MODE_KEY) ||
 let vacationShiftDefault = localStorage.getItem(VACATION_SHIFT_DEFAULT_KEY) || "default";
 let considerPublicHoliday = JSON.parse(localStorage.getItem(CONSIDER_PUBLIC_HOLIDAY_KEY));
 if (considerPublicHoliday === null) considerPublicHoliday = true;
+let showEventInfoBox = JSON.parse(localStorage.getItem(SHOW_EVENT_INFO_BOX_KEY));
+if (showEventInfoBox === null) showEventInfoBox = true;
+
+function updateGermanHolidayDependentsState() {
+  const disabled = !includeGerman;
+  if (considerPublicHolidayToggle) {
+    considerPublicHolidayToggle.disabled = disabled;
+  }
+}
 
 function updateVacationModeState() {
   if (!vacationCountdownModeSelect) return;
@@ -156,9 +167,11 @@ if (islamicToggle) {
 
 if (germanToggle) {
   germanToggle.checked = includeGerman;
+  updateGermanHolidayDependentsState();
   germanToggle.addEventListener("change", () => {
     includeGerman = germanToggle.checked;
     localStorage.setItem(GERMAN_KEY, JSON.stringify(includeGerman));
+    updateGermanHolidayDependentsState();
   });
 }
 
@@ -360,6 +373,15 @@ if (considerPublicHolidayToggle) {
   considerPublicHolidayToggle.addEventListener("change", () => {
     considerPublicHoliday = considerPublicHolidayToggle.checked;
     localStorage.setItem(CONSIDER_PUBLIC_HOLIDAY_KEY, JSON.stringify(considerPublicHoliday));
+  });
+  updateGermanHolidayDependentsState();
+}
+
+if (eventInfoBoxToggle) {
+  eventInfoBoxToggle.checked = !!showEventInfoBox;
+  eventInfoBoxToggle.addEventListener("change", () => {
+    showEventInfoBox = eventInfoBoxToggle.checked;
+    localStorage.setItem(SHOW_EVENT_INFO_BOX_KEY, JSON.stringify(showEventInfoBox));
   });
 }
 
