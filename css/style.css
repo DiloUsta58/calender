@@ -1,8 +1,12 @@
+/* Allgemeine Stileinstellungen für die Kalenderanwendung, einschließlich Layout, Farben und Interaktionen. 
+   Diese Stile sorgen für ein modernes und ansprechendes Design, das auf verschiedenen Geräten gut funktioniert. */
 * {
   box-sizing: border-box;
   font-family: "SF Pro Display", "SF Pro Text", "Inter", system-ui, sans-serif;
 }
 
+/* Grundlegende Stile für den Body, einschließlich Hintergrund, 
+  Schriftfarbe und Vermeidung von horizontalem Scrollen */
 body {
   margin: 0;
   padding: 16px;
@@ -11,6 +15,9 @@ body {
   overflow-x: hidden;
 }
 
+/* Stile für die Hauptkalenderkomponente, einschließlich Hintergrund, Rahmen, Schatten und Layout. 
+   Es werden auch CSS-Variablen definiert, 
+   um die Schriftgrößen für verschiedene Elemente des Kalenders anzupassen. */
 .calendar {
   --calendar-font-size: 12px;
   --entry-font-size: 10px;
@@ -26,6 +33,8 @@ body {
   overflow: hidden;
 }
 
+/* Stile für die Kopfzeile des Kalenders, einschließlich Layout, Abstände und Trennung von Aktionen. 
+   Es wird ein Grid-Layout verwendet, um die linke und rechte Seite der Kopfzeile zu organisieren. */
 .calendar-header {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -36,6 +45,8 @@ body {
   padding-bottom: 12px;
 }
 
+/* Stile für die linke und rechte Seite der Kopfzeile, einschließlich Layout, Ausrichtung und Abstände. 
+   Die linke Seite ist für die Monatsanzeige und die rechte Seite für Aktionen wie das Öffnen der Einstellungen vorgesehen. */
 .header-left {
   display: flex;
   flex-direction: column;
@@ -44,6 +55,8 @@ body {
   gap: 6px;
 }
 
+/* Die rechte Seite der Kopfzeile ist so gestaltet, dass die Aktionen am rechten Rand ausgerichtet sind, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .header-right {
   display: flex;
   flex-direction: column;
@@ -51,6 +64,9 @@ body {
   gap: 10px;
 }
 
+/* Stile für die Buttons in der Kopfzeile, einschließlich Hintergrund, Farben, Rahmen und Interaktionen. 
+   Es wird ein moderner Look mit einem Farbverlauf und abgerundeten Ecken verwendet, 
+   sowie eine Hover-Interaktion, um visuelles Feedback zu geben. */
 .calendar-header button {
   padding: 6px 12px;
   cursor: pointer;
@@ -61,6 +77,9 @@ body {
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
+/* Stile für den Link zu den Einstellungen, der ähnlich wie die Buttons gestaltet ist, 
+   aber als Link formatiert ist. Es wird ein konsistentes Design mit den Buttons verwendet, 
+   einschließlich Hintergrund, Farben, Rahmen und Interaktionen. */
 .settings-link {
   display: inline-flex;
   align-items: center;
@@ -75,39 +94,56 @@ body {
   border-radius: 8px;
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
- 
+
+/* Hover-Interaktionen für die Buttons in der Kopfzeile und den Einstellungslink, 
+   um visuelles Feedback zu geben, wenn der Benutzer mit der Maus darüber fährt. 
+   Es wird eine leichte Anhebung und ein Schatteneffekt verwendet, um die Interaktion hervorzuheben. */
 .calendar-header button:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/* Spezifische Hover-Interaktion für den Einstellungslink, die ähnlich wie die Buttons gestaltet ist, 
+   um ein konsistentes Benutzererlebnis zu gewährleisten. */  
 .settings-link:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/* Stile für die Aktionsleiste in der Kopfzeile, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Aktionen nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .calendar-actions {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
+/* Spezifische Farben für die Buttons in der Kopfzeile, um sie visuell zu unterscheiden. 
+   Die Buttons für den vorherigen und nächsten Monat haben eine grüne Farbe, 
+   während der Button für den aktuellen Tag eine blaue Farbe hat, um ihn hervorzuheben. */
 #prevMonth, #nextMonth {
   color: #34d399;
 }
 
+/*  Der Button für den aktuellen Tag erhält eine blaue Farbe, um ihn visuell 
+    hervorzuheben und leicht erkennbar zu machen. */
 #todayBtn {
   color: #0048ff;
   font-weight: 600;
 }
 
+/* Spezifische Farbe für den Einstellungslink, um ihn visuell hervorzuheben und leicht erkennbar zu machen. 
+   Es wird ein kräftiges Rot verwendet, um die Aufmerksamkeit des Benutzers auf den Link zu lenken. */
 .settings-link {
   color: #c20606;
 }
 
-
+/* Stile für die Monatsauswahl, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Elemente der Monatsauswahl nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .month-picker {
   display: flex;
   align-items: center;
@@ -115,6 +151,9 @@ body {
   color: #34d399;
 }
 
+/* Stile für die Jahresauswahl, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Elemente der Jahresauswahl nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .today-display { /*Aktuelle Daten kompakter anzeigen */
   display: inline-grid;
   grid-template-columns: auto auto;
@@ -126,6 +165,8 @@ body {
   line-height: 1;
 }
 
+/* Stile für die Anzeige des aktuellen Tages, Monats und Jahres, einschließlich Layout, Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um die aktuellen Daten hervorzuheben und leicht erkennbar zu machen. */
 .today-day {  /*Aktuelle Tag  */
   grid-column: 1;
   grid-row: 1 / span 2;
@@ -134,6 +175,8 @@ body {
   color: #34d399;
 }
 
+/* Die Anzeige des aktuellen Monats erhält eine grüne Farbe, um sie visuell hervorzuheben 
+   und leicht erkennbar zu machen. */
 .today-month {
   grid-column: 2;
   grid-row: 1;
@@ -143,6 +186,8 @@ body {
   align-self: end;
 }
 
+/* Die Anzeige des aktuellen Jahres erhält eine grüne Farbe, um sie visuell hervorzuheben 
+   und leicht erkennbar zu machen. */
 .today-year {
   grid-column: 2;
   grid-row: 2;
@@ -152,6 +197,9 @@ body {
   align-self: start;
 }
 
+/* Stile für das Uhr-Panel, einschließlich Layout, Ausrichtung, Abstände und visuelle Gestaltung. 
+   Es wird ein modernes Design mit einem Farbverlauf und abgerundeten Ecken verwendet, 
+   um die Uhrinformationen hervorzuheben und leicht erkennbar zu machen. */
 .clock-panel {
   margin-top: 0;
   display: flex;
@@ -166,6 +214,8 @@ body {
   background: linear-gradient(180deg, rgba(34,197,94,0.1) 0%, rgba(34,197,94,0.04) 100%);
 }
 
+/* Stile für die aktuelle Uhrzeit, einschließlich Schriftgröße, Gewicht, Farben und Schriftart. 
+   Es wird ein modernes Design verwendet, um die aktuelle Uhrzeit hervorzuheben und leicht erkennbar zu machen. */
 .clock-now {
   color: #34d399;
   font-size: 18px;
@@ -174,6 +224,8 @@ body {
   letter-spacing: 0.4px;
 }
 
+/* Stile für die Countdown-Anzeige, einschließlich Layout, Ausrichtung, Abstände, Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um die Countdown-Informationen hervorzuheben und leicht erkennbar zu machen. */
 .clock-countdown {
   display: flex;
   align-items: baseline;
@@ -183,25 +235,38 @@ body {
   line-height: 1.25;
 }
 
+/* Stile für die Zusammenfassung der Uhrinformationen, einschließlich Ausrichtung und Textausrichtung. 
+   Es wird eine rechtsbündige Ausrichtung verwendet, um die Informationen am rechten Rand des Panels anzuzeigen. */
 .clock-summary {
   justify-content: flex-end;
   text-align: right;
 }
 
+/* Stile für die linke Seite der Uhrinformationen, einschließlich Schriftart, Farben und Gewicht. 
+   Es wird eine Monospace-Schriftart verwendet, um die Uhrinformationen klar und leicht lesbar zu machen, 
+   mit einer grünen Farbe, um sie visuell hervorzuheben. */
 .clock-left {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   color: #4ade80;
   font-weight: 700;
 }
 
+/* Stile für die Trennzeichen in der Uhrinformationen, einschließlich Farben. 
+   Es wird eine leicht transparent grüne Farbe verwendet, um die Trennzeichen visuell hervorzuheben, 
+   aber dennoch subtil zu halten, damit sie die Hauptinformationen nicht überwältigen. */
 .clock-sep {
   color: rgba(134, 239, 172, 0.75);
 }
 
+/* Stile für die Namen der Uhrinformationen, einschließlich Farben. 
+   Es wird eine hellgrüne Farbe verwendet, um die Namen visuell hervorzuheben und leicht erkennbar zu machen. */
 .clock-name {
   color: #dcfce7;
 }
 
+/* Stile für die Trennlinie im Uhr-Panel, einschließlich Breite, Höhe, Farben und Abstände. 
+   Es wird eine leicht transparent grüne Farbe verwendet, um die Trennlinie visuell hervorzuheben, 
+   aber dennoch subtil zu halten, damit sie die Hauptinformationen nicht überwältigt. */
 .clock-divider {
   width: 100%;
   height: 0;
@@ -209,12 +274,17 @@ body {
   margin: 2px 0 1px;
 }
 
+/* Stile für das Event-Info-Panel, einschließlich Ausrichtung, Mindestbreite, Farben und Rahmen. 
+   Es wird ein modernes Design mit einem Farbverlauf und abgerundeten Ecken verwendet, 
+   um die Eventinformationen hervorzuheben und leicht erkennbar zu machen. */
 .event-info-panel {
   align-self: flex-end;
   min-width: 260px;
   border-color: rgba(34, 197, 94, 0.35);
 }
 
+/* Stile für die Titel der Eventinformationen, einschließlich Schriftgröße, Gewicht und Farben. 
+   Es wird eine grüne Farbe verwendet, um die Titel visuell hervorzuheben und leicht erkennbar zu machen. */
 .event-info-title {
   font-size: 12px;
   font-weight: 700;
@@ -222,6 +292,9 @@ body {
   margin-bottom: 4px;
 }
 
+/* Stile für die Liste der Eventinformationen, einschließlich Layout, Ausrichtung, Abstände, Schriftgröße und Farben. 
+   Es wird ein modernes Design verwendet, um die Eventinformationen klar und leicht lesbar zu machen, 
+   mit einer hellgrünen Farbe, um sie visuell hervorzuheben. */
 .event-info-list {
   display: flex;
   flex-direction: column;
@@ -230,12 +303,18 @@ body {
   color: #dcfce7;
 }
 
+/* Stile für die einzelnen Event-Info-Elemente, einschließlich Layout, Ausrichtung, Abstände und Schriftarten. 
+   Es wird ein flexibles Layout verwendet, um die Informationen nebeneinander anzuordnen, 
+   mit einer Monospace-Schriftart für die Uhrinformationen, um sie klar und leicht lesbar zu machen. */
 .event-info-item {
   display: flex;
   gap: 6px;
   align-items: baseline;
 }
 
+/* Stile für die Datumsangaben in den Eventinformationen, einschließlich Mindestbreite, Farben, Gewicht und Schriftart. 
+   Es wird eine grüne Farbe verwendet, um die Datumsangaben visuell hervorzuheben, 
+   mit einer Monospace-Schriftart, um sie klar und leicht lesbar zu machen. */
 .event-info-date {
   min-width: 40px;
   color: #4ade80;
@@ -243,21 +322,31 @@ body {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
+/* Stile für die Uhrzeitangaben in den Eventinformationen, einschließlich Farben, Gewicht und Schriftart. 
+   Es wird eine hellgrüne Farbe verwendet, um die Uhrzeitangaben visuell hervorzuheben, 
+   mit einer Monospace-Schriftart, um sie klar und leicht lesbar zu machen. */
 .event-info-time {
   color: #86efac;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
+/* Stile für die Namen der Events in den Eventinformationen, einschließlich Farben. 
+   Es wird eine hellgrüne Farbe verwendet, um die Namen visuell hervorzuheben und leicht erkennbar zu machen. */
 .event-info-item.past {
   opacity: 0.55;
   text-decoration: line-through;
 }
 
+/* Stile für vergangene Events in den Eventinformationen, einschließlich reduzierter Opazität und durchgestrichener Text, 
+   um sie visuell von aktuellen und zukünftigen Events zu unterscheiden. */
 .event-info-empty {
   color: #9ca3af;
   font-size: 12px;
 }
 
+/* Stile für die leere Event-Info-Anzeige, einschließlich Farben und Schriftgröße. 
+   Es wird eine graue Farbe verwendet, um anzuzeigen, dass keine Events vorhanden sind, 
+   mit einer kleineren Schriftgröße, um sie weniger hervorzuheben als tatsächliche Eventinformationen. */
 #monthLabel {
   display: block;
   margin: 0;
@@ -266,27 +355,38 @@ body {
   line-height: 1;
 }
 
-
-
+/* Stile für die Monatsanzeige, einschließlich Layout, Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um den aktuellen Monat hervorzuheben und leicht erkennbar zu machen. */
 .month-controls {
   display: flex;
   gap: 6px;
 }
 
+/* Stile für die Monatskontrollen, einschließlich Layout und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Kontrollen nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .custom-month-select {
   position: relative;
 }
 
+/* Stile für die benutzerdefinierte Monatsauswahl, einschließlich Positionierung, Layout und Abstände. 
+   Es wird eine relative Positionierung verwendet, um die Dropdown-Liste korrekt zu platzieren, 
+   und ein flexibles Layout, um die Eingabe und den Trigger nebeneinander anzuordnen. */
 .native-month-select {
   display: none;
 }
 
+/* Stile für die native Monatsauswahl, die ausgeblendet wird, um stattdessen die benutzerdefinierte Auswahl zu verwenden. 
+   Es wird auf die native Funktionalität verzichtet, um ein konsistenteres und ansprechenderes Design zu ermöglichen. */
 .year-input-wrap {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
+/* Stile für die Umschlagung der Jahreseingabe, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Eingabe und den Button nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .year-input-wrap input {
   width: 90px;
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
@@ -297,16 +397,23 @@ body {
   font-size: 12px;
 }
 
+/* Stile für die Jahreseingabe, einschließlich Hintergrund, Farben, Rahmen und Schriftgröße. 
+   Es wird ein modernes Design verwendet, um die Eingabe hervorzuheben und leicht erkennbar zu machen. */
 .native-year-input {
   display: none;
 }
 
+/* Stile für die native Jahreseingabe, die ausgeblendet wird, um stattdessen die benutzerdefinierte Auswahl zu verwenden. 
+   Es wird auf die native Funktionalität verzichtet, um ein konsistenteres und ansprechenderes Design zu ermöglichen. */
 .custom-year-select {
   position: relative;
   display: inline-flex;
   align-items: stretch;
 }
 
+/* Stile für die benutzerdefinierte Jahresauswahl, einschließlich Positionierung, Layout und Abstände. 
+   Es wird eine relative Positionierung verwendet, um die Dropdown-Liste korrekt zu platzieren, 
+   und ein flexibles Layout, um die Eingabe und den Trigger nebeneinander anzuordnen. */
 .custom-year-input {
   width: 90px;
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
@@ -319,11 +426,15 @@ body {
   outline: none;
 }
 
+/* Stile für die benutzerdefinierte Jahreseingabe, einschließlich Hintergrund, Farben, Rahmen und Schriftgröße. 
+   Es wird ein modernes Design verwendet, um die Eingabe hervorzuheben und leicht erkennbar zu machen. */
 .custom-year-input:focus {
   border-color: rgba(255,255,255,0.18);
   box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
 }
 
+/* Stile für die benutzerdefinierte Jahreseingabe im Fokuszustand, einschließlich erhöhter Rahmenfarbe und Schatteneffekt, 
+   um visuelles Feedback zu geben und die Eingabe hervorzuheben, wenn sie aktiv ist. */
 .custom-year-trigger {
   width: 30px;
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
@@ -336,16 +447,23 @@ body {
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 
+/* Stile für den Trigger der benutzerdefinierten Jahresauswahl, einschließlich Hintergrund, Farben, Rahmen und Interaktionen. 
+   Es wird ein modernes Design verwendet, um den Trigger hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .custom-year-trigger:hover {
   border-color: rgba(255,255,255,0.16);
   box-shadow: 0 4px 12px rgba(0,0,0,.25);
 }
 
+/* Stile für den Trigger der benutzerdefinierten Jahresauswahl im Hover-Zustand, einschließlich erhöhter Rahmenfarbe und Schatteneffekt, 
+   um visuelles Feedback zu geben und den Trigger hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .custom-year-select.open .custom-year-trigger,
 .custom-year-select.open .custom-year-input {
   border-color: rgba(255,255,255,0.2);
 }
 
+/* Stile für die benutzerdefinierte Jahresauswahl im geöffneten Zustand, einschließlich erhöhter Rahmenfarbe, 
+   um visuelles Feedback zu geben und die Auswahl hervorzuheben, wenn sie aktiv ist. */
 .custom-year-list {
   position: absolute;
   top: calc(100% + 4px);
@@ -363,10 +481,15 @@ body {
   color: #34d399;
 }
 
+/* Stile für die Dropdown-Liste der benutzerdefinierten Jahresauswahl, einschließlich Positionierung, Layout, Farben und Schatten. 
+   Es wird ein modernes Design verwendet, um die Liste hervorzuheben und leicht erkennbar zu machen, 
+   mit einem Farbverlauf und einem Schatteneffekt, um sie visuell ansprechend zu gestalten. */
 .custom-year-select.open .custom-year-list {
   display: block;
 }
 
+/* Stile für die Dropdown-Liste der benutzerdefinierten Jahresauswahl im geöffneten Zustand, einschließlich Anzeigeeinstellung, 
+   um die Liste sichtbar zu machen, wenn sie aktiv ist. */
 .custom-year-option {
   width: 100%;
   border: 0;
@@ -379,24 +502,35 @@ body {
   cursor: pointer;
 }
 
+/* Stile für die einzelnen Optionen in der benutzerdefinierten Jahresauswahl, einschließlich Layout, Farben und Interaktionen. 
+   Es wird ein modernes Design verwendet, um die Optionen klar und leicht lesbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben, wenn der Benutzer mit der Maus darüber fährt. */
 .custom-year-list .custom-year-option {
   color: #34d399;
 }
 
+/* Stile für die einzelnen Optionen in der Dropdown-Liste der benutzerdefinierten Jahresauswahl, einschließlich Farben. 
+   Es wird eine grüne Farbe verwendet, um die Optionen visuell hervorzuheben und leicht erkennbar zu machen. */
 .custom-year-list * {
   color: #34d399;
 }
 
+/* Stile für alle Elemente in der Dropdown-Liste der benutzerdefinierten Jahresauswahl, um sicherzustellen, dass sie die gleiche grüne Farbe haben, 
+   um ein konsistentes und ansprechendes Design zu gewährleisten. */
 .custom-year-option:hover {
   background: rgba(255,255,255,0.08);
   color: #ffffff;
 }
 
+/* Stile für die einzelnen Optionen in der benutzerdefinierten Jahresauswahl im Hover-Zustand, einschließlich erhöhter Hintergrundfarbe und weißer Schriftfarbe, 
+   um visuelles Feedback zu geben und die Option hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .custom-year-option.active {
   background: rgba(59,130,246,0.28);
   color: #e8f1ff;
 }
 
+/* Stile für die aktive Option in der benutzerdefinierten Jahresauswahl, einschließlich erhöhter Hintergrundfarbe und leicht hellerer Schriftfarbe, 
+   um visuelles Feedback zu geben und die aktive Option hervorzuheben. */
 .year-input-wrap button {
   display: none;
   padding: 4px 8px;
@@ -409,12 +543,17 @@ body {
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
+/* Stile für den Button in der Umschlagung der Jahreseingabe, einschließlich Hintergrund, Farben, Rahmen und Interaktionen. 
+   Es wird ein modernes Design verwendet, um den Button hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .year-input-wrap button:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/* Stile für den Button in der Umschlagung der Jahreseingabe im Hover-Zustand, einschließlich erhöhter Anhebung, Schatteneffekt und Rahmenfarbe, 
+   um visuelles Feedback zu geben und den Button hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .month-controls select,
 .custom-month-trigger {
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
@@ -428,17 +567,24 @@ body {
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 
+/* Stile für die Dropdown-Auswahl der Monate, einschließlich Hintergrund, Farben, Rahmen und Interaktionen. 
+   Es wird ein modernes Design verwendet, um die Auswahl hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 #monthSelect option {
   background-color: #171d28;
   color: #34d399;
 }
  
+/* Stile für die Optionen in der Monatsauswahl, einschließlich Hintergrund und Farben, 
+   um sicherzustellen, dass sie zum Design der Auswahl passen und leicht lesbar sind. */
 .month-controls select:hover,
 .custom-month-trigger:hover {
   border-color: rgba(255,255,255,0.16);
   box-shadow: 0 4px 12px rgba(0,0,0,.25);
 }
 
+/* Stile für die Dropdown-Auswahl der Monate im Hover-Zustand, einschließlich erhöhter Rahmenfarbe und Schatteneffekt, 
+   um visuelles Feedback zu geben und die Auswahl hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .custom-month-trigger {
   min-width: 124px;
   text-align: left;
@@ -447,16 +593,23 @@ body {
   padding-right: 24px;
 }
 
+/* Stile für den Trigger der benutzerdefinierten Monatsauswahl, einschließlich Mindestbreite, Textausrichtung, Cursor und Positionierung. 
+   Es wird ein modernes Design verwendet, um den Trigger hervorzuheben und leicht erkennbar zu machen, 
+   mit einem zusätzlichen rechten Padding, um Platz für das Dropdown-Symbol zu schaffen. */
 .custom-month-trigger,
 #monthSelectBtn {
   color: #34d399;
 }
 
+/* Stile für den Trigger der benutzerdefinierten Monatsauswahl und den Button für die Monatsauswahl, einschließlich Farben. 
+   Es wird eine grüne Farbe verwendet, um sie visuell hervorzuheben und leicht erkennbar zu machen. */
 .custom-month-trigger:hover,
 #monthSelectBtn:hover {
   color: #ffffff;
 }
 
+/* Stile für den Trigger der benutzerdefinierten Monatsauswahl und den Button für die Monatsauswahl im Hover-Zustand, einschließlich weißer Schriftfarbe, 
+   um visuelles Feedback zu geben und sie hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .custom-month-trigger::after {
   content: "▾";
   position: absolute;
@@ -467,15 +620,22 @@ body {
   pointer-events: none;
 }
 
+/* Stile für das Dropdown-Symbol im Trigger der benutzerdefinierten Monatsauswahl, einschließlich Inhalt, Positionierung und Farben. 
+   Es wird ein nach unten zeigendes Dreieck verwendet, um anzuzeigen, dass es sich um eine Dropdown-Auswahl handelt, 
+   mit einer leicht transparenten Farbe, um es visuell hervorzuheben, aber dennoch subtil zu halten. */
 .custom-month-select.open .custom-month-trigger {
   border-color: rgba(255,255,255,0.2);
   box-shadow: 0 8px 18px rgba(0,0,0,.3);
 }
 
+/* Stile für den Trigger der benutzerdefinierten Monatsauswahl im geöffneten Zustand, einschließlich erhöhter Rahmenfarbe und Schatteneffekt, 
+   um visuelles Feedback zu geben und die Auswahl hervorzuheben, wenn sie aktiv ist. */
 .custom-month-select.open .custom-month-trigger::after {
   content: "▴";
 }
 
+/* Stile für das Dropdown-Symbol im Trigger der benutzerdefinierten Monatsauswahl im geöffneten Zustand, einschließlich Inhalt, 
+   um anzuzeigen, dass die Auswahl geöffnet ist, indem das Dreieck nach oben zeigt. */
 .custom-month-list {
   position: absolute;
   top: calc(100% + 4px);
@@ -493,10 +653,15 @@ body {
   color: #34d399;
 }
 
+/* Stile für die Dropdown-Liste der benutzerdefinierten Monatsauswahl, einschließlich Positionierung, Layout, Farben und Schatten. 
+   Es wird ein modernes Design verwendet, um die Liste hervorzuheben und leicht erkennbar zu machen, 
+   mit einem Farbverlauf und einem Schatteneffekt, um sie visuell ansprechend zu gestalten. */
 .custom-month-select.open .custom-month-list {
   display: block;
 }
 
+/* Stile für die Dropdown-Liste der benutzerdefinierten Monatsauswahl im geöffneten Zustand, einschließlich Anzeigeeinstellung, 
+   um die Liste sichtbar zu machen, wenn sie aktiv ist. */
 .custom-month-option {
   width: 100%;
   border: 0;
@@ -509,20 +674,29 @@ body {
   cursor: pointer;
 }
 
+/* Stile für die einzelnen Optionen in der benutzerdefinierten Monatsauswahl, einschließlich Layout, Farben und Interaktionen. 
+   Es wird ein modernes Design verwendet, um die Optionen klar und leicht lesbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben, wenn der Benutzer mit der Maus darüber fährt. */
 .custom-month-list .custom-month-option {
   color: #34d399;
 }
 
+/* Stile für die einzelnen Optionen in der Dropdown-Liste der benutzerdefinierten Monatsauswahl, einschließlich Farben. 
+   Es wird eine grüne Farbe verwendet, um die Optionen visuell hervorzuheben und leicht erkennbar zu machen. */
 .custom-month-option:hover {
   background: rgba(255,255,255,0.08);
   color: #ffffff;
 }
 
+/* Stile für die einzelnen Optionen in der benutzerdefinierten Monatsauswahl im Hover-Zustand, einschließlich erhöhter Hintergrundfarbe und weißer Schriftfarbe, 
+   um visuelles Feedback zu geben und die Option hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .custom-month-option.active {
   background: rgba(59,130,246,0.28);
   color: #34d399;
 }
 
+/* Stile für die aktive Option in der benutzerdefinierten Monatsauswahl, einschließlich erhöhter Hintergrundfarbe und grüner Schriftfarbe, 
+   um visuelles Feedback zu geben und die aktive Option hervorzuheben. */
 .compact-toggle {
   display: none;
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
@@ -535,12 +709,17 @@ body {
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
  
+/* Stile für den Toggle-Button für die kompakte Anzeige, einschließlich Hintergrund, Farben, Rahmen und Interaktionen. 
+   Es wird ein modernes Design verwendet, um den Button hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .compact-toggle:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/* Stile für den Toggle-Button für die kompakte Anzeige im Hover-Zustand, einschließlich erhöhter Anhebung, Schatteneffekt und Rahmenfarbe, 
+   um visuelles Feedback zu geben und den Button hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .calendar-menu {
   display: flex;
   gap: 8px;
@@ -551,20 +730,29 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
+/* Stile für das Menü der Kalenderoptionen, einschließlich Layout, Abstände und visuelle Gestaltung. 
+   Es wird ein flexibles Layout verwendet, um die Optionen nebeneinander anzuordnen, 
+   mit einem Farbverlauf und einer Trennlinie, um das Menü visuell ansprechend zu gestalten. */
 .settings-page {
   max-width: 720px;
 }
 
+/* Stile für die Einstellungsseite, einschließlich maximaler Breite, 
+  um sicherzustellen, dass der Inhalt nicht zu breit wird und leicht lesbar bleibt. */
 .settings-title {
   font-size: 18px;
   font-weight: 700;
   margin: 0;
 }
 
+/* Stile für den Titel der Einstellungsseite, einschließlich Schriftgröße, Gewicht und Abstände. 
+   Es wird ein modernes Design verwendet, um den Titel hervorzuheben und leicht erkennbar zu machen. */
 .settings-section {
   margin-top: 12px;
 }
 
+/* Stile für die Abschnitte der Einstellungen, einschließlich Abstände, 
+   um eine klare Trennung zwischen den verschiedenen Einstellungsbereichen zu gewährleisten. */
 .settings-section h3 {
   margin: 0 0 8px 0;
   font-size: 14px;
@@ -572,6 +760,8 @@ body {
   font-weight: 600;
 }
 
+/* Stile für die Untertitel der Einstellungsabschnitte, einschließlich Abstände, Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um die Untertitel hervorzuheben und leicht erkennbar zu machen. */
 .settings-disclosure {
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 12px;
@@ -579,6 +769,9 @@ body {
   background: linear-gradient(180deg, #161a22 0%, #121722 100%);
 }
 
+/* Stile für die Disclosure-Elemente in den Einstellungen, einschließlich Rahmen, Abstände und visuelle Gestaltung. 
+   Es wird ein modernes Design mit einem Farbverlauf und abgerundeten Ecken verwendet, 
+   um die Disclosure-Elemente hervorzuheben und leicht erkennbar zu machen. */
 .settings-summary {
   cursor: pointer;
   list-style: none;
@@ -592,10 +785,15 @@ body {
   gap: 8px;
 }
 
+/* Stile für die Zusammenfassung der Disclosure-Elemente in den Einstellungen, einschließlich Cursor, Schriftgröße, Gewicht, Farben und Layout. 
+   Es wird ein modernes Design verwendet, um die Zusammenfassung hervorzuheben und leicht erkennbar zu machen, 
+   mit einer grünen Farbe und kursivem Stil, um sie visuell hervorzuheben. */
 .settings-summary::-webkit-details-marker {
   display: none;
 }
 
+/* Stile für die Standard-Markierung der Disclosure-Zusammenfassung, die ausgeblendet wird, um stattdessen ein benutzerdefiniertes Design zu verwenden. 
+   Es wird auf die native Markierung verzichtet, um ein konsistenteres und ansprechenderes Design zu ermöglichen. */
 .settings-summary::after {
   content: "▾";
   font-size: 14px;
@@ -603,22 +801,33 @@ body {
   transition: transform .15s ease;
 }
 
+/* Stile für das Dropdown-Symbol in der Disclosure-Zusammenfassung, einschließlich Inhalt, Schriftgröße, Farben und Übergang. 
+   Es wird ein nach unten zeigendes Dreieck verwendet, um anzuzeigen, dass es sich um eine Disclosure handelt, 
+   mit einer leicht transparenten Farbe und einem Übergangseffekt, um es visuell hervorzuheben. */
 .settings-summary:hover {
   color: #ffffff;
 }
 
+/* Stile für die Disclosure-Zusammenfassung im Hover-Zustand, einschließlich weißer Schriftfarbe, 
+   um visuelles Feedback zu geben und die Zusammenfassung hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .settings-summary:hover::after {
   color: #ffffff;
 }
 
+/* Stile für das Dropdown-Symbol in der Disclosure-Zusammenfassung im Hover-Zustand, einschließlich weißer Farbe, 
+   um visuelles Feedback zu geben und das Symbol hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .settings-disclosure[open] .settings-summary::after {
   transform: rotate(180deg);
 }
 
+/* Stile für das Dropdown-Symbol in der Disclosure-Zusammenfassung im geöffneten Zustand, einschließlich Rotation, 
+   um anzuzeigen, dass die Disclosure geöffnet ist, indem das Dreieck nach oben zeigt. */
 .settings-disclosure .settings-list {
   margin-top: 10px;
 }
 
+/* Stile für die Liste innerhalb der Disclosure-Elemente in den Einstellungen, einschließlich Abstände, 
+   um eine klare Trennung zwischen der Zusammenfassung und dem Inhalt der Disclosure zu gewährleisten. */
 .settings-subdisclosure {
   border: 1px solid rgba(255,255,255,0.05);
   border-radius: 10px;
@@ -626,20 +835,30 @@ body {
   background: linear-gradient(180deg, #151b26 0%, #121722 100%);
 }
 
+/* Stile für die Unter-Disclosure-Elemente in den Einstellungen, einschließlich Rahmen, Abstände und visuelle Gestaltung. 
+   Es wird ein modernes Design mit einem Farbverlauf und abgerundeten Ecken verwendet, 
+   um die Unter-Disclosure-Elemente hervorzuheben und leicht erkennbar zu machen. */
 .settings-sublist {
   margin-top: 8px;
 }
 
+/* Stile für die Liste innerhalb der Unter-Disclosure-Elemente in den Einstellungen, einschließlich Abstände, 
+   um eine klare Trennung zwischen der Zusammenfassung und dem Inhalt der Unter-Disclosure zu gewährleisten. */
 .holiday-consider-toggle {
   margin-left: 20px;
 }
 
+/* Stile für die Umschaltung der Berücksichtigung von Feiertagen, einschließlich Abstände, 
+   um sie visuell von anderen Einstellungen zu unterscheiden und eine klare Hierarchie zu schaffen. */
 .settings-subtitle {
   font-size: 13px;
   font-weight: 600;
   color: #d6deea;
 }
 
+/* Stile für die Untertitel innerhalb der Einstellungen, einschließlich Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um die Untertitel hervorzuheben und leicht erkennbar zu machen, 
+   mit einer hellblauen Farbe, um sie visuell hervorzuheben. */
 .settings-subhead-row {
   display: flex;
   align-items: center;
@@ -647,6 +866,9 @@ body {
   gap: 10px;
 }
 
+/* Stile für die Zeilen mit Unterüberschriften in den Einstellungen, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Unterüberschrift und die zugehörigen Steuerelemente nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .inline-region-select {
   min-width: 220px;
   max-width: 52%;
@@ -658,12 +880,18 @@ body {
   font-size: 13px;
 }
 
+/* Stile für die Inline-Auswahl der Region, einschließlich Mindest- und Maximalbreite, Hintergrund, Farben, Rahmen und Schriftgröße. 
+   Es wird ein modernes Design verwendet, um die Auswahl hervorzuheben und leicht erkennbar zu machen, 
+   mit einem dunklen Hintergrund und einer hellen Schriftfarbe, um einen guten Kontrast zu gewährleisten. */
 .settings-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+/* Stile für die Liste der Einstellungen, einschließlich Layout und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Einstellungen vertikal anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .settings-field {
   display: flex;
   align-items: center;
@@ -676,6 +904,9 @@ body {
   background: linear-gradient(180deg, #1a2230 0%, #141a24 100%);
 }
 
+/* Stile für die einzelnen Einstellungsfelder, einschließlich Layout, Ausrichtung, Abstände und visuelle Gestaltung. 
+   Es wird ein modernes Design mit einem Farbverlauf und abgerundeten Ecken verwendet, 
+   um die Einstellungsfelder hervorzuheben und leicht erkennbar zu machen. */
 .settings-field select {
   background: #0f1115;
   color: #e5e7eb;
@@ -685,16 +916,24 @@ body {
   font-size: 13px;
 }
 
+/* Stile für die Dropdown-Auswahl innerhalb der Einstellungsfelder, einschließlich Hintergrund, Farben, Rahmen und Schriftgröße. 
+   Es wird ein modernes Design verwendet, um die Auswahl hervorzuheben und leicht erkennbar zu machen, 
+   mit einem dunklen Hintergrund und einer hellen Schriftfarbe, um einen guten Kontrast zu gewährleisten. */
 .vacation-mode-field {
   padding-left: 55px;
 }
 
+/* Stile für das Urlaubsmodus-Feld, einschließlich zusätzlichem linken Padding, 
+   um Platz für ein Symbol oder eine visuelle Darstellung zu schaffen, die den Urlaubsmodus anzeigt. */
 .lang-picker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
+/* Stile für den Sprachwahl-Container, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Flagge und den Namen der Sprache nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .lang-flag {
   width: 28px;
   height: auto;
@@ -703,6 +942,9 @@ body {
   object-fit: cover;
 }
 
+/* Stile für die Flaggen in der Sprachwahl, einschließlich Größe, Form und Layout. 
+   Es wird eine feste Breite verwendet, um die Flaggen einheitlich zu machen, 
+   mit einer automatischen Höhe, um das Seitenverhältnis beizubehalten, und abgerundeten Ecken für ein modernes Design. */
 .settings-back {
   text-decoration: none;
   padding: 6px 12px;
@@ -714,12 +956,17 @@ body {
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
+/* Stile für den Zurück-Button in den Einstellungen, einschließlich Hintergrund, Farben, Rahmen und Interaktionen. 
+   Es wird ein modernes Design verwendet, um den Button hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .settings-back:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/* Stile für den Zurück-Button in den Einstellungen im Hover-Zustand, einschließlich erhöhter Anhebung, Schatteneffekt und Rahmenfarbe, 
+   um visuelles Feedback zu geben und den Button hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .calendar-menu button {
   padding: 6px 12px;
   cursor: pointer;
@@ -729,13 +976,18 @@ body {
   border-radius: 8px;
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
- 
+
+/* Stile für die Buttons im Kalendermenü, einschließlich Hintergrund, Farben, Rahmen und Interaktionen. 
+   Es wird ein modernes Design verwendet, um die Buttons hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .calendar-menu button:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/* Stile für die Buttons im Kalendermenü im Hover-Zustand, einschließlich erhöhter Anhebung, Schatteneffekt und Rahmenfarbe, 
+   um visuelles Feedback zu geben und die Buttons hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .menu-toggle {
   display: inline-flex;
   align-items: center;
@@ -748,6 +1000,10 @@ body {
   transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
 
+/* Stile für die Umschaltung von Kalenderoptionen, einschließlich Layout, Farben, Rahmen und Interaktionen. 
+   Es wird ein modernes Design mit einem Farbverlauf und abgerundeten Ecken verwendet, 
+   um die Umschaltung hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .menu-toggle:has(input:disabled) {
   opacity: 0.5;
   cursor: not-allowed;
@@ -755,41 +1011,57 @@ body {
   transform: none;
 }
 
+/* Stile für die Umschaltung von Kalenderoptionen im deaktivierten Zustand, einschließlich reduzierter Opazität, nicht-änderbarem Cursor und fehlendem Schatten und Transformations-Effekten, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Umschaltung nicht interaktiv ist. */
 .menu-toggle:has(input:disabled):hover {
   box-shadow: none;
   transform: none;
   border-color: rgba(255,255,255,0.06);
 }
 
+/* Stile für die Umschaltung von Kalenderoptionen im deaktivierten Zustand und im Hover-Zustand, einschließlich fehlendem Schatten und Transformations-Effekten sowie angepasster Rahmenfarbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Umschaltung nicht interaktiv ist, selbst wenn der Benutzer mit der Maus darüber fährt. */
 .menu-toggle input[type="checkbox"]:disabled {
   cursor: not-allowed;
 }
 
+/* Stile für die Checkbox innerhalb der Umschaltung von Kalenderoptionen im deaktivierten Zustand, einschließlich nicht-änderbarem Cursor, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox nicht interaktiv ist. */
 .holiday-consider-toggle input[type="checkbox"]:disabled {
   background: #1f2937;
   border-color: rgba(255,255,255,0.12);
 }
 
+/* Stile für die Checkbox innerhalb der Umschaltung der Berücksichtigung von Feiertagen im deaktivierten Zustand, einschließlich Hintergrund und Rahmenfarbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox nicht interaktiv ist. */
 .holiday-consider-toggle input[type="checkbox"]:disabled::after {
   background: #9ca3af;
 }
 
+/* Stile für den Schieberegler der Checkbox innerhalb der Umschaltung der Berücksichtigung von Feiertagen im deaktivierten Zustand, einschließlich Hintergrundfarbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox nicht interaktiv ist. */
 .holiday-consider-toggle input[type="checkbox"]:disabled:checked {
   background: #1f2937;
   border-color: rgba(255,255,255,0.12);
 }
 
+/* Stile für die Checkbox innerhalb der Umschaltung der Berücksichtigung von Feiertagen im deaktivierten und aktivierten Zustand, einschließlich Hintergrund und Rahmenfarbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox nicht interaktiv ist, selbst wenn sie aktiviert ist. */
 .holiday-consider-toggle input[type="checkbox"]:disabled:checked::after {
   transform: translateX(0);
   background: #9ca3af;
 }
 
+/* Stile für den Schieberegler der Checkbox innerhalb der Umschaltung der Berücksichtigung von Feiertagen im deaktivierten und aktivierten Zustand, einschließlich fehlender Transformation und angepasster Hintergrundfarbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox nicht interaktiv ist, selbst wenn sie aktiviert ist. */
 .menu-toggle:hover {
   transform: translateY(-1px);
   border-color: rgba(255,255,255,0.16);
   box-shadow: 0 6px 16px rgba(0,0,0,.35);
 }
 
+/* Stile für die Umschaltung von Kalenderoptionen im Hover-Zustand, einschließlich erhöhter Anhebung, Schatteneffekt und Rahmenfarbe, 
+   um visuelles Feedback zu geben und die Umschaltung hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .menu-toggle input[type="checkbox"] {
   appearance: none;
   width: 36px;
@@ -803,6 +1075,9 @@ body {
   transition: background .2s ease, border-color .2s ease;
 }
 
+/* Stile für die Checkbox innerhalb der Umschaltung von Kalenderoptionen, einschließlich Größe, Hintergrund, Rahmen, Form und Interaktionen. 
+   Es wird ein modernes Design verwendet, um die Checkbox hervorzuheben und leicht erkennbar zu machen, 
+   mit einem Schieberegler-Effekt, der durch die Positionierung eines Pseudo-Elements erreicht wird. */
 .menu-toggle input[type="checkbox"]::after {
   content: "";
   position: absolute;
@@ -815,24 +1090,35 @@ body {
   transition: transform .2s ease;
 }
 
+/* Stile für den Schieberegler der Checkbox innerhalb der Umschaltung von Kalenderoptionen, einschließlich Größe, Hintergrund, Form und Übergang. 
+   Es wird ein runder Schieberegler verwendet, der sich innerhalb der Checkbox bewegt, um den Ein-/Aus-Zustand visuell darzustellen. */
 .menu-toggle input[type="checkbox"]:checked {
   background: #22c55e;
   border-color: rgba(34,197,94,0.6);
 }
 
+/* Stile für die Checkbox innerhalb der Umschaltung von Kalenderoptionen im aktivierten Zustand, einschließlich Hintergrund und Rahmenfarbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox aktiviert ist. */
 .menu-toggle input[type="checkbox"]:checked::after {
   transform: translateX(16px);
 }
 
+/* Stile für den Schieberegler der Checkbox innerhalb der Umschaltung von Kalenderoptionen im aktivierten Zustand, einschließlich Transformation, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox aktiviert ist, indem der Schieberegler nach rechts bewegt wird. */
 .holiday-type-toggle {
   justify-content: flex-start;
   flex-wrap: nowrap;
 }
 
+/* Stile für die Umschaltung der Feiertagstypen, einschließlich Ausrichtung und Layout. 
+   Es wird eine linke Ausrichtung verwendet, um die Umschaltung und die zugehörigen Elemente nebeneinander anzuordnen, 
+   mit einem nicht umbrechenden Layout, um sicherzustellen, dass alle Elemente in einer Zeile bleiben. */
 .holiday-type-toggle span {
   white-space: nowrap;
 }
 
+/* Stile für die Beschriftung innerhalb der Umschaltung der Feiertagstypen, einschließlich Verhinderung von Zeilenumbrüchen, 
+   um sicherzustellen, dass die Beschriftung immer in einer Zeile bleibt und nicht umbricht, selbst wenn sie länger ist. */
 .holiday-type-row {
   display: flex;
   align-items: center;
@@ -840,16 +1126,23 @@ body {
   gap: 10px;
 }
 
+/* Stile für die Zeilen der Feiertagstypen, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Umschaltung und die zugehörigen Elemente nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .holiday-type-row .holiday-type-toggle {
   flex: 1;
   margin: 0;
 }
 
+/* Stile für die Umschaltung innerhalb der Zeilen der Feiertagstypen, einschließlich Flex-Eigenschaften und Abstände, 
+   um sicherzustellen, dass die Umschaltung den verfügbaren Platz einnimmt und eine klare Trennung zwischen den Elementen gewährleistet ist. */
 .holiday-type-row .holiday-type-toggle:has(input:disabled),
 .holiday-type-row input[type="color"]:disabled {
   opacity: 0.45;
 }
 
+/* Stile für die Umschaltung und die Farbauswahl innerhalb der Zeilen der Feiertagstypen im deaktivierten Zustand, einschließlich reduzierter Opazität, 
+   um visuelles Feedback zu geben und anzuzeigen, dass diese Elemente nicht interaktiv sind. */
 .holiday-type-row .holiday-type-toggle:has(input:disabled) {
   background: linear-gradient(180deg, #161c27 0%, #11161f 100%);
   border-color: rgba(255,255,255,0.04);
@@ -858,21 +1151,29 @@ body {
   cursor: not-allowed;
 }
 
+/* Stile für die Umschaltung innerhalb der Zeilen der Feiertagstypen im deaktivierten Zustand, einschließlich Hintergrund, Rahmenfarbe, fehlendem Schatten und fehlender Transformation sowie nicht-änderbarem Cursor, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Umschaltung nicht interaktiv ist. */
 .holiday-type-row .holiday-type-toggle:has(input:disabled):hover {
   transform: none;
   box-shadow: none;
   border-color: rgba(255,255,255,0.04);
 }
 
+/* Stile für die Umschaltung innerhalb der Zeilen der Feiertagstypen im deaktivierten Zustand und im Hover-Zustand, einschließlich fehlender Anhebung, fehlendem Schatten und angepasster Rahmenfarbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Umschaltung nicht interaktiv ist, selbst wenn der Benutzer mit der Maus darüber fährt. */
 .holiday-type-row .holiday-type-toggle input:disabled {
   cursor: not-allowed;
 }
 
+/* Stile für die Checkbox innerhalb der Umschaltung der Feiertagstypen im deaktivierten Zustand, einschließlich nicht-änderbarem Cursor, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Checkbox nicht interaktiv ist. */
 .holiday-type-row input[type="color"]:disabled {
   filter: grayscale(0.55) brightness(0.78);
   cursor: not-allowed;
 }
 
+/* Stile für die Farbauswahl innerhalb der Zeilen der Feiertagstypen im deaktivierten Zustand, einschließlich Graustufen- und Helligkeitsfilter sowie nicht-änderbarem Cursor, 
+   um visuelles Feedback zu geben und anzuzeigen, dass die Farbauswahl nicht interaktiv ist. */
 .calendar-grid {
   --weekday-row-height: 38px;
   display: grid;
@@ -884,10 +1185,15 @@ body {
   position: relative;
 }
 
+/* Stile für das Raster des Kalenders, einschließlich Layout, Spalten- und Zeilenstruktur, Abstände und Positionierung. 
+   Es wird ein CSS Grid verwendet, um die Tage und Wochentage in einem strukturierten Layout anzuordnen, 
+   mit einer festen Höhe für die Wochentage und flexiblen Höhen für die Tage, um eine ansprechende und funktionale Kalenderansicht zu erstellen. */
 .calendar-grid.hide-week-numbers {
   grid-template-columns: repeat(7, minmax(58px, 1fr));
 }
 
+/* Stile für das Raster des Kalenders im Zustand "hide-week-numbers", einschließlich angepasster Spaltenstruktur, 
+   um die Spalte für die Wochennummern zu entfernen und die verbleibenden Spalten gleichmäßig zu verteilen. */
 .calendar-grid::before {
   content: "";
   position: absolute;
@@ -899,6 +1205,9 @@ body {
   z-index: 1;
 }
 
+/* Stile für die horizontale Trennlinie im Kalenderraster, einschließlich Positionierung, Breite, Farbe und Z-Index. 
+   Es wird eine dünne Linie verwendet, um die Wochentage von den Tagen zu trennen, 
+   mit einer leicht transparenten Farbe, um sie subtil zu gestalten, und einem höheren Z-Index, um sicherzustellen, dass sie über den Tageszellen liegt. */
 .week-number {
   display: flex;
   align-items: flex-start;
@@ -912,6 +1221,9 @@ body {
   background: transparent;
 }
 
+/* Stile für die Wochennummern im Kalenderraster, einschließlich Layout, Abstände, Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um die Wochennummern hervorzuheben und leicht erkennbar zu machen, 
+   mit einer leicht transparenten Farbe, um einen guten Kontrast zu gewährleisten. */
 .week-corner {
   display: flex;
   align-items: flex-start;
@@ -926,6 +1238,9 @@ body {
   padding: 4px 6px 0 0;
 }
 
+/* Stile für die Ecke der Wochennummern im Kalenderraster, einschließlich Layout, Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um die Ecke der Wochennummern hervorzuheben und leicht erkennbar zu machen, 
+   mit einer leicht transparenten Farbe, um einen guten Kontrast zu gewährleisten. */
 .weekday-head {
   display: flex;
   align-items: flex-end;
@@ -941,14 +1256,21 @@ body {
   letter-spacing: 0.2px;
 }
 
+/* Stile für die Kopfzeilen der Wochentage im Kalenderraster, einschließlich Layout, Schriftgröße, Gewicht und Farben. 
+   Es wird ein modernes Design verwendet, um die Wochentage hervorzuheben und leicht erkennbar zu machen, 
+   mit einer leicht transparenten Farbe, um einen guten Kontrast zu gewährleisten. */
 .weekday-head.saturday {
   color: #2563eb;
 }
 
+/* Stile für die Kopfzeile des Samstags in den Wochentagsköpfen, einschließlich angepasster Farbe, 
+   um den Samstag visuell hervorzuheben und leicht erkennbar zu machen. */
 .weekday-head.sunday {
   color: #dc2626;
 }
 
+/* Stile für die Kopfzeile des Sonntags in den Wochentagsköpfen, einschließlich angepasster Farbe, 
+   um den Sonntag visuell hervorzuheben und leicht erkennbar zu machen. */
 .day {
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 10px;
@@ -960,30 +1282,43 @@ body {
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
  
+/* Stile für die Tageszellen im Kalenderraster, einschließlich Rahmen, Abstände, Layout, Hintergrund und Interaktionen. 
+   Es wird ein modernes Design mit abgerundeten Ecken und einem dunklen Hintergrund verwendet, 
+   um die Tage hervorzuheben und leicht erkennbar zu machen, mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .day:hover {
   transform: translateY(-1px);
   border-color: rgba(255,255,255,0.12);
   box-shadow: 0 8px 18px rgba(0,0,0,.35);
 }
 
+/* Stile für die Tageszellen im Hover-Zustand, einschließlich erhöhter Anhebung, Schatteneffekt und angepasster Rahmenfarbe, 
+   um visuelles Feedback zu geben und die Tageszelle hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .day.other-month {
   opacity: 0.45;
 }
 
+/* Stile für die Tageszellen, die zu einem anderen Monat gehören, einschließlich reduzierter Opazität, 
+   um visuelles Feedback zu geben und anzuzeigen, dass diese Tage nicht zum aktuellen Monat gehören. */
 .day.other-month .day-number,
 .day.other-month .day-weekday {
   color: #6b7280;
 }
 
+/* Stile für die Tagesnummern und Wochentagsnamen innerhalb der Tageszellen, die zu einem anderen Monat gehören, einschließlich angepasster Farbe, 
+   um visuelles Feedback zu geben und anzuzeigen, dass diese Tage nicht zum aktuellen Monat gehören. */
 .day.today {
   border-color: #16a34a;
   box-shadow: 0 0 0 2px rgba(22,163,74,.2) inset;
 }
 
+/* Stile für die Tageszelle des aktuellen Tages, einschließlich angepasster Rahmenfarbe und innerem Schatteneffekt, 
+   um den aktuellen Tag visuell hervorzuheben und leicht erkennbar zu machen. */
 .day.islamic-day {
   border-color: #eab308;
 }
 
+/* Stile für die Tageszelle eines islamischen Feiertags, einschließlich angepasster Rahmenfarbe, 
+   um den islamischen Feiertag visuell hervorzuheben und leicht erkennbar zu machen. */
 .day.today .day-number {
   background: #16a34a;
   color: #fff;
@@ -992,11 +1327,15 @@ body {
   padding: 2px 8px;
 }
 
+/* Stile für die Tagesnummer des aktuellen Tages, einschließlich Hintergrund, Farben, Form und Abstände, 
+   um die Tagesnummer hervorzuheben und leicht erkennbar zu machen, indem sie in einem grünen Kreis dargestellt wird. */
 .day-number {
   font-size: var(--calendar-font-size);
   font-weight: 600;
 }
 
+/* Stile für die Tagesnummern innerhalb der Tageszellen, einschließlich Schriftgröße und Gewicht, 
+   um die Tagesnummern hervorzuheben und leicht erkennbar zu machen. */
 .day-head {
   display: flex;
   align-items: center;
@@ -1004,11 +1343,16 @@ body {
   margin-bottom: 4px;
 }
 
+/* Stile für die Kopfzeile innerhalb der Tageszellen, einschließlich Layout, Ausrichtung und Abstände. 
+   Es wird ein flexibles Layout verwendet, um die Tagesnummer und den Wochentagsnamen nebeneinander anzuordnen, 
+   mit einem kleinen Abstand zwischen ihnen, um eine klare Trennung zu gewährleisten. */
 .day-weekday {
   font-size: 12px;
   font-weight: 600;
 }
 
+/* Stile für die Wochentagsnamen innerhalb der Tageszellen, einschließlich Schriftgröße und Gewicht, 
+   um die Wochentagsnamen hervorzuheben und leicht erkennbar zu machen. */
 .day-menu {
   display: none;
   position: absolute;
@@ -1024,11 +1368,16 @@ body {
   z-index: 5;
 }
 
+/* Stile für das Kontextmenü innerhalb der Tageszellen, einschließlich Positionierung, Hintergrund, Rahmen, Schatten und Abstände. 
+   Es wird ein modernes Design verwendet, um das Menü hervorzuheben und leicht erkennbar zu machen, 
+   mit einem dunklen Hintergrund und einem Schatteneffekt, um es visuell vom Rest der Tageszelle abzuheben. */
 .day.menu-open .day-menu {
   display: none;
   grid-template-columns: 1fr;
 }
 
+/* Stile für das Kontextmenü innerhalb der Tageszellen im Zustand "menu-open", einschließlich Anzeige und Spaltenstruktur, 
+   um das Menü anzuzeigen und die Aktionen in einer einzelnen Spalte anzuordnen. */
 .day-menu .day-action {
   border: 1px solid rgba(255,255,255,0.08);
   background: #0f1115;
@@ -1041,6 +1390,9 @@ body {
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 
+/* Stile für die Aktionen innerhalb des Kontextmenüs der Tageszellen, einschließlich Rahmen, Hintergrund, Abstände, Farben und Interaktionen. 
+   Es wird ein modernes Design verwendet, um die Aktionen hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .day-menu .day-action:hover {
   background: #111827;
   transform: translateY(-1px);
@@ -1048,14 +1400,20 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,.35);
 }
 
+/* Stile für die Aktionen innerhalb des Kontextmenüs der Tageszellen im Hover-Zustand, einschließlich angepasstem Hintergrund, erhöhter Anhebung, angepasster Rahmenfarbe und Schatteneffekt, 
+   um visuelles Feedback zu geben und die Aktion hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .day.saturday .day-number {
   color: #2563eb;
 }
 
+/* Stile für die Tagesnummer des Samstags, einschließlich angepasster Farbe, 
+   um den Samstag visuell hervorzuheben und leicht erkennbar zu machen. */
 .day.saturday .day-weekday {
   color: #2563eb;
 }
 
+/* Stile für den Wochentagsnamen des Samstags, einschließlich angepasster Farbe, 
+   um den Samstag visuell hervorzuheben und leicht erkennbar zu machen. */
 .day.sunday .day-number,
 .day.holiday-day .day-number,
 .day.sunday .day-weekday,
@@ -1063,6 +1421,8 @@ body {
   color: #dc2626;
 }
 
+/* Stile für die Tagesnummern und Wochentagsnamen des Sonntags und der Feiertage, einschließlich angepasster Farbe, 
+   um den Sonntag und die Feiertage visuell hervorzuheben und leicht erkennbar zu machen. */
 .entry {
   font-size: var(--entry-font-size);
   padding: 2px 4px;
@@ -1074,26 +1434,33 @@ body {
   transition: transform .12s ease, box-shadow .12s ease;
 }
  
+/* Stile für die Einträge innerhalb der Tageszellen, einschließlich Schriftgröße, Abstände, Farben, Schatten und Interaktionen. 
+   Es wird ein modernes Design verwendet, um die Einträge hervorzuheben und leicht erkennbar zu machen, 
+   mit einer Hover-Interaktion, um visuelles Feedback zu geben. */
 .entry:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 12px rgba(0,0,0,.35);
 }
 
+/* Stile für die Einträge innerhalb der Tageszellen im Hover-Zustand, einschließlich erhöhter Anhebung und Schatteneffekt, 
+   um visuelles Feedback zu geben und den Eintrag hervorzuheben, wenn der Benutzer mit der Maus darüber fährt. */
 .entries {
   margin-top: auto;
 }
 
-.appointment { background: #3b82f6; }
-.birthday    { background: #ec4899; }
-.shift       { background: #22c55e; }
-.holiday     { background: #ef4444; }
-.vacation    { background: #10b981; }
-.islamic-holiday {
-  background: #ef4444;
+/* Stile für den Container der Einträge innerhalb der Tageszellen, einschließlich automatischem oberen Rand, 
+   um die Einträge am unteren Rand der Tageszelle auszurichten und einen Abstand zwischen den Einträgen und der Tagesnummer zu schaffen. */
+.appointment { background: #3b82f6; } /*Blau für Termine */
+.birthday    { background: #ec4899; } /*Pink für Geburtstage */
+.shift       { background: #22c55e; } /*Grün für Schichten */
+.holiday     { background: #af0000e3; color:#ffffff; border: 1px solid #06a0f9; } /*Rot für Feiertage */
+.vacation    { background: #10b981; color:#0487b7; } /*Türkis für Urlaub*/
+.islamic-holiday { /*Rotes Overlay für islamische Feiertage, wenn sie auf einen Tag fallen, der kein regulärer Feiertag ist*/
+  background: #af0000e3;
   border: 1px solid #eab308;
 }
 
-.overlay {
+.overlay { /*Generelles Styling für Overlays, die für die Bearbeitung von Einträgen oder die Anzeige von Details verwendet werden*/
   position: fixed;
   inset: 0;
   background: rgba(2, 6, 12, 0.55);
@@ -1104,11 +1471,11 @@ body {
   z-index: 100;
 }
 
-.overlay.show {
+.overlay.show { /*Klasse zum Anzeigen des Overlays */ 
   display: flex;
 }
 
-.overlay-card {
+.overlay-card { /* Styling für die Karte innerhalb des Overlays, die den Inhalt enthält */ 
   width: min(560px, 100%);
   background: #161a22;
   border: 1px solid rgba(255,255,255,0.08);
@@ -1153,13 +1520,13 @@ body {
   white-space: pre-wrap;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 700px) { /* Anpassungen für kleinere Bildschirme, z.B. Smartphones */
   .overlay {
     align-items: flex-end;
     padding: 8px;
   }
 
-  .overlay-card {
+  .overlay-card { /* Die Karte nimmt die volle Breite ein und hat abgerundete Ecken nur oben */
     width: 100%;
     border-radius: 16px 16px 0 0;
     border-bottom: none;
@@ -1168,8 +1535,10 @@ body {
     touch-action: none;
     animation: sheetIn .18s ease-out;
   }
-
-  .overlay-header {
+  
+  /* Das Header-Design wird angepasst, um den Eindruck eines 
+  "Sheets" zu vermitteln, das von unten hereinschiebt */
+  .overlay-header { 
     position: relative;
     padding-top: 18px;
   }
@@ -1192,10 +1561,14 @@ body {
   }
 }
 
+/* Spezifisches Styling für die Aktionsleiste im Overlay, 
+  z.B. für Schaltflächen zum Hinzufügen oder Bearbeiten von Einträgen */
 .overlay-actions {
   display: flex;
   gap: 8px;
 }
+
+/* Spezifisches Styling für die Schaltfläche zum Hinzufügen von Einträgen im Overlay */
 
 .overlay-add {
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
@@ -1206,13 +1579,17 @@ body {
   cursor: pointer;
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
- 
+
+/* Hover-Effekt für die Schaltfläche zum Hinzufügen von Einträgen im Overlay */
 .overlay-add:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/*  Styling für das Menü, das erscheint, 
+   wenn der Benutzer auf die Schaltfläche zum Hinzufügen von Einträgen klickt, 
+   z.B. um den Typ des Eintrags auszuwählen */
 .overlay-add-menu {
   display: none;
   padding: 10px 14px;
@@ -1220,11 +1597,13 @@ body {
   gap: 8px;
 }
 
+/* Styling für die Schaltflächen im Menü zum Hinzufügen von Einträgen im Overlay */
 .overlay-add-menu.show {
   display: flex;
   flex-wrap: wrap;
 }
 
+/* Hover-Effekt für die Schaltflächen im Menü zum Hinzufügen von Einträgen im Overlay */
 .overlay-add-menu button {
   background: linear-gradient(180deg, #242b3a 0%, #1a2230 100%);
   color: #e5e7eb;
@@ -1235,19 +1614,23 @@ body {
   font-size: var(--overlay-font-size);
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
- 
+
+/* Hover-Effekt für die Schaltflächen im Menü zum Hinzufügen von Einträgen im Overlay */
 .overlay-add-menu button:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(0,0,0,.35);
   border-color: rgba(255,255,255,0.16);
 }
 
+/* Spezifisches Styling für die Liste der Einträge, die im Overlay angezeigt wird, 
+   z.B. wenn der Benutzer die Details eines Tages anzeigt und alle Einträge dieses Tages aufgelistet werden */
 .overlay-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+/* Styling für einzelne Einträge in der Liste im Overlay */
 .overlay-item {
   background: #0f1115;
   border: 1px solid rgba(255,255,255,0.06);
@@ -1258,6 +1641,7 @@ body {
   transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 
+/* Hover-Effekt für einzelne Einträge in der Liste im Overlay */
 .shift-badge-inline {
   display: inline-flex;
   align-items: center;
@@ -1273,16 +1657,20 @@ body {
   font-weight: 700;
 }
 
+/* Spezifisches Styling für Einträge in der Liste im Overlay, die als Feiertage markiert sind */
 .overlay-item:hover {
   transform: translateY(-1px);
   border-color: rgba(255,255,255,0.14);
   box-shadow: 0 8px 16px rgba(0,0,0,.35);
 }
 
+/* Spezifisches Styling für Einträge in der Liste im Overlay, die als Feiertage markiert sind */
 .overlay-item.holiday {
-  border-color: #ef4444;
+  border-color: #ffffff;
 }
 
+/* Spezifisches Styling für den Fall, dass keine Einträge in der Liste im Overlay vorhanden sind, 
+   z.B. wenn der Benutzer die Details eines Tages anzeigt, an dem keine Einträge vorhanden sind */
 .overlay-empty {
   text-align: center;
   color: #9ca3af;
@@ -1290,6 +1678,8 @@ body {
   padding: 20px 0;
 }
 
+/* Spezifisches Styling für die Fußzeile des Kalenders, 
+  z.B. für rechtliche Hinweise oder Links zu Datenschutzrichtlinien */
 .calendar-footer {
   margin: 12px auto 0;
   max-width: 1200px;
@@ -1299,6 +1689,7 @@ body {
   padding-bottom: 12px;
 }
 
+/* Responsive Anpassungen für verschiedene Bildschirmgrößen, z.B. Tablets und Smartphones */
 @media (max-width: 1100px) {
   body { padding: 12px; }
   .calendar { padding: 12px; }
@@ -1307,6 +1698,8 @@ body {
   .day-weekday { font-size: 11px; }
 }
 
+/* Weitere Anpassungen für kleinere Bildschirme, 
+  z.B. um die Benutzeroberfläche kompakter zu gestalten und die Lesbarkeit zu verbessern */
 @media (max-width: 900px) {
   .calendar-header { grid-template-columns: 1fr; }
   .header-right { width: 100%; align-items: stretch; }
@@ -1326,6 +1719,9 @@ body {
   .weekday-head { font-size: 13px; padding: 0 0 4px 8px; }
 }
 
+/* Weitere Anpassungen für Bildschirme zwischen 521px und 900px, 
+  z.B. um die Kalenderzellen kompakter zu gestalten und die Anzahl 
+  der angezeigten Informationen zu reduzieren */
 @media (max-width: 900px) and (min-width: 521px) {
   .calendar { padding: 14px; }
   .calendar-grid { grid-auto-rows: minmax(100px, auto); }
@@ -1343,6 +1739,8 @@ body {
   }
 }
 
+/* Weitere Anpassungen für kleinere Bildschirme, 
+  z.B. um die Benutzeroberfläche weiter zu optimieren und die Navigation zu erleichtern */
 @media (max-width: 700px) {
   .calendar-header { gap: 8px; align-items: stretch; }
   .month-picker { width: 100%; justify-content: center; flex-wrap: wrap; }
@@ -1370,6 +1768,8 @@ body {
   .weekday-head { font-size: 11px; padding: 0 0 4px 5px; }
 }
 
+/* Weitere Anpassungen für sehr kleine Bildschirme, 
+  z.B. um die Benutzeroberfläche weiter zu vereinfachen und die Navigation zu erleichtern */
 @media (max-width: 600px) {
   .calendar-header {
     grid-template-columns: 1fr;
@@ -1379,30 +1779,39 @@ body {
       "clock"
       "actions"
       "picker";
-  }
+  } /* Header auf kleinen Bildschirmen so anpassen, dass die wichtigsten 
+    Informationen und Aktionen leicht zugänglich sind und die Navigation erleichtert wird */
   .header-left,
   .header-right {
     display: contents;
-  }
+  } /* Die Bereiche im Header so anpassen, dass sie auf kleinen 
+       Bildschirmen besser angeordnet sind und die wichtigsten 
+       Informationen und Aktionen leicht zugänglich sind */
   #todayDisplay {
     grid-area: today;
   }
+  /* Das Uhrzeit-Panel so anpassen, dass es auf kleinen Bildschirmen
+     besser angeordnet ist und die wichtigsten Informationen leicht zugänglich sind */
   #clockPanel {
     grid-area: clock;
-  }
+  }/* Die Aktionsleiste so anpassen, dass sie auf kleinen Bildschirmen besser 
+      angeordnet ist und die wichtigsten Aktionen leicht zugänglich sind */
   .calendar-actions {
     grid-area: actions;
     width: 100%;
     justify-content: flex-start;
-  }
+  } /* Die Monatsteuerung so anpassen, dass sie auf kleinen Bildschirmen besser 
+       angeordnet ist und die Navigation erleichtert wird */
   .month-picker {
     grid-area: picker;
     width: 100%;
     justify-content: flex-start;
   }
-  
 }
 
+/* Weitere Anpassungen für sehr kleine Bildschirme, 
+  z.B. um die Kalenderzellen weiter zu vereinfachen und die Anzahl 
+  der angezeigten Informationen zu reduzieren */
 @media (max-width: 520px) {
   body { padding: 10px; height: 100dvh; }
   .calendar {
@@ -1410,12 +1819,12 @@ body {
     height: calc(100dvh - 95px); /* Header und Footer berücksichtigen */
     display: flex;
     flex-direction: column;
-  }
+  } /* Kalender auf kleinen Bildschirmen so anpassen, dass er den verfügbaren Platz optimal nutzt und die Navigation erleichtert */
   .calendar.settings-page {
     height: auto;
     min-height: calc(100dvh - 95px);
     overflow: auto;
-  }
+  } /* Spezifische Anpassungen für die Einstellungen, um sie auf kleinen Bildschirmen besser nutzbar zu machen */
   .calendar-header h2 { font-size: 17px; }
   .calendar-actions { width: 100%; justify-content: space-between; }
   .calendar-header button { padding: 5px 8px; font-size: 12px; }
@@ -1425,7 +1834,8 @@ body {
   .month-controls {
     flex-wrap: nowrap;
     align-items: center;
-  }
+  } 
+  /* Monatsteuerung anpassen, um sie auf kleinen Bildschirmen besser nutzbar zu machen */
   .today-display { min-width: 70px; column-gap: 1px; } /*Aktuelle Daten kompakter anzeigen */
   .month-controls select,
   .custom-month-trigger { font-size: 11px; padding: 4px 6px; }
@@ -1441,12 +1851,14 @@ body {
     flex: 1;
     min-height: 0;
     align-content: stretch;
-  }
+  } 
+  /* Kalenderzellen auf die gleiche Höhe bringen und den verfügbaren Platz optimal nutzen */
   .calendar-grid.hide-week-numbers { grid-template-columns: repeat(7, minmax(33px, 1fr)); }
   .weekday-head {
     font-size: 10px;
     padding: 0 0 3px 3px;
   }
+  /* Aktuelle Daten weiter anpassen, um sie kompakter darzustellen und die Lesbarkeit zu verbessern */
   .today-day { font-size: 26px; }
   .today-month { font-size: 17px; }
   .today-year { font-size: 15px; }
@@ -1472,6 +1884,8 @@ body {
   }*/
 }
 
+/* Weitere Anpassungen für sehr kleine Bildschirme, 
+  z.B. um die Benutzeroberfläche weiter zu vereinfachen und die Navigation zu erleichtern */
 @media (max-width: 400px) {
   .calendar-header button,
   .calendar-menu button { font-size: 12px; padding: 5px 8px; }
@@ -1482,25 +1896,23 @@ body {
   .weekday-head { font-size: 9px; padding: 0 0 2px 2px; }
 }
 
+/*  Spezifische Anpassungen für den Druck, z.B. um die Farben zu optimieren und unnötige Elemente 
+    auszublenden, damit der Kalender auf Papier gut lesbar ist und die wichtigsten 
+    Informationen hervorgehoben werden */
 @media print {
-
   body {
     background: #fff !important;
     color: #000 !important;
   }
-
   .calendar {
     box-shadow: none;
   }
-
   .calendar-header button {
     display: none;
   }
-
   .settings-link {
     display: none;
   }
-
   .entry {
     color: #000 !important;
     background: #ddd !important;
