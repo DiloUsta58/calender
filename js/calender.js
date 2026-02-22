@@ -58,7 +58,7 @@ const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
 const CONSIDER_PUBLIC_HOLIDAY_KEY = "calendar_consider_public_holiday";
 const SHOW_EVENT_INFO_BOX_KEY = "calendar_show_event_info_box";
 const VIEW_DATE_SESSION_KEY = "calendar_view_date";
-const APP_VERSION = "1.0.11";
+const APP_VERSION = "1.0.12";
 
 let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [
 /*  { date: "2026-02-10", type: "appointment", title: "Arzt 10:00" },

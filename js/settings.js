@@ -26,7 +26,7 @@ const VACATION_COUNTDOWN_MODE_KEY = "calendar_vacation_countdown_mode";
 const VACATION_SHIFT_DEFAULT_KEY = "calendar_vacation_shift_default";
 const CONSIDER_PUBLIC_HOLIDAY_KEY = "calendar_consider_public_holiday";
 const SHOW_EVENT_INFO_BOX_KEY = "calendar_show_event_info_box";
-const APP_VERSION = "1.0.11";
+const APP_VERSION = "1.0.12";
 
 const islamicToggle = document.getElementById("toggleIslamic");
 const germanToggle = document.getElementById("toggleGerman");
