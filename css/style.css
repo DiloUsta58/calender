@@ -1789,6 +1789,9 @@ body {
        Informationen und Aktionen leicht zugänglich sind */
   #todayDisplay {
     grid-area: today;
+    justify-self: start;
+    align-self: start;
+    text-align: left;
   }
   /* Das Uhrzeit-Panel so anpassen, dass es auf kleinen Bildschirmen
      besser angeordnet ist und die wichtigsten Informationen leicht zugänglich sind */
@@ -1845,7 +1848,7 @@ body {
   .year-input-wrap button { display: inline-flex; font-size: 11px; }
   .calendar-grid {
     --weekday-row-height: 24px;
-    grid-template-columns: 10px repeat(7, minmax(33px, 1fr));
+    grid-template-columns: 18px repeat(7, minmax(33px, 1fr));
     grid-template-rows: var(--weekday-row-height);
     grid-auto-rows: 1fr;
     flex: 1;
@@ -1857,6 +1860,11 @@ body {
   .weekday-head {
     font-size: 10px;
     padding: 0 0 3px 3px;
+  }
+  .week-number,
+  .week-corner {
+    padding: 4px 2px 0 0;
+    font-size: 10px;
   }
   /* Aktuelle Daten weiter anpassen, um sie kompakter darzustellen und die Lesbarkeit zu verbessern */
   .today-day { font-size: 26px; }
@@ -1889,11 +1897,16 @@ body {
 @media (max-width: 400px) {
   .calendar-header button,
   .calendar-menu button { font-size: 12px; padding: 5px 8px; }
-  .calendar-grid { grid-template-columns: 15px repeat(7, minmax(33px, 1fr)); grid-template-rows: var(--weekday-row-height); grid-auto-rows: minmax(86px, auto); }
+  .calendar-grid { grid-template-columns: 18px repeat(7, minmax(33px, 1fr)); grid-template-rows: var(--weekday-row-height); grid-auto-rows: minmax(86px, auto); }
   .calendar-grid.hide-week-numbers { grid-template-columns: repeat(7, minmax(33px, 1fr)); }
   .entry { height: 5px; }
   .calendar-grid { --weekday-row-height: 22px; }
   .weekday-head { font-size: 9px; padding: 0 0 2px 2px; }
+  .week-number,
+  .week-corner {
+    padding: 4px 2px 0 0;
+    font-size: 9px;
+  }
 }
 
 /*  Spezifische Anpassungen für den Druck, z.B. um die Farben zu optimieren und unnötige Elemente 
