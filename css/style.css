@@ -5,6 +5,32 @@
   font-family: "SF Pro Display", "SF Pro Text", "Inter", system-ui, sans-serif;
 }
 
+@font-face {
+  font-family: "Digital-7";
+  src: url("../fonts/digital-7 (italic).ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+.today-day,
+.today-month,
+.today-year,
+#monthLabel,
+.weekday-head,
+.day-number,
+.day-weekday,
+.week-number,
+.week-corner,
+.custom-month-trigger,
+.custom-month-option,
+.custom-year-input,
+.custom-year-trigger,
+.custom-year-option,
+.year-input-wrap input {
+  font-family: "Digital-7", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
 /* Grundlegende Stile für den Body, einschließlich Hintergrund, 
   Schriftfarbe und Vermeidung von horizontalem Scrollen */
 body {
@@ -170,7 +196,7 @@ body {
 .today-day {  /*Aktuelle Tag  */
   grid-column: 1;
   grid-row: 1 / span 2;
-  font-size: 35px;
+  font-size: 40px;
   font-weight: 400;
   color: #34d399;
 }
@@ -180,7 +206,7 @@ body {
 .today-month {
   grid-column: 2;
   grid-row: 1;
-  font-size: 25px;
+  font-size: 28px;
   font-weight: 400;
   color: #34d399;
   align-self: end;
@@ -191,7 +217,7 @@ body {
 .today-year {
   grid-column: 2;
   grid-row: 2;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 400;
   color: #34d399;
   align-self: start;
@@ -220,7 +246,7 @@ body {
   color: #34d399;
   font-size: 18px;
   font-weight: 700;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: "Digital-7", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   letter-spacing: 0.4px;
 }
 
@@ -233,6 +259,7 @@ body {
   color: #86efac;
   font-size: 13px;
   line-height: 1.25;
+  font-family: "Digital-7", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 /* Stile für die Zusammenfassung der Uhrinformationen, einschließlich Ausrichtung und Textausrichtung. 
@@ -246,7 +273,7 @@ body {
    Es wird eine Monospace-Schriftart verwendet, um die Uhrinformationen klar und leicht lesbar zu machen, 
    mit einer grünen Farbe, um sie visuell hervorzuheben. */
 .clock-left {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: "Digital-7", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   color: #4ade80;
   font-weight: 700;
 }
@@ -350,7 +377,7 @@ body {
 #monthLabel {
   display: block;
   margin: 0;
-  font-size: 25px;
+  font-size: 30px;
   font-weight: 400;
   line-height: 1;
 }
@@ -1419,6 +1446,11 @@ body {
 .day.sunday .day-weekday,
 .day.holiday-day .day-weekday {
   color: #dc2626;
+}
+
+.day.islamic-day .day-number,
+.day.islamic-day .day-weekday {
+  color: #eab308;
 }
 
 /* Stile für die Tagesnummern und Wochentagsnamen des Sonntags und der Feiertage, einschließlich angepasster Farbe, 
