@@ -1296,8 +1296,8 @@ function updateHeaderClockAndCountdown() {
     const entriesLabel = (window.i18n && window.i18n.t) ? window.i18n.t("entries_label") : "Einträge";
     const vacationLabel = (window.i18n && window.i18n.t) ? window.i18n.t("vacation") : "Urlaub";
     const daysLabel = (window.i18n && window.i18n.t) ? window.i18n.t("days") : "Tage";
-    const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE";
-    const withWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("with_weekend_short") : "mit WE";
+    const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : " - ";
+    const withWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("with_weekend_short") : " WE ";
     const summaryText = vacationStats.withoutWeekendApplied
       ? `${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationStats.total} ${escapeHtml(daysLabel)} (${escapeHtml(withoutWeLabel)}) - ${vacationStats.totalWithWeekend} ${escapeHtml(daysLabel)} (${escapeHtml(withWeLabel)})`
       : `${escapeHtml(entriesLabel)}: ${escapeHtml(vacationLabel)} ${vacationStats.total} ${escapeHtml(daysLabel)}`;
@@ -1443,8 +1443,8 @@ function getVacationKindDetailForEvent(event, vacationLabel, daysLabel, start, e
   const days = getVacationDaysWithHolidays(start, end, excludeWeekends);
   if (excludeWeekends) {
     const fullDays = getVacationDaysWithHolidays(start, end, false);
-    const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : "Ohne WE";
-    const withWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("with_weekend_short") : "mit WE";
+    const withoutWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("without_weekend_short") : " - ";
+    const withWeLabel = (window.i18n && window.i18n.t) ? window.i18n.t("with_weekend_short") : " WE ";
     return `${vacationLabel} - ${days} ${daysLabel} (${withoutWeLabel}) - ${fullDays} ${daysLabel} (${withWeLabel})`;
   }
   return `${vacationLabel} - ${days} ${daysLabel}`;
@@ -1658,7 +1658,10 @@ overlayAddMenu?.addEventListener("click", (e) => {
 });
 
 function isMobileSwipeEnabled() {
-  return window.matchMedia("(max-width: 600px)").matches;
+  const hasTouch = (navigator.maxTouchPoints || 0) > 0 || ("ontouchstart" in window);
+  const fineHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const tabletWidth = window.matchMedia("(max-width: 1024px)").matches;
+  return hasTouch && (!fineHover || tabletWidth);
 }
 
 function handleMonthSwipe(deltaX, deltaY) {
