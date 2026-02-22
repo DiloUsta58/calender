@@ -7,9 +7,10 @@
 
 @font-face {
   font-family: "Digital-7";
-  src: url("../fonts/digital.ttf") format("truetype");
+  src: url("../fonts/ds-digital.woff") format("woff"),
+       url("../fonts/digital.ttf") format("truetype");
   font-weight: 400;
-  font-style: italic;
+  font-style: normal;
   font-display: swap;
 }
 
