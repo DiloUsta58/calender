@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "Digital-7";
-  src: url("../fonts/ds-digital.woff") format("woff"),
+  src: url("../fonts/digital.woff") format("woff"),
        url("../fonts/digital.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
