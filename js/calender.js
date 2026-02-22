@@ -1664,6 +1664,41 @@ function isMobileSwipeEnabled() {
   return hasTouch && (!fineHover || tabletWidth);
 }
 
+function setupTouchDebugBadge() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("debugTouch") !== "1") return;
+  const badge = document.createElement("div");
+  badge.id = "touchDebugBadge";
+  badge.style.position = "fixed";
+  badge.style.right = "10px";
+  badge.style.bottom = "10px";
+  badge.style.zIndex = "9999";
+  badge.style.background = "rgba(15, 23, 42, 0.9)";
+  badge.style.color = "#fff";
+  badge.style.padding = "8px 10px";
+  badge.style.borderRadius = "10px";
+  badge.style.fontSize = "12px";
+  badge.style.fontFamily = "monospace";
+  badge.style.lineHeight = "1.4";
+  badge.style.boxShadow = "0 6px 18px rgba(0,0,0,0.25)";
+  document.body.appendChild(badge);
+
+  const update = () => {
+    const hasTouch = (navigator.maxTouchPoints || 0) > 0 || ("ontouchstart" in window);
+    const fineHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const tabletWidth = window.matchMedia("(max-width: 1024px)").matches;
+    badge.textContent = [
+      `touch: ${hasTouch}`,
+      `hoverFine: ${fineHover}`,
+      `<=1024: ${tabletWidth}`,
+      `swipe: ${isMobileSwipeEnabled()}`
+    ].join(" | ");
+  };
+
+  update();
+  window.addEventListener("resize", update);
+}
+
 function handleMonthSwipe(deltaX, deltaY) {
   const absX = Math.abs(deltaX);
   const absY = Math.abs(deltaY);
@@ -1723,6 +1758,8 @@ if (calendarRoot) {
     handleMonthSwipe(dx, dy);
   }, { passive: true });
 }
+
+setupTouchDebugBadge();
 
 function shouldIgnoreNavEvent(target) {
   if (!target) return false;
